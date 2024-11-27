@@ -1,0 +1,5 @@
+flair==0.10
+torch
+flask
+gensim
+

@@ -7,7 +7,6 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-
     with app.app_context():
         nlp_processor = NLPProcessor()  
         router_init(app, nlp_processor)
@@ -15,4 +14,4 @@ def create_app():
     return app
 
 if __name__ == "__main__":
-    create_app().run()
+    create_app().run(host="0.0.0.0", port=5000)  
