@@ -7,9 +7,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     g++ \
     git \
     pkg-config \
-    libsentencepiece-dev \
-    curl && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+    curl
 
 WORKDIR /app
 
@@ -23,4 +21,4 @@ COPY . /app
 
 ENV PATH="/app/.venv/bin:$PATH"
 
-CMD ["python", "your_application_entrypoint.py"]
+CMD ["python", "app.py"]
