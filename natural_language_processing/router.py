@@ -18,9 +18,9 @@ class NLPHandler(MethodView):
             return jsonify({"keywords": keywords})
         except ValueError as e:
             return jsonify({"error": str(e)}), 400
-
-def init(app):
+            
+def init(app, nlp_processor):
     app.url_map.strict_slashes = False
     ner_bp = Blueprint("ner", __name__)
-    ner_bp.add_url_rule("/", view_func=NLPHandler.as_view("ner", processor=NLPProcessor()))
+    ner_bp.add_url_rule("/", view_func=NLPHandler.as_view("ner", processor=nlp_processor))
     app.register_blueprint(ner_bp)

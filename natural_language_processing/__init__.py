@@ -1,5 +1,5 @@
 from flask import Flask
-from natural_language_processing.router import init as router_init
+from natural_language_processing import router
 from natural_language_processing.nlp import NLPProcessor
 from natural_language_processing.config import Config  
 
@@ -10,7 +10,7 @@ def create_app():
 
     with app.app_context():
         nlp_processor = NLPProcessor()  
-        router_init(app, nlp_processor)
+        router.init(app, nlp_processor)
 
     return app
 
