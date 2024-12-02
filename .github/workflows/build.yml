@@ -3,7 +3,7 @@ name: Build and Test NLP Bot Package
 on:
   push:
     branches:
-      - main
+      - master
     tags:
       - "**"
   workflow_dispatch:
@@ -18,33 +18,36 @@ jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
+    env:
+      VENV_PATH: venv/bin/activate
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v3
-        with:
-          enable-cache: true
-
-      - name: Set up Python
-        run: uv python install
-
-      - name: Install the project
-        run: uv sync --all-extras --dev
+      - name: Install dependencies from pyproject.toml
+        run: |
+          python -m venv venv
+          source $VENV_PATH
+          pip install --upgrade pip
+          pip install .[dev]  # Install the development dependencies
 
       - name: Lint with ruff
-        run: uv run ruff check --output-format=github .
+        run: |
+          source $VENV_PATH
+          ruff check --output-format=github .
 
       - name: Run tests
-        run: uv run pytest
-
+        run: |
+          source $VENV_PATH
+          pytest -v
 
   build_container:
-    name: Build Docker Container
+    name: Build Container
     runs-on: ubuntu-latest
     needs: test
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
+      - uses: actions/checkout@v4
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -55,14 +58,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set build environment variables
-        run: |
-          echo "GHCR_OWNER=${GITHUB_REPOSITORY_OWNER,,}" >>${GITHUB_ENV}
+      - name: Set build env
+        run: echo "GHCR_OWNER=${GITHUB_REPOSITORY_OWNER,,}" >>${GITHUB_ENV}
 
-      - name: Build and push Docker container
+      - name: Build and push container
         uses: docker/build-push-action@v5
         with:
-          file: Containerfile  
+          file: Containerfile  e
+          context: .
           push: true
           tags: |
             ghcr.io/${{ env.GHCR_OWNER }}/taranis-nlp-bot:latest

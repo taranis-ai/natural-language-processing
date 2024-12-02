@@ -14,10 +14,13 @@ classifiers = [
 requires-python = ">=3.10"
 dependencies = [
     "networkx",
-    "flask",  
-    "requests", 
-    "gunicorn",  
-    "sentencepiece",  
+    "flask",
+    "requests",
+    "gunicorn",
+    "sentencepiece",
+    "flair==0.10",  
+    "torch",               
+    "pydantic"      
 ]
 dynamic = ["version"]
 
