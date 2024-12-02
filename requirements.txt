@@ -1,5 +1,6 @@
 flair==0.10
 torch
 Flask>=2.0.0
-pydantic
+pydantic-settings
+
 
