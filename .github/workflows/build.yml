@@ -3,7 +3,7 @@ name: Build and Test NLP Bot Package
 on:
   push:
     branches:
-      - master
+      - main
     tags:
       - "**"
   workflow_dispatch:
