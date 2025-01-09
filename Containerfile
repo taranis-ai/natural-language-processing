@@ -1,24 +1,41 @@
-FROM python:3.10
+FROM python:3.12-slim AS builder
 
-RUN apt-get update && apt-get install --no-install-recommends -y \
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+WORKDIR /app/
+
+# install common packages
+RUN apt-get update && apt-get upgrade -y && apt-get install --no-install-recommends -y \
     build-essential \
-    cmake \
-    gcc \
-    g++ \
-    git \
-    pkg-config \
-    curl
+    python3-dev \
+    git
 
-WORKDIR /app
+COPY . /app/
 
-COPY requirements.txt /app/requirements.txt
+RUN uv venv && \
+    export PATH="/app/.venv/bin:$PATH" && \
+    uv sync --frozen && \
+    python -m compileall /app/
 
-RUN python -m venv /app/.venv && \
-    /app/.venv/bin/pip install --upgrade pip && \
-    /app/.venv/bin/pip install -r /app/requirements.txt
+FROM python:3.12-slim
 
-COPY . /app
+WORKDIR /app/
+
+RUN groupadd user && useradd --home-dir /app -g user user && chown -R user:user /app
+RUN install -d -o user -g user /app/data
+
+COPY --from=builder --chown=user:user /app/.venv /app/.venv
+COPY --chown=user:user natural_language_processing README.md app.py LICENSE.md /app/
+
+USER user
 
 ENV PATH="/app/.venv/bin:$PATH"
+ENV PYTHONPATH=/app
+ENV GRANIAN_THREADS=2
+ENV GRANIAN_WORKERS=2
+ENV GRANIAN_BLOCKING_THREADS=4
+ENV GRANIAN_INTERFACE=wsgi
+ENV GRANIAN_HOST=0.0.0.0
 
-CMD ["python", "app.py"]
+EXPOSE 8000
+
+CMD ["granian", "app"]

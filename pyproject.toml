@@ -18,9 +18,9 @@ dependencies = [
     "requests",
     "gunicorn",
     "sentencepiece",
-    "flair==0.10",  
+    "flair",  
     "torch",
-    "huggingface_hub>=0.9.0",
+    "huggingface_hub",
     "pydantic-settings"    
 ]
 dynamic = ["version"]
