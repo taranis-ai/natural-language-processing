@@ -4,7 +4,7 @@ Performs natural language processing on news items, extracting keywords and name
 
 ## Development
 
-```
+```bash
 uv venv
 uv sync --all-extras --dev
 ```
@@ -13,7 +13,7 @@ uv sync --all-extras --dev
 
 Run via
 
-```
+```bash
 flask run
 # or
 granian run
