@@ -30,7 +30,7 @@ def init(app, nlp_processor):
     app.url_map.strict_slashes = False
     ner_bp = Blueprint("ner", __name__)
     ner_bp.add_url_rule(
-        "/ner", view_func=NLPHandler.as_view("ner", processor=nlp_processor)
+        "/", view_func=NLPHandler.as_view("ner", processor=nlp_processor)
     )
     ner_bp.add_url_rule("/health", view_func=HealthCheck.as_view("health"))
     app.register_blueprint(ner_bp)
