@@ -16,7 +16,7 @@ dependencies = [
     "networkx",
     "flask",
     "requests",
-    "gunicorn",
+    "granian",
     "sentencepiece",
     "flair",  
     "torch",
