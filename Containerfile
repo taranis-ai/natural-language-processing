@@ -4,19 +4,22 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 WORKDIR /app/
 
 # install common packages
-RUN apt-get update && apt-get upgrade -y && apt-get install --no-install-recommends -y \
+RUN apt-get update && apt-get install --no-install-recommends -y \
     build-essential \
     python3-dev \
     git
 
 COPY . /app/
 
+ENV UV_COMPILE_BYTECODE=1
+
 RUN uv venv && \
     export PATH="/app/.venv/bin:$PATH" && \
-    uv sync --frozen && \
-    python -m compileall /app/
+    uv sync --frozen
 
 FROM python:3.12-slim
+
+ARG MODEL="flair"
 
 WORKDIR /app/
 
@@ -29,6 +32,7 @@ COPY --chown=user:user README.md app.py LICENSE.md /app/
 
 USER user
 
+ENV PYTHONOPTIMIZE=1
 ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONPATH=/app
 ENV GRANIAN_THREADS=2

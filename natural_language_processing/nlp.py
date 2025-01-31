@@ -1,38 +1,29 @@
-from flair.models import SequenceTagger
-from flair.data import Sentence
+from natural_language_processing.config import Config
+
 
 class NLPProcessor:
+    """
+    Wrapper class for Models to allow for conditional imports based on the Config.MODEL setting
+    """
+
     def __init__(self):
-        # Load only the English model during initialization
-        self.model = SequenceTagger.load("flair/ner-english")
+        if Config.MODEL == "flair":
+            from natural_language_processing.flair_ner import FlairNER
 
-        # Uncomment and modify this when adding support for multiple languages.
-        """
-        with open(config_path, 'r') as f:
-            self.model_mapping = json.load(f)
-            
-        self.models = {
-            lang: SequenceTagger.load(model_name)
-            for lang, model_name in self.model_mapping.items()
-        }
-        """
+            self.model = FlairNER()
+        elif Config.MODEL == "roberta":
+            from natural_language_processing.roberta_ner import RobertaNER
 
+            self.model = RobertaNER()
+        elif Config.MODEL == "roberta_german":
+            from natural_language_processing.roberta_ner_german import RobertaGermanNER
 
-    def predict(self, text: str, language: str = "en"):
-        # Uncomment this when adding multiple languages support.
-        """
-        if language not in self.models:
-            raise ValueError(f"Language {language} is not supported.")
-        
-        # Select the model for the given language, defaulting to English if not found
-        tagger = self.models.get(language, self.models['en'])
-        """
+            self.model = RobertaGermanNER()
+        else:
+            raise ValueError(f"Unsupported NER model: {Config.MODEL}")
 
-        # Default behavior: use the pre-loaded English model
-        tagger = self.model
+    def predict(self, text: str) -> dict[str, str]:
+        return self.model.predict(text)
 
-        sentence = Sentence(text)
-        tagger.predict(sentence)
-
-        keywords = {ent.data_point.text: ent.value for ent in sentence.get_labels()}
-        return keywords
+    def modelinfo(self) -> dict[str, str]:
+        return self.model.modelinfo

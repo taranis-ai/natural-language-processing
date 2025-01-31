@@ -21,7 +21,8 @@ dependencies = [
     "flair",  
     "torch",
     "huggingface_hub",
-    "pydantic-settings"    
+    "pydantic-settings",
+    "python-dotenv"
 ]
 dynamic = ["version"]
 
