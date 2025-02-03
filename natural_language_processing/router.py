@@ -1,11 +1,12 @@
 from flask import Blueprint, jsonify, request
 from flask.views import MethodView
-from natural_language_processing.nlp import NLPProcessor
+from natural_language_processing.predictor import Predictor
 from natural_language_processing.decorators import api_key_required
+from natural_language_processing.predictor_factory import PredictorFactory
 
 
 class NLPHandler(MethodView):
-    def __init__(self, processor: NLPProcessor):
+    def __init__(self, processor: Predictor):
         super().__init__()
         self.processor = processor
 
@@ -28,18 +29,19 @@ class HealthCheck(MethodView):
 
 
 class ModelInfo(MethodView):
-    def __init__(self, processor: NLPProcessor):
+    def __init__(self, processor: Predictor):
         super().__init__()
         self.processor = processor
 
     def get(self):
-        return jsonify(self.processor.modelinfo())
+        return jsonify(self.processor.modelinfo)
 
 
-def init(app, nlp_processor):
+def init(app):
+    processor = PredictorFactory()
     app.url_map.strict_slashes = False
     ner_bp = Blueprint("ner", __name__)
-    ner_bp.add_url_rule("/", view_func=NLPHandler.as_view("ner", processor=nlp_processor))
+    ner_bp.add_url_rule("/", view_func=NLPHandler.as_view("ner", processor=processor))
     ner_bp.add_url_rule("/health", view_func=HealthCheck.as_view("health"))
-    ner_bp.add_url_rule("/modelinfo", view_func=ModelInfo.as_view("modelinfo", processor=nlp_processor))
+    ner_bp.add_url_rule("/modelinfo", view_func=ModelInfo.as_view("modelinfo", processor=processor))
     app.register_blueprint(ner_bp)

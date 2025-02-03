@@ -3,7 +3,6 @@ FROM python:3.12-slim AS builder
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 WORKDIR /app/
 
-# install common packages
 RUN apt-get update && apt-get install --no-install-recommends -y \
     build-essential \
     python3-dev \
@@ -42,7 +41,7 @@ ENV GRANIAN_INTERFACE=wsgi
 ENV GRANIAN_HOST=0.0.0.0
 
 # bake models in to the image
-RUN python -c 'from natural_language_processing.nlp import NLPProcessor; NLPProcessor()'
+RUN python -c 'from natural_language_processing.predictor_factory import PredictorFactory; PredictorFactory()'
 
 EXPOSE 8000
 

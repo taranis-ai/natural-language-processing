@@ -41,7 +41,7 @@ jobs:
   build_container:
     name: Build and Push Container
     runs-on: ${{ matrix.os }}
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'push'
     strategy:
       matrix:
         model: [flair, roberta, roberta_german]

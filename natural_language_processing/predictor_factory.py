@@ -1,29 +1,26 @@
 from natural_language_processing.config import Config
+from natural_language_processing.predictor import Predictor
 
 
-class NLPProcessor:
+class PredictorFactory:
     """
-    Wrapper class for Models to allow for conditional imports based on the Config.MODEL setting
+    Factory class that dynamically instantiates and returns the correct Predictor
+    based on the configuration. This approach ensures that only the configured model
+    is loaded at startup.
     """
 
-    def __init__(self):
+    def __new__(cls, *args, **kwargs) -> Predictor:
         if Config.MODEL == "flair":
             from natural_language_processing.flair_ner import FlairNER
 
-            self.model = FlairNER()
+            return FlairNER(*args, **kwargs)
         elif Config.MODEL == "roberta":
             from natural_language_processing.roberta_ner import RobertaNER
 
-            self.model = RobertaNER()
+            return RobertaNER(*args, **kwargs)
         elif Config.MODEL == "roberta_german":
             from natural_language_processing.roberta_ner_german import RobertaGermanNER
 
-            self.model = RobertaGermanNER()
+            return RobertaGermanNER(*args, **kwargs)
         else:
             raise ValueError(f"Unsupported NER model: {Config.MODEL}")
-
-    def predict(self, text: str) -> dict[str, str]:
-        return self.model.predict(text)
-
-    def modelinfo(self) -> dict[str, str]:
-        return self.model.modelinfo
