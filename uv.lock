@@ -319,7 +319,7 @@ wheels = [
 [[package]]
 name = "flair"
 version = "0.15.0"
-source = { registry = "https://pypi.org/simple" }
+source = { git = "https://github.com/flairNLP/flair?rev=master#e00e0ff73e1036046e8d4e258a066a7a7dc07c89" }
 dependencies = [
     { name = "bioc" },
     { name = "boto3" },
@@ -346,10 +346,6 @@ dependencies = [
     { name = "transformer-smaller-training-vocab" },
     { name = "transformers", extra = ["sentencepiece"] },
     { name = "wikipedia-api" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/ee/f7/5ea640ad606ee73942b7f450125312e04440cf3bb57c234430a7c310f705/flair-0.15.0.tar.gz", hash = "sha256:815513edb2b72f15b54ee5659b6316ccb854b3e7fcadb52c807ff1de90e0ae87", size = 379223 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/92/20/fc57c4338ccf67cd4bdc42fce176c0c581c3d739311c062ed585ef849ef4/flair-0.15.0-py3-none-any.whl", hash = "sha256:bfb2f6ab2a355fbd94d03edc9d78f836f2e87fc3bc36d576d686c007513410f5", size = 1167239 },
 ]
 
 [[package]]
@@ -930,7 +926,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "flair" },
+    { name = "flair", git = "https://github.com/flairNLP/flair?rev=master" },
     { name = "flask" },
     { name = "granian" },
     { name = "huggingface-hub" },
