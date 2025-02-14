@@ -13,6 +13,10 @@ permissions:
   packages: write
   contents: write
   id-token: write
+  attestations: write
+
+env:
+  GHCR_IMAGE: ghcr.io/taranis-ai/taranis-nlp-bot
 
 jobs:
   test:
@@ -43,9 +47,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     if: github.event_name == 'push'
     strategy:
+      fail-fast: false
       matrix:
         model: [flair, roberta, roberta_german]
         os: [ubuntu-latest, ubuntu-24.04-arm]
+    env:
+      arch: ${{ matrix.os == 'ubuntu-latest' && 'amd64' || 'arm64' }}
     steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -57,31 +64,101 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set GHCR Owner Variable
-        id: set_env
-        run: echo "GHCR_OWNER=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_ENV
-
       - name: Set metadata for ${{ matrix.model }}
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ env.GHCR_OWNER }}/taranis-nlp-bot
-          tags: |
-            type=ref,event=tag
-            type=ref,event=branch
-            type=raw,value=${{ matrix.model }}
-            type=raw,value=latest,enable=${{ matrix.model == 'flair' }}
+          images: ${{ env.GHCR_IMAGE }}
+          labels: |
+            org.opencontainers.image.architecture=${{ env.arch }}
 
       - name: Build and push container for ${{ matrix.model }}
         uses: docker/build-push-action@v6
         with:
           file: Containerfile
-          push: true
-          platforms: ${{ matrix.os == 'ubuntu-latest' && 'linux/amd64' || 'linux/arm64' }}
-          tags: ${{ steps.meta.outputs.tags }}
+          platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
+          provenance: true
+          sbom: true
           build-args: |
             BUILDKIT_CONTEXT_KEEP_GIT_DIR=true
             MODEL=${{ matrix.model }}
-          cache-from: type=registry,ref=ghcr.io/${{ env.GHCR_OWNER }}/taranis-nlp-bot-cache:latest
-          cache-to: type=registry,ref=ghcr.io/${{ env.GHCR_OWNER }}/taranis-nlp-bot-cache:latest,mode=max
+          cache-from: type=registry,ref=${{ env.GHCR_IMAGE }}-cache-${{ env.arch }}-${{ matrix.model }}:latest
+          cache-to: type=registry,ref=${{ env.GHCR_IMAGE }}-cache-${{ env.arch }}-${{ matrix.model }}:latest,mode=max
+          outputs: |
+            type=image,"name=${{ env.GHCR_IMAGE }}",push-by-digest=true,name-canonical=true,push=true
+            type=local,dest=./output
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ${{ env.GHCR_IMAGE }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+
+      - name: Generate SBOM attestation
+        uses: actions/attest-sbom@v1
+        with:
+          subject-name: ${{ env.GHCR_IMAGE }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          sbom-path: 'output/sbom.spdx.json'
+          push-to-registry: true
+
+      - name: Export digest
+        run: |
+          mkdir -p ${{ runner.temp }}/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ env.arch }}-${{ matrix.model }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+
+  merge:
+    runs-on: ubuntu-latest
+    needs:
+      - build_container
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digests-*
+          merge-multiple: true
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Set metadata for container build
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.GHCR_IMAGE }}
+          tags: |
+            type=ref,event=tag
+            type=ref,event=branch,enable=${{ github.ref != format('refs/heads/{0}', 'master') }}
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'master')  }}
+
+      - name: Create manifest list and push
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+          --annotation "org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+          --annotation "org.opencontainers.image.revision=${{ github.sha }}" \
+            $(printf '${{ env.GHCR_IMAGE }}@sha256:%s ' *)
+
+      - name: Inspect image
+        run: |
+          docker buildx imagetools inspect ${{ env.GHCR_IMAGE }}:${{ steps.meta.outputs.version }}
