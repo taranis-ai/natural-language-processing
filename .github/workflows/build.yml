@@ -80,21 +80,13 @@ jobs:
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           provenance: true
-          sbom: true
           build-args: |
             BUILDKIT_CONTEXT_KEEP_GIT_DIR=true
             MODEL=${{ matrix.model }}
           cache-from: type=registry,ref=${{ env.GHCR_IMAGE }}-cache-${{ env.arch }}:${{ matrix.model }}
           cache-to: type=registry,ref=${{ env.GHCR_IMAGE }}-cache-${{ env.arch }}:${{ matrix.model }},mode=max
           outputs: |
-            type=image,"name=${{ env.GHCR_IMAGE }}",push-by-digest=true,name-canonical=true,push=true
-
-      - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@v2
-        with:
-          subject-name: ${{ env.GHCR_IMAGE }}
-          subject-digest: ${{ steps.build.outputs.digest }}
-          push-to-registry: true
+            type=image,"name=${{ env.GHCR_IMAGE }}",push-by-digest=true,name-canonical=true,push=true,compression=zstd
 
       - name: Export digest
         run: |
@@ -109,7 +101,6 @@ jobs:
           path: ${{ runner.temp }}/digests/*
           if-no-files-found: error
           retention-days: 1
-
 
   merge:
     runs-on: ubuntu-latest
@@ -153,6 +144,14 @@ jobs:
           docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
             $(printf '${{ env.GHCR_IMAGE }}@sha256:%s ' *)
 
-      - name: Inspect image
+      - name: Get final merged image digest
         run: |
-          docker buildx imagetools inspect ${{ env.GHCR_IMAGE }}:${{ steps.meta.outputs.version }}
+          DIGEST=$(docker buildx imagetools inspect ${{ env.GHCR_IMAGE }}:${{ matrix.model }} --format '{{ json .Manifest.Digest }}' | tr -d '"')
+          echo "MERGED_DIGEST=$DIGEST" >> $GITHUB_ENV
+
+      - name: Generate attestation for merged multiarch image
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ${{ env.GHCR_IMAGE }}
+          subject-digest: ${{ env.MERGED_DIGEST }}
+          push-to-registry: true
