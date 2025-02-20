@@ -1,4 +1,4 @@
-name: Build and Test NLP Bot Package
+name: Test and Build Containers
 
 on:
   push:
@@ -15,143 +15,33 @@ permissions:
   id-token: write
   attestations: write
 
-env:
-  GHCR_IMAGE: ghcr.io/taranis-ai/taranis-nlp-bot
-
 jobs:
   test:
-    name: pytest
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
-        with:
-          enable-cache: true
-
-      - name: Set up Python
-        run: uv python install
-
-      - name: Install the project
-        run: uv sync --all-extras --dev
-
-      - name: Lint with ruff
-        run: uv run ruff check --output-format=github .
-
-      - name: Run tests
-        run: uv run pytest
+    name: Run Python Tests
+    uses: taranis-ai/github-actions/.github/workflows/python-uv.yml@master
 
   build_container:
-    name: Build and Push Container
-    runs-on: ${{ matrix.os }}
-    if: github.event_name == 'push'
+    name: Build and Push Containers
     strategy:
       fail-fast: false
       matrix:
         model: [flair, roberta, roberta_german]
         os: [ubuntu-latest, ubuntu-24.04-arm]
-    env:
-      arch: ${{ matrix.os == 'ubuntu-latest' && 'amd64' || 'arm64' }}
-    steps:
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+    uses: taranis-ai/github-actions/.github/workflows/build-multiarch-bot-container.yml@master
+    with:
+      ghcr_image: ghcr.io/taranis-ai/taranis-nlp-bot
+      model: ${{ matrix.model }}
+      os: ${{ matrix.os }}
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set metadata for ${{ matrix.model }}
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.GHCR_IMAGE }}
-          labels: |
-            org.opencontainers.image.architecture=${{ env.arch }}
-
-      - name: Build and push container for ${{ matrix.model }}
-        uses: docker/build-push-action@v6
-        id: build
-        with:
-          file: Containerfile
-          platforms: ${{ matrix.platform }}
-          labels: ${{ steps.meta.outputs.labels }}
-          provenance: true
-          build-args: |
-            BUILDKIT_CONTEXT_KEEP_GIT_DIR=true
-            MODEL=${{ matrix.model }}
-          cache-from: type=registry,ref=${{ env.GHCR_IMAGE }}-cache-${{ env.arch }}:${{ matrix.model }}
-          cache-to: type=registry,ref=${{ env.GHCR_IMAGE }}-cache-${{ env.arch }}:${{ matrix.model }},mode=max
-          outputs: |
-            type=image,"name=${{ env.GHCR_IMAGE }}",push-by-digest=true,name-canonical=true,push=true,compression=zstd
-
-      - name: Export digest
-        run: |
-          mkdir -p ${{ runner.temp }}/digests
-          digest="${{ steps.build.outputs.digest }}"
-          touch "${{ runner.temp }}/digests/${digest#sha256:}"
-
-      - name: Upload digest
-        uses: actions/upload-artifact@v4
-        with:
-          name: digests-${{ env.arch }}-${{ matrix.model }}
-          path: ${{ runner.temp }}/digests/*
-          if-no-files-found: error
-          retention-days: 1
-
-  merge:
-    runs-on: ubuntu-latest
-    needs:
-      - build_container
+  merge_container:
+    name: Merge Container Manifests
+    needs: build_container
     strategy:
+      fail-fast: false
       matrix:
         model: [flair, roberta, roberta_german]
-    env:
-      MODEL: ${{ matrix.model }}
-    steps:
-      - name: Download digests for model ${{ matrix.model }}
-        uses: actions/download-artifact@v4
-        with:
-          path: ${{ runner.temp }}/digests
-          pattern: digests-*-${{ matrix.model }}
-          merge-multiple: true
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Set metadata for container build
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.GHCR_IMAGE }}
-          tags: |
-            type=raw,value=${{ matrix.model }}
-            type=raw,value=latest,enable=${{ matrix.model == 'flair' }}
-
-      - name: Create manifest list and push
-        working-directory: ${{ runner.temp }}/digests
-        run: |
-          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf '${{ env.GHCR_IMAGE }}@sha256:%s ' *)
-
-      - name: Get final merged image digest
-        run: |
-          DIGEST=$(docker buildx imagetools inspect ${{ env.GHCR_IMAGE }}:${{ matrix.model }} --format '{{ json .Manifest.Digest }}' | tr -d '"')
-          echo "MERGED_DIGEST=$DIGEST" >> $GITHUB_ENV
-
-      - name: Generate attestation for merged multiarch image
-        uses: actions/attest-build-provenance@v2
-        with:
-          subject-name: ${{ env.GHCR_IMAGE }}
-          subject-digest: ${{ env.MERGED_DIGEST }}
-          push-to-registry: true
+    uses: taranis-ai/github-actions/.github/workflows/merge-multiarch-bot-container.yml@master
+    with:
+      ghcr_image: ghcr.io/taranis-ai/taranis-nlp-bot
+      model: ${{ matrix.model }}
+      latest: ${{ matrix.model == 'flair' }}
