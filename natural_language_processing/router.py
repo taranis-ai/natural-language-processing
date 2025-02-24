@@ -17,8 +17,7 @@ class NLPHandler(MethodView):
         if not text:
             return jsonify({"error": "No text provided for NER extraction"}), 400
         try:
-            keywords = self.processor.predict(text)
-            return jsonify({"keywords": keywords})
+            return jsonify(self.processor.predict(text))
         except ValueError as e:
             return jsonify({"error": str(e)}), 400
 

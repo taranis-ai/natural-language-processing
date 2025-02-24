@@ -29,6 +29,8 @@ To test the API with a POST request, use curl:
 curl -X POST http://127.0.0.1:8000/ \
   -H "Content-Type: application/json" \
   -d '{"text": "This is an example for NER, about the ACME Corporation which is producing Dynamite in Acme City, which is in Australia and run by Mr. Wile E. Coyote."}'
+
+# {"ACME Corporation":"ORG","Acme City":"LOC","Australia":"LOC","Dynamite":"MISC","NER":"ORG","Wile E. Coyote":"PER"}
 ```
 
 ```python
@@ -42,7 +44,6 @@ response = requests.post('http://127.0.0.1:8000', json=json_data)
 
 print(response.text)
 ```
-
 
 ## License
 
