@@ -3,7 +3,7 @@ from natural_language_processing.config import Config
 from natural_language_processing.predictor import Predictor
 
 
-class MPNETNer(Predictor):
+class GLiNERModel(Predictor):
     model_name = "selfconstruct3d/AITSecNER"
 
     def __init__(self):

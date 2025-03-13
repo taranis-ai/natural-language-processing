@@ -2,7 +2,7 @@ import pytest
 
 from natural_language_processing.roberta_ner import RobertaNER
 from natural_language_processing.flair_ner import FlairNER
-from natural_language_processing.mpnet_ner import MPNETNer
+from natural_language_processing.gliner import GLiNERModel
 
 
 @pytest.fixture(scope="session")
@@ -16,8 +16,8 @@ def roberta_model():
 
 
 @pytest.fixture(scope="session")
-def mpnet_model():
-    yield MPNETNer()
+def gliner_model():
+    yield GLiNERModel()
 
 
 @pytest.fixture(scope="session")

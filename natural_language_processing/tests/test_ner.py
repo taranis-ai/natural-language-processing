@@ -1,6 +1,6 @@
 from natural_language_processing.roberta_ner import RobertaNER
 from natural_language_processing.flair_ner import FlairNER
-from natural_language_processing.mpnet_ner import MPNETNer
+from natural_language_processing.gliner import GLiNERModel
 
 
 def test_exapmle_ner_flair(example_text: str, flair_model: FlairNER):
@@ -21,8 +21,8 @@ def test_example_ner_roberta(example_text: str, roberta_model: RobertaNER):
     assert not mislabelled_entities, f"Not all expected entities were labelled correctly: {mislabelled_entities}"
 
 
-def test_example_ner_mpnet(example_cybersec_text: str, mpnet_model: MPNETNer):
-    result = mpnet_model.predict(example_cybersec_text)
+def test_example_ner_gliner(example_cybersec_text: str, gliner_model: GLiNERModel):
+    result = gliner_model.predict(example_cybersec_text)
     expected = {"Emotet": "MALWARE", "Microsoft": "ORG"}
 
     missed_entities = {entity for entity in expected if entity not in result}
