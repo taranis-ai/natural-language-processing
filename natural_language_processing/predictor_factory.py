@@ -22,5 +22,9 @@ class PredictorFactory:
             from natural_language_processing.roberta_ner_german import RobertaGermanNER
 
             return RobertaGermanNER(*args, **kwargs)
+        elif Config.MODEL == "mpnet":
+            from natural_language_processing.mpnet_ner import MPNETNer
+
+            return MPNETNer(*args, **kwargs)
         else:
             raise ValueError(f"Unsupported NER model: {Config.MODEL}")
