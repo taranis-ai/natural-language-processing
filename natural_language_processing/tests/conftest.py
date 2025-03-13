@@ -2,6 +2,7 @@ import pytest
 
 from natural_language_processing.roberta_ner import RobertaNER
 from natural_language_processing.flair_ner import FlairNER
+from natural_language_processing.mpnet_ner import MPNETNer
 
 
 @pytest.fixture(scope="session")
@@ -15,8 +16,18 @@ def roberta_model():
 
 
 @pytest.fixture(scope="session")
+def mpnet_model():
+    yield MPNETNer()
+
+
+@pytest.fixture(scope="session")
 def example_text():
     yield "This is an example for NER, about the ACME Corporation which is producing Dynamite in Acme City, which is in Australia and run by Mr. Wile E. Coyote"
+
+
+@pytest.fixture(scope="session")
+def example_cybersec_text():
+    yield "Upon opening Emotet maldocs, victims are greeted with fake Microsoft 365 prompt that states 'THIS DOCUMENT IS PROTECTED,' and instructs victims on how to enable macros."
 
 
 @pytest.fixture(scope="session")
@@ -53,7 +64,7 @@ def content1():
         "the transition to a greener future. The program's success is anticipated to create a ripple effect, inspiring other corporations and governments to adopt similar measures, "
         "ultimately leading to widespread societal change."
     )
-    expected = ["NovaTech"]
+    expected = {"NovaTech": "ORG"}
     return text, expected
 
 
@@ -67,7 +78,7 @@ def content2():
         "advanced security protocols and collaborating with international experts. Analysts suggest this revelation may trigger a broader "
         "industry re-evaluation of software security practices."
     )
-    expected = ["European"]
+    expected = {"European": "MISC"}
     return text, expected
 
 
@@ -81,7 +92,7 @@ def content3():
         "causing significant disruptions before detection. IT departments worldwide have been alerted, and companies are urged to perform immediate system audits "
         "to ensure no breaches have occurred. Ongoing investigations are underway to trace the origins of the malware and assess its impact on corporate infrastructures."
     )
-    expected = ["Linux"]
+    expected = {"Linux": "MISC"}
     return text, expected
 
 
@@ -95,7 +106,7 @@ def content4():
         "leading to an increased demand for cybersecurity consultations and software audits. Stakeholders remain cautiously optimistic as the company works to restore trust and "
         "reinforce its commitment to digital security."
     )
-    expected = ["European"]
+    expected = {"European": "MISC"}
     return text, expected
 
 
@@ -107,7 +118,7 @@ def content5():
         "software patches designed to prevent the exploitation of known vulnerabilities. Industry experts have lauded this collaborative effort, noting that it sets a new standard "
         "for public-private partnerships in cybersecurity. Customers are urged to update their systems promptly to benefit from these enhancements, and further updates are expected as the partnership evolves."
     )
-    expected = ["Intel", "Oracle"]
+    expected = {"Intel": "ORG", "Oracle": "ORG"}
     return text, expected
 
 
@@ -128,7 +139,7 @@ def content6():
         "to secure substantial funding for the next phase of development. As quantum technology continues to evolve at an unprecedented pace, this breakthrough is seen as a pivotal step toward "
         "realizing the long-anticipated promise of quantum advantage in both commercial and scientific applications."
     )
-    expected = ["BrightMinds"]
+    expected = {"BrightMinds": "ORG"}
     return text, expected
 
 
@@ -152,7 +163,7 @@ def content7():
         "opportunities. The event concluded with a series of actionable commitments, laying the groundwork for enhanced trade partnerships and setting the stage for a new era of global economic collaboration. "
         "Attendees left the summit with a shared sense of urgency and optimism, prepared to implement the agreed-upon measures and drive meaningful change in the international trading system."
     )
-    expected = ["Geneva"]
+    expected = {"Geneva": "LOC"}
     return text, expected
 
 
