@@ -22,7 +22,8 @@ dependencies = [
     "torch",
     "huggingface_hub",
     "pydantic-settings",
-    "python-dotenv"
+    "python-dotenv",
+    "gliner>=0.2.16",
 ]
 dynamic = ["version"]
 
