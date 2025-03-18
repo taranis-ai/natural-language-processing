@@ -36,7 +36,7 @@ dev = ["pytest", "ruff"]
 [build-system]
 requires = [
     "setuptools>=45",
-    "setuptools_scm>=8.2",
+    "setuptools_scm[toml]>=6.2",
     "wheel"
 ]
 build-backend = "setuptools.build_meta"
