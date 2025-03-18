@@ -43,7 +43,6 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
 fallback_version = "0.0.0"
-tag_regex = "^refs/pull/(\\d+)/merge$"
 
 [tool.setuptools]
 packages = ["natural_language_processing"]
