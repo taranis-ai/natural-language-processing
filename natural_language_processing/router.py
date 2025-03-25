@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask.views import MethodView
 from natural_language_processing.predictor import Predictor
-from natural_language_processing.decorators import api_key_required
+from natural_language_processing.decorators import api_key_required, debug_request
 from natural_language_processing.predictor_factory import PredictorFactory
 
 
@@ -10,6 +10,7 @@ class NLPHandler(MethodView):
         super().__init__()
         self.processor = processor
 
+    @debug_request
     @api_key_required
     def post(self):
         data = request.get_json()
@@ -23,6 +24,7 @@ class NLPHandler(MethodView):
 
 
 class HealthCheck(MethodView):
+    @debug_request
     def get(self):
         return jsonify({"status": "ok"})
 
@@ -32,6 +34,7 @@ class ModelInfo(MethodView):
         super().__init__()
         self.processor = processor
 
+    @debug_request
     def get(self):
         return jsonify(self.processor.modelinfo)
 
