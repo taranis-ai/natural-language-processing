@@ -26,8 +26,8 @@ jobs:
       fail-fast: false
       matrix:
         model: [flair, roberta, roberta_german, gliner]
-        os: [ubuntu-latest, ubuntu-24.04-arm]
-    uses: taranis-ai/github-actions/.github/workflows/build-multiarch-bot-container.yml@master
+        os: [blacksmith-4vcpu-ubuntu-2204, blacksmith-4vcpu-ubuntu-2204-arm]
+        uses: taranis-ai/github-actions/.github/workflows/build-multiarch-bot-container.yml@master
     with:
       ghcr_image: ghcr.io/taranis-ai/taranis-nlp-bot
       model: ${{ matrix.model }}
