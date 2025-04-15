@@ -11,7 +11,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Topic :: Security",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.12,<3.13"
 dependencies = [
     "networkx",
     "flask",
@@ -22,7 +22,8 @@ dependencies = [
     "torch",
     "huggingface_hub",
     "pydantic-settings",
-    "python-dotenv"
+    "python-dotenv",
+    "gliner>=0.2.16",
 ]
 dynamic = ["version"]
 
@@ -41,6 +42,8 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
+fallback_version = "0.0.0"
+tag_regex = "^refs/pull/(\\d+)/merge$"
 
 [tool.setuptools]
 packages = ["natural_language_processing"]

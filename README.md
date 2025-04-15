@@ -16,7 +16,7 @@ Run via
 ```bash
 flask run
 # or
-granian run
+granian app
 # or
 docker run -p 8000:8000 ghcr.io/taranis-ai/taranis-nlp-bot:latest
 ```

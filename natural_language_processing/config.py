@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     GIT_INFO: dict[str, str] | None = None
     CACHE_TYPE: str = "SimpleCache"
     CACHE_DEFAULT_TIMEOUT: int = 300
-    MODEL: Literal["flair", "roberta", "roberta_german"] = "flair"
+    MODEL: Literal["flair", "roberta", "roberta_german", "gliner"] = "flair"
 
     confidence_threshold: float = 0.9
 
