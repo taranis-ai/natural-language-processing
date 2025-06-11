@@ -26,5 +26,10 @@ class PredictorFactory:
             from natural_language_processing.gliner import GLiNERModel
 
             return GLiNERModel(*args, **kwargs)
+
+        elif Config.MODEL == "gliner_ppn":
+            from natural_language_processing.gliner_ppn import GLiNERPPN
+
+            return GLiNERPPN(*args, **kwargs)
         else:
             raise ValueError(f"Unsupported NER model: {Config.MODEL}")
