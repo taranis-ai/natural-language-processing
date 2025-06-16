@@ -1,6 +1,4 @@
 import pytest
-from flask import Flask
-import json
 import os
 
 # Import your Flask app here. Adjust as needed.
