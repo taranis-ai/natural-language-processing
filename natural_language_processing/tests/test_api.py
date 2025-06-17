@@ -1,8 +1,7 @@
 import pytest
 import os
-
-# Import your Flask app here. Adjust as needed.
 from app import app as flask_app
+from natural_language_processing.config import Config
 
 @pytest.fixture
 def client():
@@ -15,22 +14,25 @@ def client_with_api_key():
     """Client with API key authentication enabled"""
     # Temporarily set API key for testing
     original_api_key = os.environ.get('API_KEY', '')
-    os.environ['API_KEY'] = 'test-api-key-123'
+    original_config_api_key = getattr(Config, 'API_KEY', '')
     
-    # Reload config to pick up the new API key
-    from natural_language_processing.config import Config
-    Config.API_KEY = 'test-api-key-123'
+    try:
+        os.environ['API_KEY'] = 'test-api-key-123'
+        
+        # Reload config to pick up the new API key
+        Config.API_KEY = 'test-api-key-123'
+        
+        flask_app.config["TESTING"] = True
+        with flask_app.test_client() as client:
+            yield client
     
-    flask_app.config["TESTING"] = True
-    with flask_app.test_client() as client:
-        yield client
-    
-    # Restore original API key
-    if original_api_key:
-        os.environ['API_KEY'] = original_api_key
-    else:
-        os.environ.pop('API_KEY', None)
-    Config.API_KEY = original_api_key
+    finally:
+        # Restore original API key - guaranteed to run even if test fails
+        if original_api_key:
+            os.environ['API_KEY'] = original_api_key
+        else:
+            os.environ.pop('API_KEY', None)
+        Config.API_KEY = original_config_api_key
 
 def test_root_health(client):
     response = client.post("/", json={"text": "Health check text."})
