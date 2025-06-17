@@ -1,5 +1,4 @@
 import pytest
-import os
 from app import app as flask_app
 from natural_language_processing.config import Config
 
