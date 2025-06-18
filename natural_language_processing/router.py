@@ -15,6 +15,11 @@ class NLPHandler(MethodView):
     @api_key_required
     def post(self):
         data = request.get_json()
+        
+        # Check if JSON data is a dictionary
+        if not isinstance(data, dict):
+            return jsonify({"error": "JSON payload must be an object with 'text' field"}), 400
+            
         text = data.get("text", "")
         if not text:
             return jsonify({"error": "No text provided for NER extraction"}), 400

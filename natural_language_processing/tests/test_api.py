@@ -36,7 +36,15 @@ def test_empty_input(client):
 
 def test_invalid_json(client):
     response = client.post("/", data="notjson", content_type="application/json")
-    assert response.status_code in (400, 422)  # Adjust for your error handling
+    assert response.status_code == 400
+
+def test_valid_json_but_not_dict(client):
+    """Test valid JSON that isn't a dictionary"""
+    # This mimics: curl -d '"notjson"' (valid JSON string, not a dict)
+    response = client.post("/", data='"notjson"', content_type="application/json")
+    assert response.status_code == 400
+    data = response.get_json()
+    assert "error" in data
 
 def test_missing_authorization_header_with_api_key(client_with_api_key):
     """Test missing Authorization header when API key is required"""
