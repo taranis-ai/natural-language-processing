@@ -1,7 +1,14 @@
-from pydantic import field_validator, ValidationInfo
+from pydantic import field_validator, ValidationInfo, BaseModel
 from pydantic_settings import BaseSettings
 from datetime import datetime
 from typing import Literal
+
+
+class ExtendedNerOutput(BaseModel):
+    value: str
+    type: str
+    probability: float
+    position: str
 
 
 class Settings(BaseSettings):
@@ -19,6 +26,7 @@ class Settings(BaseSettings):
     CACHE_TYPE: str = "SimpleCache"
     CACHE_DEFAULT_TIMEOUT: int = 300
     MODEL: Literal["flair", "roberta", "roberta_german", "gliner"] = "flair"
+    EXT_OUT: bool = False
 
     confidence_threshold: float = 0.9
 
