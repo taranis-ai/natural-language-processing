@@ -1,14 +1,7 @@
-from pydantic import field_validator, ValidationInfo, BaseModel
+from pydantic import field_validator, ValidationInfo
 from pydantic_settings import BaseSettings
 from datetime import datetime
 from typing import Literal
-
-
-class ExtendedNerOutput(BaseModel):
-    value: str
-    type: str
-    probability: float
-    position: str
 
 
 class Settings(BaseSettings):
