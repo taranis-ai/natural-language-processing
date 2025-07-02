@@ -10,12 +10,12 @@ class RobertaNER(Predictor):
     def __init__(self):
         self.model = pipeline(task="ner", model=self.model_name, aggregation_strategy="simple")
 
-    def predict(self, text: str) -> dict[str, str] | list[dict]:
+    def predict(self, text: str, extended_output: bool = False) -> dict[str, str] | list[dict]:
         entities = self.model(text)
         if not entities:
             return {}
 
-        if Config.EXT_OUT:
+        if extended_output:
             out_list = []
             out_list.extend(
                 {

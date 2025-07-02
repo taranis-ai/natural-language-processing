@@ -11,12 +11,12 @@ class GLiNERModel(Predictor):
         self.model = GLiNER.from_pretrained("selfconstruct3d/AITSecNER", load_tokenizer=True)
         self.labels = ["CLICommand/CodeSnippet", "CON", "DATE", "GROUP", "LOC", "MALWARE", "ORG", "SECTOR", "TACTIC", "TECHNIQUE", "TOOL"]
 
-    def predict(self, text: str) -> dict[str, str] | list[dict]:
+    def predict(self, text: str, extended_output: bool = False) -> dict[str, str] | list[dict]:
         entities = self.model.predict_entities(text, self.labels, threshold=Config.confidence_threshold)
         if not entities:
             return {}
 
-        if Config.EXT_OUT:
+        if extended_output:
             out_list = []
             out_list.extend(
                 {
