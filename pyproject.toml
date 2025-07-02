@@ -24,6 +24,7 @@ dependencies = [
     "pydantic-settings",
     "python-dotenv",
     "gliner>=0.2.16",
+    "jsonschema"
 ]
 dynamic = ["version"]
 

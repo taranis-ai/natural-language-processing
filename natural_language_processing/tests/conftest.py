@@ -170,3 +170,34 @@ def content7():
 @pytest.fixture(params=["content1", "content2", "content3", "content4", "content5", "content6", "content7"])
 def article(request):
     return request.getfixturevalue(request.param)
+
+
+@pytest.fixture(scope="session")
+def extended_output_schema():
+    yield {
+        "$id": "",
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "Entity List",
+        "description": "A list of named-entity objects",
+        "type": "array",
+        "items": {
+            "type": "object",
+            "title": "Named Entity Info",
+            "description": "Information about a single recognized entity",
+            "properties": {
+                "value": {
+                    "type": "string",
+                },
+                "type": {
+                    "type": "string",
+                },
+                "confidence": {
+                    "type": "number",
+                },
+                "position": {
+                    "type": "string",
+                },
+            },
+            "required": ["value", "type"],
+        },
+    }
