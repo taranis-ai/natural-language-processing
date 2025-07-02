@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import requests
+from natural_language_processing.config import ExtendedNerOutput
 
 
 class Predictor(ABC):
@@ -9,7 +10,7 @@ class Predictor(ABC):
         pass
 
     @abstractmethod
-    def predict(self, text: str) -> dict[str, str]:
+    def predict(self, text: str) -> dict[str, str] | list[ExtendedNerOutput]:
         pass
 
     @property
