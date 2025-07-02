@@ -1,5 +1,5 @@
 from gliner import GLiNER
-from natural_language_processing.config import Config, ExtendedNerOutput
+from natural_language_processing.config import Config
 from natural_language_processing.predictor import Predictor
 from natural_language_processing.misc import get_word_positions
 
@@ -11,7 +11,7 @@ class GLiNERModel(Predictor):
         self.model = GLiNER.from_pretrained("selfconstruct3d/AITSecNER", load_tokenizer=True)
         self.labels = ["CLICommand/CodeSnippet", "CON", "DATE", "GROUP", "LOC", "MALWARE", "ORG", "SECTOR", "TACTIC", "TECHNIQUE", "TOOL"]
 
-    def predict(self, text: str) -> dict[str, str] | list[ExtendedNerOutput]:
+    def predict(self, text: str) -> dict[str, str] | list[dict]:
         entities = self.model.predict_entities(text, self.labels, threshold=Config.confidence_threshold)
         if not entities:
             return {}

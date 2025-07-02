@@ -1,5 +1,5 @@
 from transformers import pipeline
-from natural_language_processing.config import Config, ExtendedNerOutput
+from natural_language_processing.config import Config
 from natural_language_processing.predictor import Predictor
 from natural_language_processing.misc import get_word_positions
 
@@ -10,7 +10,7 @@ class RobertaNER(Predictor):
     def __init__(self):
         self.model = pipeline(task="ner", model=self.model_name, aggregation_strategy="simple")
 
-    def predict(self, text: str) -> dict[str, str] | list[ExtendedNerOutput]:
+    def predict(self, text: str) -> dict[str, str] | list[dict]:
         entities = self.model(text)
         if not entities:
             return {}

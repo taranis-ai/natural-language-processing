@@ -1,7 +1,7 @@
 from flair.models import SequenceTagger
 from flair.data import Sentence
 
-from natural_language_processing.config import Config, ExtendedNerOutput
+from natural_language_processing.config import Config
 from natural_language_processing.predictor import Predictor
 from natural_language_processing.misc import get_word_positions
 
@@ -12,7 +12,7 @@ class FlairNER(Predictor):
     def __init__(self):
         self.model = SequenceTagger.load(self.model_name)
 
-    def predict(self, text: str) -> dict[str, str] | list[ExtendedNerOutput]:
+    def predict(self, text: str) -> dict[str, str] | list[dict]:
         sentence = Sentence(text)
         self.model.predict(sentence)
 
