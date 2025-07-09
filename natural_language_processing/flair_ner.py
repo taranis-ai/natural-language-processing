@@ -3,7 +3,6 @@ from flair.data import Sentence
 
 from natural_language_processing.config import Config
 from natural_language_processing.predictor import Predictor
-from natural_language_processing.misc import get_word_positions
 
 
 class FlairNER(Predictor):
@@ -19,12 +18,7 @@ class FlairNER(Predictor):
         if extended_output:
             out_list = []
             out_list.extend(
-                {
-                    "value": span.text,
-                    "type": span.tag,
-                    "confidence": span.score,
-                    "position": get_word_positions(text, span.text, span.start_position),
-                }
+                {"value": span.text, "type": span.tag, "probability": span.score, "position": f"{span.start_position}-{span.end_position}"}
                 for span in sentence.get_spans("ner")
                 if span.score >= Config.confidence_threshold
             )

@@ -1,7 +1,6 @@
 from transformers import pipeline
 from natural_language_processing.config import Config
 from natural_language_processing.predictor import Predictor
-from natural_language_processing.misc import get_word_positions
 
 
 class RobertaGermanNER(Predictor):
@@ -21,8 +20,8 @@ class RobertaGermanNER(Predictor):
                 {
                     "value": entity.get("word", ""),
                     "type": entity.get("entity_group", ""),
-                    "confidence": float(entity.get("score", 0.0)),
-                    "position": get_word_positions(text, entity.get("word", ""), entity.get("start", None)),
+                    "probability": float(entity.get("score", 0.0)),
+                    "position": f"{entity.get('start', '')}-{entity.get('end', '')}",
                 }
                 for entity in entities
                 if isinstance(entity, dict) and entity.get("score", 0) > Config.confidence_threshold and entity.get("word") is not None

@@ -1,7 +1,6 @@
 from gliner import GLiNER
 from natural_language_processing.config import Config
 from natural_language_processing.predictor import Predictor
-from natural_language_processing.misc import get_word_positions
 
 
 class GLiNERModel(Predictor):
@@ -22,8 +21,8 @@ class GLiNERModel(Predictor):
                 {
                     "value": entity.get("text", ""),
                     "type": entity.get("label", ""),
-                    "confidence": entity.get("score", 0.0),
-                    "position": get_word_positions(text, entity.get("text", ""), entity.get("start", None)),
+                    "probability": entity.get("score", 0.0),
+                    "position": f"{entity.get('start', '')}-{entity.get('end', '')}",
                 }
                 for entity in entities
                 if isinstance(entity, dict) and entity.get("score", 0) > Config.confidence_threshold and entity.get("text") is not None

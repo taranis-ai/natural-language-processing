@@ -191,7 +191,7 @@ def extended_output_schema():
                 "type": {
                     "type": "string",
                 },
-                "confidence": {
+                "probability": {
                     "type": "number",
                 },
                 "position": {
