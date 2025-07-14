@@ -11,8 +11,20 @@ class FlairNER(Predictor):
     def __init__(self):
         self.model = SequenceTagger.load(self.model_name)
 
-    def predict(self, text: str) -> dict[str, str]:
+    def predict(self, text: str, extended_output: bool = False) -> dict[str, str] | list[dict]:
         sentence = Sentence(text)
         self.model.predict(sentence)
 
-        return {ent.data_point.text: ent.value for ent in sentence.get_labels() if ent.score >= Config.confidence_threshold}
+        if extended_output:
+            out_list = []
+            out_list.extend(
+                {"value": span.text, "type": span.tag, "probability": span.score, "position": f"{span.start_position}-{span.end_position}"}
+                for span in sentence.get_spans("ner")
+                if span.score >= Config.confidence_threshold
+            )
+            return out_list
+        return {
+            ner_result.data_point.text: ner_result.value
+            for ner_result in sentence.get_labels()
+            if ner_result.score >= Config.confidence_threshold
+        }

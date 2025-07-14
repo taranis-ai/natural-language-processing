@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     CACHE_TYPE: str = "SimpleCache"
     CACHE_DEFAULT_TIMEOUT: int = 300
     MODEL: Literal["flair", "roberta", "roberta_german", "gliner"] = "flair"
+    EXT_OUT: bool = False
 
     confidence_threshold: float = 0.9
 
