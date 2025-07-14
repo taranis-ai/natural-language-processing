@@ -1,12 +1,12 @@
 name: Build and merge containers
 
 on:
-  pull_request_review:
-    types: [submitted]
+  push:
+    branches:
+      - master
+    tags:
+      - "**"
   workflow_dispatch:
-
-env:
-  IS_APPROVED: ${{ github.event.review.state == 'approved' && github.event.pull_request.draft == false }}
 
 permissions:
   packages: write
@@ -17,7 +17,6 @@ permissions:
 jobs:
 
   build_container:
-    if: ${{ env.IS_APPROVED }}
     name: Build and Push Containers
     strategy:
       fail-fast: false
@@ -31,7 +30,6 @@ jobs:
       os: ${{ matrix.os }}
 
   merge_container:
-    if: ${{ env.IS_APPROVED }}
     name: Merge Container Manifests
     needs: build_container
     strategy:
