@@ -23,13 +23,12 @@ dependencies = [
     "huggingface_hub",
     "pydantic-settings",
     "python-dotenv",
-    "gliner>=0.2.16",
-    "jsonschema"
+    "gliner>=0.2.16"
 ]
 dynamic = ["version"]
 
 [project.optional-dependencies]
-dev = ["pytest", "ruff"]
+dev = ["pytest", "jsonschema", "ruff"]
 
 [project.urls]
 "Source Code" = "https://github.com/taranis-ai/natural_language_processing"
