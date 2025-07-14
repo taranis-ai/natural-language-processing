@@ -1,13 +1,12 @@
-name: Test and Build Containers
+name: Build and merge containers
 
 on:
-  push:
-    branches:
-      - master
-    tags:
-      - "**"
+  pull_request_review:
+    types: [submitted]
   workflow_dispatch:
-  pull_request:
+
+env:
+  IS_APPROVED: ${{ github.event.review.state == 'approved' && github.event.pull_request.draft == false }}
 
 permissions:
   packages: write
@@ -16,17 +15,15 @@ permissions:
   attestations: write
 
 jobs:
-  test:
-    name: Run Python Tests
-    uses: taranis-ai/github-actions/.github/workflows/python-uv.yml@master
 
   build_container:
+    if: ${{ env.IS_APPROVED }}
     name: Build and Push Containers
     strategy:
       fail-fast: false
       matrix:
         model: [flair, roberta, roberta_german, gliner]
-        os: [blacksmith-4vcpu-ubuntu-2204, blacksmith-4vcpu-ubuntu-2204-arm]
+        os: [blacksmith-2vcpu-ubuntu-2404, blacksmith-2vcpu-ubuntu-2404-arm]
     uses: taranis-ai/github-actions/.github/workflows/build-multiarch-bot-container.yml@master
     with:
       ghcr_image: ghcr.io/taranis-ai/taranis-nlp-bot
@@ -34,6 +31,7 @@ jobs:
       os: ${{ matrix.os }}
 
   merge_container:
+    if: ${{ env.IS_APPROVED }}
     name: Merge Container Manifests
     needs: build_container
     strategy:
