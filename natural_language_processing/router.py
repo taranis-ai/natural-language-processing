@@ -20,11 +20,13 @@ class NLPHandler(MethodView):
         if not isinstance(data, dict):
             return jsonify({"error": "JSON payload must be an object with 'text' field"}), 400
 
+        is_cybersecurity = data.get("cybersecurity", False)
+
         text = data.get("text", "")
         if not text:
             return jsonify({"error": "No text provided for NER extraction"}), 400
         try:
-            return jsonify(self.processor.predict(text, Config.EXT_OUT))
+            return jsonify(self.processor.predict(text, Config.EXT_OUT, is_cybersecurity))
         except ValueError as e:
             return jsonify({"error": str(e)}), 400
 
