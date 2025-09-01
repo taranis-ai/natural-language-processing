@@ -1,26 +1,54 @@
 from gliner import GLiNER
 from natural_language_processing.config import Config
 from natural_language_processing.predictor import Predictor
+from natural_language_processing.post_process import clean_entities
+import langdetect
+
+
+def map_cybersec_entities(cybersec_entities: list[dict[str, str]]) -> list[dict[str, str]]:
+    mapped_entities = []
+    for entity in cybersec_entities:
+        if entity.get("label", "") == "CON":
+            mapped_entities.append({**entity, "label": "Concept"})
+        else:
+            mapped_entities.append({**entity, "label": entity.get("label", "").capitalize()})
+    return mapped_entities
+
+
+def transform_result(entities: list[dict]) -> list[dict]:
+    if not entities:
+        return []
+    return [{**e, "type": e.get("label"), "idx": i} for i, e in enumerate(entities)]
 
 
 class GLiNERModel(Predictor):
-    model_name = "selfconstruct3d/AITSecNER"
-
     def __init__(self):
-        self.model = GLiNER.from_pretrained("selfconstruct3d/AITSecNER", load_tokenizer=True)
-        self.labels = ["CLICommand/CodeSnippet", "CON", "DATE", "GROUP", "LOC", "MALWARE", "ORG", "SECTOR", "TACTIC", "TECHNIQUE", "TOOL"]
+        self.general_model = GLiNER.from_pretrained("llinauer/gliner_de_en_news")
+        self.general_labels = ["Person", "Location", "Organization", "Event", "Product", "Address", "URL"]
+        self.cybersec_model = GLiNER.from_pretrained("selfconstruct3d/AITSecNER", load_tokenizer=True)
+        self.cybersec_labels = ["CLICommand/CodeSnippet", "CON", "GROUP", "MALWARE", "SECTOR", "TACTIC", "TECHNIQUE", "TOOL"]
 
-    def predict(self, text: str, extended_output: bool = False) -> dict[str, str] | list[dict]:
-        entities = self.model.predict_entities(text, self.labels, threshold=Config.confidence_threshold)
+    def predict(self, text: str, extended_output: bool = False, is_cybersecurity: bool = False) -> dict[str, str] | list[dict]:
+        general_entities = self.general_model.predict_entities(text, self.general_labels, threshold=Config.confidence_threshold)
+        if is_cybersecurity:
+            cybersec_entities = self.cybersec_model.predict_entities(text, self.cybersec_labels, threshold=Config.confidence_threshold)
+            cybersec_entities = map_cybersec_entities(cybersec_entities)
+        else:
+            cybersec_entities = []
+
+        entities = general_entities + cybersec_entities
+
         if not entities:
-            return {}
+            return [] if extended_output else []
+
+        entities = clean_entities(transform_result(entities), langdetect.detect(text))
 
         if extended_output:
             out_list = []
             out_list.extend(
                 {
                     "value": entity.get("text", ""),
-                    "type": entity.get("label", ""),
+                    "type": entity.get("type", ""),
                     "probability": entity.get("score", 0.0),
                     "position": f"{entity.get('start', '')}-{entity.get('end', '')}",
                 }
