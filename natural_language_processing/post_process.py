@@ -1,4 +1,13 @@
 import re
+import inflect
+import spacy
+
+try:
+    _NLP_DE = spacy.load("de_core_news_sm", disable=["ner", "textcat"])
+except Exception:
+    _NLP_DE = None  # fallback if model not installed
+
+_INFLECT = inflect.engine()
 
 DEMONYM_TO_COUNTRY_EN = {
     "russian": "russia",
@@ -129,18 +138,22 @@ def singularize_word(word: str, lang: str = "en") -> str:
         return IRREGULAR_PLURALS[word]
 
     if lang == "de":
-        if len(word) > 4:
-            for suf in ("en", "n", "er", "s"):
-                if word.endswith(suf):
-                    return word[: -len(suf)]
+        nlp = spacy.load("de_core_news_sm", disable=["ner", "textcat"])
+        doc = nlp(word)
+        if not doc or len(doc) == 0:
+            return word
+
+        token = doc[0]
+        lemma = token.lemma_ or word
+
+        # Guard: keep capitalization of proper nouns if input looked like proper noun
+        if word[:1].isupper() and lemma.islower():
+            # German nouns are capitalized; keep original case for display
+            return lemma.capitalize()
+        return lemma
     elif lang == "en":
-        # English endings
-        if re.search(r"[a-z]ies$", word):
-            return re.sub(r"ies$", "y", word)
-        if re.search(r"(xes|ses|zes|ches|shes)$", word):
-            return re.sub(r"es$", "", word)
-        if re.search(r"[a-z]s$", word) and not re.search(r"(ss|us|is)$", word):
-            return word[:-1]
+        singular = inflect.engine().singular_noun(word)
+        return singular if singular else word
     return word
 
 
@@ -214,33 +227,65 @@ def deduplicate_persons(entities: list[dict]) -> list[dict]:
 
 
 def singularize(entities: list[dict], language: str = "en") -> list[dict]:
-    groups: dict[tuple[str, str], list[dict]] = {}
+    if not entities:
+        return []
+
+    prepped = []
+    heads = []
     for e in entities:
         text = e["text"]
         if toks := tokenize_name(text):
-            head = toks[-1]
-            stem = singularize_word(head, language)
             prefix = " ".join(toks[:-1]).lower()
-            key = (prefix, stem)
+            head = toks[-1]
         else:
-            key = ("", singularize_word(text, language))
+            prefix = ""
+            head = text
+        prepped.append((e, prefix, head))
+        heads.append(head)
+
+    # Compute singular/lemma for heads
+    head_to_lemma: dict[str, str] = {}
+
+    if language.lower().startswith("de") and _NLP_DE is not None:
+        # batched lemmatization via spaCy
+        for head_tok, doc in zip(heads, _NLP_DE.pipe(heads, batch_size=256)):
+            if doc and len(doc) > 0:
+                lemma = doc[0].lemma_ or head_tok
+                # keep capitalization for German nouns if input looked capitalized
+                if head_tok[:1].isupper() and lemma.islower():
+                    lemma = lemma.capitalize()
+                head_to_lemma[head_tok] = lemma
+            else:
+                head_to_lemma[head_tok] = head_tok
+    else:
+        # English or DE fallback: use inflect (EN) or your existing singularize_word
+        for head_tok in heads:
+            if language.lower().startswith("en"):
+                singular = _INFLECT.singular_noun(head_tok)
+                head_to_lemma[head_tok] = singular or head_tok
+            else:
+                # fallback to your singularize_word for other langs / DE without spaCy
+                head_to_lemma[head_tok] = singularize_word(head_tok, language)
+
+    groups: dict[tuple[str, str], list[dict]] = {}
+    for e, prefix, head in prepped:
+        lemma = head_to_lemma.get(head, head)
+        key = (prefix, lemma.lower())
         groups.setdefault(key, []).append(e)
 
-    # If within a group we have multiple variants (plural/singular), keep the one whose head matches the singular form
-    # or, if multiple remain, prefer the shortest head (likely singular) then the longest full text (for case/extra info).
     cleaned = []
     for key, members in groups.items():
         if len(members) == 1:
             cleaned.append(members[0])
             continue
 
-        # Rank: head matches exact singular > shorter head length > longer full text
+        lemma_lower = key[1]
         ranked = []
         for e in members:
             toks = tokenize_name(e["text"])
-            head = toks[-1].lower() if toks else e["text"].lower()
-            exact_singular_match = int(head == key[1])
-            ranked.append((exact_singular_match, -len(head), len(e["text"]), e))
+            head = (toks[-1] if toks else e["text"]).lower()
+            exact = int(head == lemma_lower)
+            ranked.append((exact, -len(head), len(e["text"]), e))
         ranked.sort(reverse=True)
         cleaned.append(ranked[0][3])
 
