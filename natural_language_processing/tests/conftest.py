@@ -3,6 +3,10 @@ import pytest
 from natural_language_processing.roberta_ner import RobertaNER
 from natural_language_processing.flair_ner import FlairNER
 from natural_language_processing.gliner import GLiNERModel
+from natural_language_processing.config import Config
+
+
+Config.SPACY_MODEL_PATH = "/tmp/natural_language_processing_test/de_core_news_sm"
 
 
 @pytest.fixture(scope="session")
