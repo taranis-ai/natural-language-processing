@@ -15,6 +15,19 @@ def map_cybersec_entities(cybersec_entities: list[dict[str, str]]) -> list[dict[
     return mapped_entities
 
 
+def merge_with_cybersec_priority(general_entities: list[dict], cybersec_entities: list[dict]) -> list[dict]:
+    def make_key(entity):
+        return (
+            (entity["start"], entity["end"])
+            if entity.get("start") is not None and entity.get("end") is not None
+            else (entity.get("text", "") or "").strip().lower()
+        )
+
+    merged = {make_key(e): e for e in general_entities}
+    merged.update({make_key(e): e for e in cybersec_entities})
+    return list(merged.values())
+
+
 def transform_result(entities: list[dict]) -> list[dict]:
     if not entities:
         return []
@@ -36,10 +49,10 @@ class GLiNERModel(Predictor):
         else:
             cybersec_entities = []
 
-        entities = general_entities + cybersec_entities
+        entities = merge_with_cybersec_priority(general_entities, cybersec_entities)
 
         if not entities:
-            return [] if extended_output else []
+            return [] if extended_output else {}
 
         entities = clean_entities(transform_result(entities), langdetect.detect(text))
 
