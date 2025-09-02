@@ -55,28 +55,6 @@ def test_singularize_word(word, lang, expected):
     assert pc.singularize_word(word, lang) == expected
 
 
-def test_deduplication():
-    raw_entities = [
-        ("Drone", "Product"),
-        ("drone", "Product"),
-        ("Karl Landsteiner", "Person"),
-        ("karl Landsteiner", "Person"),
-        ("Apple", "Organization"),
-        ("apple", "Product"),
-        ("united Nations", "Organization"),
-        ("United Nations", "Organization"),
-    ]
-    raw_entities = [{"text": e[0], "label": e[1]} for e in raw_entities]
-    processed_entities = pc.deduplication(raw_entities)
-    assert processed_entities == [
-        {"text": "Drone", "label": "Product"},
-        {"text": "Karl Landsteiner", "label": "Person"},
-        {"text": "Apple", "label": "Organization"},
-        {"text": "apple", "label": "Product"},
-        {"text": "United Nations", "label": "Organization"},
-    ]
-
-
 @pytest.mark.parametrize(
     "word,expected",
     [
@@ -117,3 +95,50 @@ def test_normalize_de_demonym_form(word, expected):
 )
 def test_map_demonym_to_country(inp, expected):
     assert pc.map_demonym_to_country(inp) == expected
+
+
+def test_deduplication():
+    raw_entities = [
+        ("Drone", "Product"),
+        ("drone", "Product"),
+        ("Karl Landsteiner", "Person"),
+        ("karl Landsteiner", "Person"),
+        ("Apple", "Organization"),
+        ("apple", "Product"),
+        ("united Nations", "Organization"),
+        ("United Nations", "Organization"),
+    ]
+    raw_entities = [{"text": e[0], "label": e[1]} for e in raw_entities]
+    processed_entities = pc.deduplication(raw_entities)
+    assert processed_entities == [
+        {"text": "Drone", "label": "Product"},
+        {"text": "Karl Landsteiner", "label": "Person"},
+        {"text": "Apple", "label": "Organization"},
+        {"text": "apple", "label": "Product"},
+        {"text": "United Nations", "label": "Organization"},
+    ]
+
+
+@pytest.mark.parametrize(
+    "entities,expected",
+    [
+        (
+            [{"text": "Russia", "type": "Location"}, {"text": "russian", "type": "Location"}],
+            [{"text": "Russia", "type": "Location"}],
+        ),
+        (
+            [{"text": "russian", "type": "Location"}, {"text": "Berlin", "type": "Location"}],
+            [{"text": "russian", "type": "Location"}, {"text": "Berlin", "type": "Location"}],
+        ),
+        (
+            [{"text": "RUSSIA", "type": "Location"}, {"text": "Russian", "type": "Location"}],
+            [{"text": "RUSSIA", "type": "Location"}],
+        ),
+        (
+            [{"text": "Russia", "type": "Location"}, {"text": "russian", "type": "Organization"}],
+            [{"text": "Russia", "type": "Location"}, {"text": "russian", "type": "Organization"}],
+        ),
+    ],
+)
+def test_drop_demonyms(entities, expected):
+    assert pc.drop_demonyms(entities) == expected
