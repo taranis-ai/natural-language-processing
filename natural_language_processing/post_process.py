@@ -186,6 +186,24 @@ def singularize_word(word: str, lang: str = "en") -> str:
     return word
 
 
+def normalize_de_demonym_form(word: str) -> str:
+    # map demonyms ending with -isch to base form
+    # e.g. schweizerischen -> schweizerisch, russischen -> russisch
+    # map demonyms with common endings to base form
+    # e.g. deutsche -> deutsch
+
+    DE_ISCH_INFLECTED_RE = re.compile(r"^(.*?isch)(e|er|en|em|es)$", flags=re.IGNORECASE)
+    if match := DE_ISCH_INFLECTED_RE.match(word):
+        return match[1]
+
+    DE_ADJ_ENDINGS = ("en", "er", "em", "es", "e")
+
+    return next(
+        (word[: -len(suf)] for suf in DE_ADJ_ENDINGS if word.endswith(suf)),
+        word,
+    )
+
+
 def map_demonym_to_country(entity: str) -> str | None:
     # nationality adjectives to country names
     # e.g. russian -> Russia
@@ -193,11 +211,34 @@ def map_demonym_to_country(entity: str) -> str | None:
     if entity in DEMONYM_TO_COUNTRY_EN:
         return DEMONYM_TO_COUNTRY_EN[entity]
 
-    GER_ENDINGS = ("e", "er", "en", "em", "es", "ische", "ischen", "ischem", "ischer", "isches")
-    base = re.sub(rf"({'|'.join(map(re.escape, GER_ENDINGS))})$", "", entity)
-    de_key = entity if entity in DEMONYM_TO_COUNTRY_DE else base
-    if de_key in DEMONYM_TO_COUNTRY_DE:
-        return DEMONYM_TO_COUNTRY_DE[de_key]
+    if entity in DEMONYM_TO_COUNTRY_DE:
+        return DEMONYM_TO_COUNTRY_DE[entity]
+
+    normalized_entity = normalize_de_demonym_form(entity)
+    if normalized_entity in DEMONYM_TO_COUNTRY_DE:
+        return DEMONYM_TO_COUNTRY_DE[normalized_entity]
+
+    if entity.endswith("en"):
+        cand = f"{entity[:-2]}e"
+        if cand in DEMONYM_TO_COUNTRY_DE:
+            return DEMONYM_TO_COUNTRY_DE[cand]
+
+    if entity.endswith("innen"):
+        cand = entity[: -len("innen")]
+        if cand in DEMONYM_TO_COUNTRY_DE:
+            return DEMONYM_TO_COUNTRY_DE[cand]
+        stem = cand[:-2] if cand.endswith("er") else cand
+        adj = (stem[:-1] if stem.endswith("i") else stem) + "isch"
+        if adj in DEMONYM_TO_COUNTRY_DE:
+            return DEMONYM_TO_COUNTRY_DE[adj]
+
+    if entity.endswith("er"):
+        stem = entity[:-2]
+        if stem in DEMONYM_TO_COUNTRY_DE:
+            return DEMONYM_TO_COUNTRY_DE[stem]
+        adj = (stem[:-1] if stem.endswith("i") else stem) + "isch"
+        if adj in DEMONYM_TO_COUNTRY_DE:
+            return DEMONYM_TO_COUNTRY_DE[adj]
 
     return None
 
@@ -215,8 +256,9 @@ def deduplication(entities: list[dict]) -> list[dict]:
 
 
 def drop_demonyms(entities: list[dict]) -> list[dict]:
-    # if both a country name and its demonym exists (e.g. Russia and russian)
+    # if both a country name and its demonym exist (e.g. Russia and russian)
     # -> keep only country name
+
     texts = {normalize(e["text"]) for e in entities}
     to_drop_idcs = set()
     for e in entities:

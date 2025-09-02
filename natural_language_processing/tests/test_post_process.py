@@ -77,15 +77,42 @@ def test_singularize_word_de(word, expected):
 
 
 @pytest.mark.parametrize(
+    "word,expected",
+    [
+        ("chinesische", "chinesisch"),
+        ("Chinesischen", "Chinesisch"),
+        ("russische", "russisch"),
+        ("Russischem", "Russisch"),
+        ("französisches", "französisch"),
+        ("deutsche", "deutsch"),
+        ("deutschen", "deutsch"),
+        ("deutscher", "deutsch"),
+        ("deutschem", "deutsch"),
+        ("österreicher", "österreich"),
+        ("spanisch", "spanisch"),
+        ("polnisch", "polnisch"),
+    ],
+)
+def test_normalize_de_demonym_form(word, expected):
+    assert pc.normalize_de_demonym_form(word) == expected
+
+
+@pytest.mark.parametrize(
     "inp,expected",
     [
         ("russian", "russia"),
         ("german", "germany"),
         ("lithuanian", "lithuania"),
-        ("amerikanischen", "vereinigte staaten"),  # stripped to base "amerikanisch"
+        ("amerikanischen", "vereinigte staaten"),
         ("russischen", "russland"),
         ("unknown", None),
+        ("deutsche", "deutschland"),
+        ("schweizerisch", "schweiz"),
+        ("finnisch", "finnland"),
+        ("chinese", "china"),
+        ("spanier", "spanien"),
+        ("spanierinnen", "spanien"),
     ],
 )
 def test_map_demonym_to_country(inp, expected):
-    assert pc.map_demonym_to_country(pc.normalize(inp)) == expected
+    assert pc.map_demonym_to_country(inp) == expected
