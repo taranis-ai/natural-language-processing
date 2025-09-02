@@ -216,3 +216,73 @@ def test_drop_demonyms(entities, expected):
 )
 def test_deduplicate_persons(entities, expected):
     assert pc.deduplicate_persons(entities) == expected
+
+
+@pytest.mark.parametrize(
+    "language,entities,expected",
+    [
+        (
+            "en",
+            [
+                {"idx": 1, "text": "prices"},
+                {"idx": 2, "text": "price"},
+            ],
+            [
+                {"idx": 2, "text": "price"},
+            ],
+        ),
+        (
+            "en",
+            [
+                {"idx": 1, "text": "Wolves"},
+                {"idx": 2, "text": "Wolf"},
+            ],
+            [
+                {"idx": 2, "text": "Wolf"},
+            ],
+        ),
+        (
+            "en",
+            [
+                {"idx": 1, "text": "Apple Stores"},
+                {"idx": 2, "text": "Apple Store"},
+            ],
+            [
+                {"idx": 2, "text": "Apple Store"},
+            ],
+        ),
+        (
+            "en",
+            [
+                {"idx": 1, "text": "dogs"},
+                {"idx": 2, "text": "smartphones"},
+            ],
+            [
+                {"idx": 1, "text": "dogs"},
+                {"idx": 2, "text": "smartphones"},
+            ],
+        ),
+        (
+            "de",
+            [
+                {"idx": 1, "text": "Katzen"},
+                {"idx": 2, "text": "Katze"},
+            ],
+            [
+                {"idx": 2, "text": "Katze"},
+            ],
+        ),
+        (
+            "de",
+            [
+                {"idx": 1, "text": "Technische Universitäten"},
+                {"idx": 2, "text": "Technische Universität"},
+            ],
+            [
+                {"idx": 2, "text": "Technische Universität"},
+            ],
+        ),
+    ],
+)
+def test_singularize(language, entities, expected):
+    assert pc.singularize(entities, language) == expected

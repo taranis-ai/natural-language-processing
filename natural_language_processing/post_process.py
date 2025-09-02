@@ -160,21 +160,21 @@ def tokenize_name(name: str) -> list[str]:
     return [t for t in re.split(r"[^\wÀ-ÖØ-öø-ÿ]+", name) if t]
 
 
-def singularize_word(word: str, lang: str = "en") -> str:
+def singularize_word(word: str, language: str = "en") -> str:
     # infer singular of a word based on the language
     # e.g. prices -> price, Katzen -> Katze
 
     if word in IRREGULAR_PLURALS:
         return IRREGULAR_PLURALS[word]
 
-    if lang == "de":
+    if language == "de":
         doc = NLP_DE(word)
         if not doc or len(doc) == 0:
             return word
         token = doc[0]
         return token.lemma_ or word
 
-    elif lang == "en":
+    elif language == "en":
         singular = inflect.engine().singular_noun(word)
         return singular or word
     return word
@@ -291,11 +291,9 @@ def deduplicate_persons(entities: list[dict]) -> list[dict]:
 
 
 def singularize(entities: list[dict], language: str = "en") -> list[dict]:
-    if not entities:
-        return []
-
     prepped = []
     heads = []
+
     for e in entities:
         text = e["text"]
         if toks := tokenize_name(text):
@@ -307,31 +305,9 @@ def singularize(entities: list[dict], language: str = "en") -> list[dict]:
         prepped.append((e, prefix, head))
         heads.append(head)
 
-    # Compute singular/lemma for heads
-    head_to_lemma: dict[str, str] = {}
+    head_to_lemma = {h: singularize_word(h, language) for h in heads}
 
-    if language.lower().startswith("de") and NLP_DE is not None:
-        # batched lemmatization via spaCy
-        for head_tok, doc in zip(heads, NLP_DE.pipe(heads, batch_size=256)):
-            if doc and len(doc) > 0:
-                lemma = doc[0].lemma_ or head_tok
-                # keep capitalization for German nouns if input looked capitalized
-                if head_tok[:1].isupper() and lemma.islower():
-                    lemma = lemma.capitalize()
-                head_to_lemma[head_tok] = lemma
-            else:
-                head_to_lemma[head_tok] = head_tok
-    else:
-        # English or DE fallback: use inflect (EN) or your existing singularize_word
-        for head_tok in heads:
-            if language.lower().startswith("en"):
-                singular = INFLECT.singular_noun(head_tok)
-                head_to_lemma[head_tok] = singular or head_tok
-            else:
-                # fallback to your singularize_word for other langs / DE without spaCy
-                head_to_lemma[head_tok] = singularize_word(head_tok, language)
-
-    groups: dict[tuple[str, str], list[dict]] = {}
+    groups = {}
     for e, prefix, head in prepped:
         lemma = head_to_lemma.get(head, head)
         key = (prefix, lemma.lower())
