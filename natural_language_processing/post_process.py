@@ -171,18 +171,12 @@ def singularize_word(word: str, lang: str = "en") -> str:
         doc = NLP_DE(word)
         if not doc or len(doc) == 0:
             return word
-
         token = doc[0]
-        lemma = token.lemma_ or word
+        return token.lemma_ or word
 
-        # Guard: keep capitalization of proper nouns if input looked like proper noun
-        if word[:1].isupper() and lemma.islower():
-            # German nouns are capitalized; keep original case for display
-            return lemma.capitalize()
-        return lemma
     elif lang == "en":
         singular = inflect.engine().singular_noun(word)
-        return singular if singular else word
+        return singular or word
     return word
 
 

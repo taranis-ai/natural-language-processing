@@ -15,6 +15,46 @@ def test_normalize(s, expected):
     assert pc.normalize(s) == expected
 
 
+@pytest.mark.parametrize(
+    "name,expected",
+    [
+        ("ralf schumacher", ["ralf", "schumacher"]),
+        ("Jean-Luc Picard", ["Jean", "Luc", "Picard"]),
+        ("Sean O’Connor", ["Sean", "O", "Connor"]),
+        ("Hans Müller-Lüdenscheidt", ["Hans", "Müller", "Lüdenscheidt"]),
+        ("APT29", ["APT29"]),
+        ("", []),
+    ],
+)
+def test_tokenize_name(name, expected):
+    assert pc.tokenize_name(name) == expected
+
+
+@pytest.mark.parametrize(
+    "word,lang,expected",
+    [
+        ("dogs", "en", "dog"),
+        ("cars", "en", "car"),
+        ("houses", "en", "house"),
+        ("men", "en", "man"),
+        ("women", "en", "woman"),
+        ("children", "en", "child"),
+        ("mice", "en", "mouse"),
+        ("wolves", "en", "wolf"),
+        ("indices", "en", "index"),
+        ("matrices", "en", "matrix"),
+        ("Katzen", "de", "Katze"),
+        ("Häuser", "de", "Haus"),
+        ("Bücher", "de", "Buch"),
+        ("Männer", "de", "Mann"),
+        ("Frauen", "de", "Frau"),
+        ("Städte", "de", "Stadt"),
+    ],
+)
+def test_singularize_word(word, lang, expected):
+    assert pc.singularize_word(word, lang) == expected
+
+
 def test_deduplication():
     raw_entities = [
         ("Drone", "Product"),
@@ -35,45 +75,6 @@ def test_deduplication():
         {"text": "apple", "label": "Product"},
         {"text": "United Nations", "label": "Organization"},
     ]
-
-
-@pytest.mark.parametrize(
-    "name,expected",
-    [
-        ("ralf schumacher", ["ralf", "schumacher"]),
-        ("Jean-Luc Picard", ["Jean", "Luc", "Picard"]),
-        ("Sean O’Connor", ["Sean", "O", "Connor"]),
-        ("Hans Müller-Lüdenscheidt", ["Hans", "Müller", "Lüdenscheidt"]),
-        ("APT29", ["APT29"]),
-        ("", []),
-    ],
-)
-def test_tokenize_name(name, expected):
-    assert pc.tokenize_name(name) == expected
-
-
-@pytest.mark.parametrize(
-    "word,expected",
-    [
-        ("companies", "company"),
-        ("batteries", "battery"),
-        ("buses", "bus"),
-        ("analyses", "analysis"),
-        ("police", "police"),
-        ("data", "datum"),
-        ("status", "status"),
-    ],
-)
-def test_singularize_word_en(word, expected):
-    assert pc.singularize_word(word, "en") == expected
-
-
-@pytest.mark.parametrize(
-    "word,expected",
-    [("Schafe", "Schaf"), ("Veranstaltungen", "Veranstaltung"), ("Syteme", "System")],
-)
-def test_singularize_word_de(word, expected):
-    assert pc.singularize_word(word, "de") == expected
 
 
 @pytest.mark.parametrize(
