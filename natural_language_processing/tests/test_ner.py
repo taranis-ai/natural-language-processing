@@ -1,59 +1,56 @@
-from natural_language_processing.roberta_ner import RobertaNER
-from natural_language_processing.flair_ner import FlairNER
-from natural_language_processing.gliner import GLiNERModel
+import pytest
 from jsonschema import validate
 
 
-def test_exapmle_ner_flair(example_text: str, flair_model: FlairNER, extended_output_schema: dict):
-    result = flair_model.predict(example_text)
-    expected = {"Australia": "LOC", "Wile E. Coyote": "PER"}
-    missed_entities = {entity for entity in expected if entity not in result}
-    assert not missed_entities, f"Not all expected entities were identified: {missed_entities}"
-    mislabelled_entities = {entity for entity, label in expected.items() if result[entity] != label}
-    assert not mislabelled_entities, f"Not all expected entities were labelled correctly: {mislabelled_entities}"
+def assert_entities(result: dict[str, str], expected: dict[str, str]) -> None:
+    """Assert that all expected entities are present with correct labels.
+    Order-independent and tolerant to extra entities in 'result'."""
+    missing = set(expected) - set(result)
+    assert not missing, f"Missing entities: {missing}"
 
-    extended_result = flair_model.predict(example_text, extended_output=True)
-    validate(instance=extended_result, schema=extended_output_schema)
+    mislabelled = {ent: (expected[ent], result[ent]) for ent in expected if result.get(ent) != expected[ent]}
+    assert not mislabelled, f"Mislabelled entities: {mislabelled}"
 
 
-def test_example_ner_roberta(example_text: str, roberta_model: RobertaNER, extended_output_schema):
-    result = roberta_model.predict(example_text)
-    expected = {"ACME Corporation": "ORG", "Acme City": "LOC", "Australia": "LOC", "Dynamite": "MISC"}
-    missed_entities = {entity for entity in expected if entity not in result}
-    assert not missed_entities, f"Not all expected entities were identified: {missed_entities}"
-    mislabelled_entities = {entity for entity, label in expected.items() if result[entity] != label}
-    assert not mislabelled_entities, f"Not all expected entities were labelled correctly: {mislabelled_entities}"
+@pytest.mark.parametrize(
+    "model_fixture,text_fixture,expected,is_cybersecurity",
+    [
+        ("flair_model", "example_text", {"Australia": "LOC", "Wile E. Coyote": "PER"}, False),
+        ("roberta_model", "example_text", {"ACME Corporation": "ORG", "Acme City": "LOC", "Australia": "LOC", "Dynamite": "MISC"}, False),
+        (
+            "gliner_model",
+            "example_text",
+            {"ACME Corporation": "Organization", "Acme City": "Location", "Australia": "Location", "Dynamite": "Product"},
+            False,
+        ),
+        ("gliner_model", "example_cybersec_text", {"Emotet": "Malware", "Microsoft 365": "Product"}, True),
+    ],
+)
+def test_ner_models(
+    request: pytest.FixtureRequest,
+    model_fixture: str,
+    text_fixture: str,
+    expected: dict,
+    is_cybersecurity: bool,
+    extended_output_schema: dict,
+):
+    model = request.getfixturevalue(model_fixture)
+    text = request.getfixturevalue(text_fixture)
 
-    extended_result = roberta_model.predict(example_text, extended_output=True)
-    validate(instance=extended_result, schema=extended_output_schema)
+    result = model.predict(text, extended_output=False, is_cybersecurity=is_cybersecurity)
+    assert isinstance(result, dict)
+    assert_entities(result, expected)
+
+    extended = model.predict(text, extended_output=True, is_cybersecurity=is_cybersecurity)
+    validate(instance=extended, schema=extended_output_schema)
 
 
-def test_example_ner_gliner(example_cybersec_text: str, gliner_model: GLiNERModel, extended_output_schema):
-    result = gliner_model.predict(example_cybersec_text)
-    expected = {"Emotet": "MALWARE", "Microsoft": "ORG"}
-
-    missed_entities = {entity for entity in expected if entity not in result}
-    assert not missed_entities, f"Not all expected entities were identified: {missed_entities}"
-    mislabelled_entities = {entity for entity, label in expected.items() if result[entity] != label}
-    assert not mislabelled_entities, f"Not all expected entities were labelled correctly: {mislabelled_entities}"
-
-    extended_result = gliner_model.predict(example_cybersec_text, extended_output=True)
-    validate(instance=extended_result, schema=extended_output_schema)
-
-
-def test_ner_flair(article: tuple[str, list], flair_model: FlairNER):
+@pytest.mark.parametrize(
+    "model_fixture",
+    ["flair_model", "roberta_model"],
+)
+def test_ner_on_articles(request: pytest.FixtureRequest, model_fixture: str, article: tuple[str, dict]):
     content, expected = article
-    result = flair_model.predict(content)
-    missed_entities = {entity for entity in expected if entity not in result}
-    assert not missed_entities, f"Not all expected entities were identified: {missed_entities}"
-    mislabelled_entities = {entity for entity, label in expected.items() if result[entity] != label}
-    assert not mislabelled_entities, f"Not all expected entities were labelled correctly: {mislabelled_entities}"
-
-
-def test_ner_roberta(article: tuple[str, list], roberta_model: RobertaNER):
-    content, expected = article
-    result = roberta_model.predict(content)
-    missed_entities = {entity for entity in expected if entity not in result}
-    assert not missed_entities, f"Not all expected entities were identified: {missed_entities}"
-    mislabelled_entities = {entity for entity, label in expected.items() if result[entity] != label}
-    assert not mislabelled_entities, f"Not all expected entities were labelled correctly: {mislabelled_entities}"
+    model = request.getfixturevalue(model_fixture)
+    result = model.predict(content)
+    assert_entities(result, expected)
