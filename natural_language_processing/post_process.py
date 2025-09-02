@@ -2,12 +2,8 @@ import re
 import inflect
 import spacy
 
-try:
-    _NLP_DE = spacy.load("de_core_news_sm", disable=["ner", "textcat"])
-except Exception:
-    _NLP_DE = None  # fallback if model not installed
-
-_INFLECT = inflect.engine()
+NLP_DE = spacy.load("de_core_news_sm", disable=["ner", "textcat"])
+INFLECT = inflect.engine()
 
 DEMONYM_TO_COUNTRY_EN = {
     "russian": "russia",
@@ -100,8 +96,25 @@ IRREGULAR_PLURALS = {
     "children": "child",
     "mice": "mouse",
     "geese": "goose",
+    "teeth": "tooth",
+    "feet": "foot",
+    "oxen": "ox",
+    "lice": "louse",
+    "dice": "die",
+    "cacti": "cactus",
+    "fungi": "fungus",
+    "nuclei": "nucleus",
+    "alumni": "alumnus",
+    "syllabi": "syllabus",
     "indices": "index",
     "matrices": "matrix",
+    "criteria": "criterion",
+    "phenomena": "phenomenon",
+    "appendices": "appendix",
+    "theses": "thesis",
+    "analyses": "analysis",
+    "diagnoses": "diagnosis",
+    "crises": "crisis",
     "data": "datum",
     "media": "medium",
     "barracks": "barracks",
@@ -115,6 +128,23 @@ IRREGULAR_PLURALS = {
     "länder": "land",
     "regionen": "region",
     "zeiten": "zeit",
+    "männer": "mann",
+    "frauen": "frau",
+    "häuser": "haus",
+    "bücher": "buch",
+    "lieder": "lied",
+    "bäume": "baum",
+    "mäuse": "maus",
+    "füße": "fuß",
+    "kühe": "kuh",
+    "eier": "ei",
+    "wörter": "wort",
+    "worte": "wort",
+    "bilder": "bild",
+    "töchter": "tochter",
+    "brüder": "bruder",
+    "väter": "vater",
+    "mütter": "mutter",
 }
 
 
@@ -138,8 +168,7 @@ def singularize_word(word: str, lang: str = "en") -> str:
         return IRREGULAR_PLURALS[word]
 
     if lang == "de":
-        nlp = spacy.load("de_core_news_sm", disable=["ner", "textcat"])
-        doc = nlp(word)
+        doc = NLP_DE(word)
         if not doc or len(doc) == 0:
             return word
 
@@ -174,15 +203,15 @@ def map_demonym_to_country(entity: str) -> str | None:
 
 
 def deduplication(entities: list[dict]) -> list[dict]:
-    # remove duplicates
-    best = {}
+    # remove duplicates with different casing from same category
+    unique = {}
     for e in entities:
-        key = normalize(e["text"])
-        score = e.get("score", 0)
-        # keep higher score, then longer text as tie-break
-        if key not in best or (score, len(e["text"])) > (best[key].get("score", 0), len(best[key]["text"])):
-            best[key] = e
-    return list(best.values())
+        key = (normalize(e["text"]), e["label"])
+        if key not in unique:
+            unique[key] = e
+        elif e["text"][0].isupper() and not unique[key]["text"][0].isupper():
+            unique[key] = e
+    return list(unique.values())
 
 
 def drop_demonyms(entities: list[dict]) -> list[dict]:
@@ -246,9 +275,9 @@ def singularize(entities: list[dict], language: str = "en") -> list[dict]:
     # Compute singular/lemma for heads
     head_to_lemma: dict[str, str] = {}
 
-    if language.lower().startswith("de") and _NLP_DE is not None:
+    if language.lower().startswith("de") and NLP_DE is not None:
         # batched lemmatization via spaCy
-        for head_tok, doc in zip(heads, _NLP_DE.pipe(heads, batch_size=256)):
+        for head_tok, doc in zip(heads, NLP_DE.pipe(heads, batch_size=256)):
             if doc and len(doc) > 0:
                 lemma = doc[0].lemma_ or head_tok
                 # keep capitalization for German nouns if input looked capitalized
@@ -261,7 +290,7 @@ def singularize(entities: list[dict], language: str = "en") -> list[dict]:
         # English or DE fallback: use inflect (EN) or your existing singularize_word
         for head_tok in heads:
             if language.lower().startswith("en"):
-                singular = _INFLECT.singular_noun(head_tok)
+                singular = INFLECT.singular_noun(head_tok)
                 head_to_lemma[head_tok] = singular or head_tok
             else:
                 # fallback to your singularize_word for other langs / DE without spaCy
@@ -294,8 +323,7 @@ def singularize(entities: list[dict], language: str = "en") -> list[dict]:
 
 
 def clean_entities(entities: list[dict], lang: str = "en") -> list[dict[str, str]]:
-    # normalize whitespaces of entity texts
-    cleaned_ents = [{**e, "text": normalize(e.get("text", "")), "idx": e.get("idx", id(e))} for e in entities if e.get("text", "").strip()]
+    cleaned_ents = [{**e, "idx": e.get("idx", id(e))} for e in entities if e.get("text", "").strip()]
 
     cleaned_ents = deduplication(cleaned_ents)
     cleaned_ents = drop_demonyms(cleaned_ents)

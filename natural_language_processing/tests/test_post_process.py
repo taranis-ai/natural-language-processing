@@ -15,13 +15,35 @@ def test_normalize(s, expected):
     assert pc.normalize(s) == expected
 
 
+def test_deduplication():
+    raw_entities = [
+        ("Drone", "Product"),
+        ("drone", "Product"),
+        ("Karl Landsteiner", "Person"),
+        ("karl Landsteiner", "Person"),
+        ("Apple", "Organization"),
+        ("apple", "Product"),
+        ("united Nations", "Organization"),
+        ("United Nations", "Organization"),
+    ]
+    raw_entities = [{"text": e[0], "label": e[1]} for e in raw_entities]
+    processed_entities = pc.deduplication(raw_entities)
+    assert processed_entities == [
+        {"text": "Drone", "label": "Product"},
+        {"text": "Karl Landsteiner", "label": "Person"},
+        {"text": "Apple", "label": "Organization"},
+        {"text": "apple", "label": "Product"},
+        {"text": "United Nations", "label": "Organization"},
+    ]
+
+
 @pytest.mark.parametrize(
     "name,expected",
     [
         ("ralf schumacher", ["ralf", "schumacher"]),
         ("Jean-Luc Picard", ["Jean", "Luc", "Picard"]),
-        ("O’Connor", ["O", "Connor"]),
-        ("Müller-Lüdenscheidt", ["Müller", "Lüdenscheidt"]),
+        ("Sean O’Connor", ["Sean", "O", "Connor"]),
+        ("Hans Müller-Lüdenscheidt", ["Hans", "Müller", "Lüdenscheidt"]),
         ("APT29", ["APT29"]),
         ("", []),
     ],
