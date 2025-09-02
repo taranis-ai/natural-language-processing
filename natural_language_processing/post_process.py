@@ -274,20 +274,19 @@ def deduplicate_persons(entities: list[dict]) -> list[dict]:
     singletons = []
     multi = []
     for p in persons:
-        toks = tokenize_name(p["text"])
-        (multi if len(toks) >= 2 else singletons).append((p, toks))
+        tokens = tokenize_name(normalize(p["text"]))
+        (multi if len(tokens) >= 2 else singletons).append((p, tokens))
 
     to_drop_idcs = set()
 
-    for single_ent, s_toks in singletons:
-        s = s_toks[0] if s_toks else ""
+    for single_ent, singular_tokens in singletons:
+        s = singular_tokens[0] if singular_tokens else ""
         if not s:
             continue
-        for multi_ent, m_toks in multi:
-            if any(t == s for t in m_toks):
+        for _, multi_tokens in multi:
+            if any(t == s for t in multi_tokens):
                 to_drop_idcs.add(id(single_ent))
                 break
-
     return [e for e in entities if id(e) not in to_drop_idcs]
 
 

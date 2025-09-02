@@ -142,3 +142,77 @@ def test_deduplication():
 )
 def test_drop_demonyms(entities, expected):
     assert pc.drop_demonyms(entities) == expected
+
+
+@pytest.mark.parametrize(
+    "entities,expected",
+    [
+        (
+            [
+                {"text": "Willem Defoe", "type": "Person"},
+                {"text": "Defoe", "type": "Person"},
+                {"text": "Random Corp", "type": "Organization"},
+            ],
+            [
+                {"text": "Willem Defoe", "type": "Person"},
+                {"text": "Random Corp", "type": "Organization"},
+            ],
+        ),
+        (
+            [
+                {"text": "Defoe", "type": "Person"},
+                {"text": "Random Corp", "type": "Organization"},
+            ],
+            [
+                {"text": "Defoe", "type": "Person"},
+                {"text": "Random Corp", "type": "Organization"},
+            ],
+        ),
+        (
+            [
+                {"text": "WILLEM DEFOE", "type": "Person"},
+                {"text": "defoe", "type": "Person"},
+            ],
+            [
+                {"text": "WILLEM DEFOE", "type": "Person"},
+            ],
+        ),
+        (
+            [
+                {"text": "John Ronald Reuel Tolkien", "type": "Person"},
+                {"text": "Tolkien", "type": "Person"},
+                {"text": "John Ronald", "type": "Person"},
+            ],
+            [
+                {"text": "John Ronald Reuel Tolkien", "type": "Person"},
+                {"text": "John Ronald", "type": "Person"},
+            ],
+        ),
+        (
+            [
+                {"text": "John Smith", "type": "Person"},
+                {"text": "Anna Smith", "type": "Person"},
+                {"text": "Smith", "type": "Person"},
+            ],
+            [
+                {"text": "John Smith", "type": "Person"},
+                {"text": "Anna Smith", "type": "Person"},
+            ],
+        ),
+        (
+            [
+                {"text": "Berlin", "type": "Location"},
+                {"text": "Doe", "type": "Organization"},
+                {"text": "John Doe", "type": "Person"},
+                {"text": "Doe", "type": "Person"},
+            ],
+            [
+                {"text": "Berlin", "type": "Location"},
+                {"text": "Doe", "type": "Organization"},
+                {"text": "John Doe", "type": "Person"},
+            ],
+        ),
+    ],
+)
+def test_deduplicate_persons(entities, expected):
+    assert pc.deduplicate_persons(entities) == expected
