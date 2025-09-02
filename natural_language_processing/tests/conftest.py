@@ -201,3 +201,29 @@ def extended_output_schema():
             "required": ["value", "type"],
         },
     }
+
+
+@pytest.fixture
+def entities_en():
+    return [
+        {"idx": 1, "text": "Russia", "label": "Location"},
+        {"idx": 2, "text": "russian", "label": "Location"},
+        {"idx": 3, "text": "Willem Defoe", "label": "Person"},
+        {"idx": 4, "text": "Defoe", "label": "Person"},
+        {"idx": 5, "text": "prices", "label": "Misc"},
+        {"idx": 6, "text": "price", "label": "Misc"},
+    ]
+
+
+@pytest.fixture
+def entities_de():
+    return [
+        {"idx": 1, "text": "Spanien", "label": "Location"},
+        {"idx": 2, "text": "Spanier", "label": "Location"},
+        {"idx": 3, "text": "Russland", "label": "Location"},
+        {"idx": 4, "text": "russischen", "label": "Location"},
+        {"idx": 5, "text": "Katzen", "label": "Misc"},
+        {"idx": 6, "text": "Katze", "label": "Misc"},
+        {"idx": 7, "text": "Burroughs", "label": "Person"},
+        {"idx": 8, "text": "William S. Burroughs", "label": "Person"},
+    ]

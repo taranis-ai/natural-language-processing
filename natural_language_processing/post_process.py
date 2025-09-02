@@ -256,7 +256,7 @@ def drop_demonyms(entities: list[dict]) -> list[dict]:
     texts = {normalize(e["text"]) for e in entities}
     to_drop_idcs = set()
     for e in entities:
-        if e.get("type") != "Location":
+        if e.get("label") != "Location":
             continue
         ent_txt = normalize(e["text"])
         country = map_demonym_to_country(ent_txt)
@@ -270,7 +270,7 @@ def deduplicate_persons(entities: list[dict]) -> list[dict]:
     # if a person is mentioned twice in a text (e.g. Willem Defoe & Defoe)
     # -> drop the tag with only the last name
 
-    persons = [e for e in entities if e["type"] == "Person"]
+    persons = [e for e in entities if e["label"] == "Person"]
     singletons = []
     multi = []
     for p in persons:

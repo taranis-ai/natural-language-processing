@@ -123,20 +123,20 @@ def test_deduplication():
     "entities,expected",
     [
         (
-            [{"text": "Russia", "type": "Location"}, {"text": "russian", "type": "Location"}],
-            [{"text": "Russia", "type": "Location"}],
+            [{"text": "Russia", "label": "Location"}, {"text": "russian", "label": "Location"}],
+            [{"text": "Russia", "label": "Location"}],
         ),
         (
-            [{"text": "russian", "type": "Location"}, {"text": "Berlin", "type": "Location"}],
-            [{"text": "russian", "type": "Location"}, {"text": "Berlin", "type": "Location"}],
+            [{"text": "russian", "label": "Location"}, {"text": "Berlin", "label": "Location"}],
+            [{"text": "russian", "label": "Location"}, {"text": "Berlin", "label": "Location"}],
         ),
         (
-            [{"text": "RUSSIA", "type": "Location"}, {"text": "Russian", "type": "Location"}],
-            [{"text": "RUSSIA", "type": "Location"}],
+            [{"text": "RUSSIA", "label": "Location"}, {"text": "Russian", "label": "Location"}],
+            [{"text": "RUSSIA", "label": "Location"}],
         ),
         (
-            [{"text": "Russia", "type": "Location"}, {"text": "russian", "type": "Organization"}],
-            [{"text": "Russia", "type": "Location"}, {"text": "russian", "type": "Organization"}],
+            [{"text": "Russia", "label": "Location"}, {"text": "russian", "label": "Organization"}],
+            [{"text": "Russia", "label": "Location"}, {"text": "russian", "label": "Organization"}],
         ),
     ],
 )
@@ -149,67 +149,67 @@ def test_drop_demonyms(entities, expected):
     [
         (
             [
-                {"text": "Willem Defoe", "type": "Person"},
-                {"text": "Defoe", "type": "Person"},
-                {"text": "Random Corp", "type": "Organization"},
+                {"text": "Willem Defoe", "label": "Person"},
+                {"text": "Defoe", "label": "Person"},
+                {"text": "Random Corp", "label": "Organization"},
             ],
             [
-                {"text": "Willem Defoe", "type": "Person"},
-                {"text": "Random Corp", "type": "Organization"},
-            ],
-        ),
-        (
-            [
-                {"text": "Defoe", "type": "Person"},
-                {"text": "Random Corp", "type": "Organization"},
-            ],
-            [
-                {"text": "Defoe", "type": "Person"},
-                {"text": "Random Corp", "type": "Organization"},
+                {"text": "Willem Defoe", "label": "Person"},
+                {"text": "Random Corp", "label": "Organization"},
             ],
         ),
         (
             [
-                {"text": "WILLEM DEFOE", "type": "Person"},
-                {"text": "defoe", "type": "Person"},
+                {"text": "Defoe", "label": "Person"},
+                {"text": "Random Corp", "label": "Organization"},
             ],
             [
-                {"text": "WILLEM DEFOE", "type": "Person"},
-            ],
-        ),
-        (
-            [
-                {"text": "John Ronald Reuel Tolkien", "type": "Person"},
-                {"text": "Tolkien", "type": "Person"},
-                {"text": "John Ronald", "type": "Person"},
-            ],
-            [
-                {"text": "John Ronald Reuel Tolkien", "type": "Person"},
-                {"text": "John Ronald", "type": "Person"},
+                {"text": "Defoe", "label": "Person"},
+                {"text": "Random Corp", "label": "Organization"},
             ],
         ),
         (
             [
-                {"text": "John Smith", "type": "Person"},
-                {"text": "Anna Smith", "type": "Person"},
-                {"text": "Smith", "type": "Person"},
+                {"text": "WILLEM DEFOE", "label": "Person"},
+                {"text": "defoe", "label": "Person"},
             ],
             [
-                {"text": "John Smith", "type": "Person"},
-                {"text": "Anna Smith", "type": "Person"},
+                {"text": "WILLEM DEFOE", "label": "Person"},
             ],
         ),
         (
             [
-                {"text": "Berlin", "type": "Location"},
-                {"text": "Doe", "type": "Organization"},
-                {"text": "John Doe", "type": "Person"},
-                {"text": "Doe", "type": "Person"},
+                {"text": "John Ronald Reuel Tolkien", "label": "Person"},
+                {"text": "Tolkien", "label": "Person"},
+                {"text": "John Ronald", "label": "Person"},
             ],
             [
-                {"text": "Berlin", "type": "Location"},
-                {"text": "Doe", "type": "Organization"},
-                {"text": "John Doe", "type": "Person"},
+                {"text": "John Ronald Reuel Tolkien", "label": "Person"},
+                {"text": "John Ronald", "label": "Person"},
+            ],
+        ),
+        (
+            [
+                {"text": "John Smith", "label": "Person"},
+                {"text": "Anna Smith", "label": "Person"},
+                {"text": "Smith", "label": "Person"},
+            ],
+            [
+                {"text": "John Smith", "label": "Person"},
+                {"text": "Anna Smith", "label": "Person"},
+            ],
+        ),
+        (
+            [
+                {"text": "Berlin", "label": "Location"},
+                {"text": "Doe", "label": "Organization"},
+                {"text": "John Doe", "label": "Person"},
+                {"text": "Doe", "label": "Person"},
+            ],
+            [
+                {"text": "Berlin", "label": "Location"},
+                {"text": "Doe", "label": "Organization"},
+                {"text": "John Doe", "label": "Person"},
             ],
         ),
     ],
@@ -286,3 +286,32 @@ def test_deduplicate_persons(entities, expected):
 )
 def test_singularize(language, entities, expected):
     assert pc.singularize(entities, language) == expected
+
+
+def test_clean_entities_en(entities_en):
+    cleaned = pc.clean_entities(entities_en, lang="en")
+
+    assert any(e["text"] == "Russia" for e in cleaned)
+    assert all(e["text"] != "russian" for e in cleaned)
+
+    assert any(e["text"] == "Willem Defoe" for e in cleaned)
+    assert all(e["text"] != "Defoe" for e in cleaned)
+
+    assert any(e["text"] == "price" for e in cleaned)
+    assert all(e["text"] != "prices" for e in cleaned)
+
+
+def test_clean_entities_de(entities_de):
+    cleaned = pc.clean_entities(entities_de, lang="de")
+
+    assert any(e["text"] == "Spanien" for e in cleaned)
+    assert all(e["text"] != "Spanier" for e in cleaned)
+
+    assert any(e["text"] == "Russland" for e in cleaned)
+    assert all(e["text"] != "russischen" for e in cleaned)
+
+    assert any(e["text"] == "Katze" for e in cleaned)
+    assert all(e["text"] != "Katzen" for e in cleaned)
+
+    assert any(e["text"] == "William S. Burroughs" for e in cleaned)
+    assert all(e["text"] != "Burroughs" for e in cleaned)
