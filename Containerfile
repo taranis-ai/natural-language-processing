@@ -18,7 +18,7 @@ RUN uv venv && \
 
 FROM python:3.12-slim
 
-ARG MODEL="flair"
+ARG MODEL="gliner"
 
 WORKDIR /app/
 
