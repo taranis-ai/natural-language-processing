@@ -1,5 +1,6 @@
 from natural_language_processing.config import Config
 from natural_language_processing.predictor import Predictor
+from natural_language_processing.post_process import download_spacy_model
 
 
 class PredictorFactory:
@@ -10,6 +11,8 @@ class PredictorFactory:
     """
 
     def __new__(cls, *args, **kwargs) -> Predictor:
+        download_spacy_model(Config.SPACY_MODEL_PATH)
+
         if Config.MODEL == "flair":
             from natural_language_processing.flair_ner import FlairNER
 

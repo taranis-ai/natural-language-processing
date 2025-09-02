@@ -31,6 +31,7 @@ COPY --chown=user:user README.md app.py LICENSE.md /app/
 
 USER user
 
+ENV SPACY_MODEL_PATH=/app/data/de_core_news_sm
 ENV PYTHONOPTIMIZE=1
 ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONPATH=/app
