@@ -1,9 +1,21 @@
 import re
 import inflect
 import spacy
+from pathlib import Path
+from huggingface_hub import snapshot_download
 
-NLP_DE = spacy.load("de_core_news_sm", disable=["ner", "textcat"])
-INFLECT = inflect.engine()
+from natural_language_processing.log import logger
+from natural_language_processing.config import Config
+
+NLP_DE = None
+
+
+def get_nlp_de():
+    global NLP_DE
+    if NLP_DE is None:
+        NLP_DE = load_spacy_model(Config.SPACY_MODEL_PATH)
+    return NLP_DE
+
 
 DEMONYM_TO_COUNTRY_EN = {
     "russian": "russia",
@@ -148,6 +160,27 @@ IRREGULAR_PLURALS = {
 }
 
 
+def load_spacy_model(model_path: str) -> spacy.language.Language | None:
+    p = Path(model_path)
+    if not p.exists():
+        download_spacy_model(model_path)
+    try:
+        return spacy.load(model_path)
+    except Exception as e:
+        logger.error(f"Cannot load spacy model from {model_path}: {e}")
+        return None
+
+
+def download_spacy_model(model_path: str):
+    # try to create parent path of model_path
+    Path(model_path).parent.mkdir(exist_ok=True, parents=True)
+    try:
+        logger.info("Downloading spacy model spacy/de_core_news_sm")
+        snapshot_download("spacy/de_core_news_sm", local_dir=model_path)
+    except Exception as e:
+        logger.error(f"Failed to download model to {model_path}: {e}")
+
+
 def normalize(s: str) -> str:
     # remove whitespaces and cast to lowercase
     # " Marty   Friedman"  -> "marty friedman"
@@ -167,17 +200,19 @@ def singularize_word(word: str, language: str = "en") -> str:
     if word in IRREGULAR_PLURALS:
         return IRREGULAR_PLURALS[word]
 
-    if language == "de":
-        doc = NLP_DE(word)
-        if not doc or len(doc) == 0:
-            return word
-        token = doc[0]
-        return token.lemma_ or word
-
-    elif language == "en":
+    if language == "en":
         singular = inflect.engine().singular_noun(word)
         return singular or word
-    return word
+
+    nlp = get_nlp_de()
+    if nlp is None:
+        return word
+
+    doc = nlp(word)
+    if not doc or len(doc) == 0:
+        return word
+    token = doc[0]
+    return token.lemma_ or word
 
 
 def normalize_de_demonym_form(word: str) -> str:
