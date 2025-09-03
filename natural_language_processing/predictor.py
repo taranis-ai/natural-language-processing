@@ -9,7 +9,7 @@ class Predictor(ABC):
         pass
 
     @abstractmethod
-    def predict(self, text: str, extended_output: bool = False) -> dict[str, str] | list[dict]:
+    def predict(self, text: str, extended_output: bool = False, is_cybersecurity: bool = False) -> dict[str, str] | list[dict]:
         pass
 
     @property

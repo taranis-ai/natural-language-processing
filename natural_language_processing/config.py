@@ -18,8 +18,9 @@ class Settings(BaseSettings):
     GIT_INFO: dict[str, str] | None = None
     CACHE_TYPE: str = "SimpleCache"
     CACHE_DEFAULT_TIMEOUT: int = 300
-    MODEL: Literal["flair", "roberta", "roberta_german", "gliner"] = "flair"
+    MODEL: Literal["flair", "roberta", "roberta_german", "gliner"] = "gliner"
     EXT_OUT: bool = False
+    SPACY_MODEL_PATH: str = ""
 
     confidence_threshold: float = 0.9
 
@@ -27,6 +28,12 @@ class Settings(BaseSettings):
     def check_non_empty_string(cls, v: str, info: ValidationInfo) -> str:
         if not isinstance(v, str) or not v.strip():
             print("API_KEY is not set or empty, disabling API key requirement")
+        return v
+
+    @field_validator("SPACY_MODEL_PATH", mode="before")
+    def check_spacy_model_path(cls, v: str, info: ValidationInfo) -> str:
+        if not isinstance(v, str) or not v.strip():
+            print("SPACY_MODEL_PATH is not set or empty. Cannot use spacy for entity post processing.")
         return v
 
 

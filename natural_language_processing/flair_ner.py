@@ -11,7 +11,7 @@ class FlairNER(Predictor):
     def __init__(self):
         self.model = SequenceTagger.load(self.model_name)
 
-    def predict(self, text: str, extended_output: bool = False) -> dict[str, str] | list[dict]:
+    def predict(self, text: str, extended_output: bool = False, is_cybersecurity: bool = False) -> dict[str, str] | list[dict]:
         sentence = Sentence(text)
         self.model.predict(sentence)
 
