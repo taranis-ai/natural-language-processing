@@ -40,4 +40,4 @@ jobs:
     with:
       ghcr_image: ghcr.io/taranis-ai/taranis-nlp-bot
       model: ${{ matrix.model }}
-      latest: ${{ matrix.model == 'flair' }}
+      latest: ${{ matrix.model == 'gliner' }}
