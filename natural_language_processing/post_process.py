@@ -341,7 +341,6 @@ def singularize(entities: list[dict], language: str = "en") -> list[dict]:
         heads.append(head)
 
     head_to_lemma = {h: singularize_word(h, language) for h in heads}
-
     groups = {}
     for e, prefix, head in prepped:
         lemma = head_to_lemma.get(head, head)
@@ -354,15 +353,19 @@ def singularize(entities: list[dict], language: str = "en") -> list[dict]:
             cleaned.append(members[0])
             continue
 
+        if len({e["text"] for e in members}) == 1:
+            cleaned.extend(members)
+            continue
+
         lemma_lower = key[1]
         ranked = []
         for e in members:
             toks = tokenize_name(e["text"])
             head = (toks[-1] if toks else e["text"]).lower()
             exact = int(head == lemma_lower)
-            ranked.append((exact, -len(head), len(e["text"]), e))
-        ranked.sort(reverse=True)
-        cleaned.append(ranked[0][3])
+            ranked.append(((exact, -len(head), len(e["text"])), e))
+        ranked.sort(key=lambda x: x[0], reverse=True)
+        cleaned.append(ranked[0][1])
 
     cleaned_idx = {e["idx"] for e in cleaned}
     return [e for e in entities if e["idx"] in cleaned_idx]

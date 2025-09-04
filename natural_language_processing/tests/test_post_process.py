@@ -282,6 +282,17 @@ def test_deduplicate_persons(entities, expected):
                 {"idx": 2, "text": "Technische Universität"},
             ],
         ),
+        (
+            "en",
+            [
+                {"idx": 1, "text": "Marshmallow", "label": "Product"},
+                {"idx": 2, "text": "Marshmallow", "label": "Organization"},
+            ],
+            [
+                {"idx": 1, "text": "Marshmallow", "label": "Product"},
+                {"idx": 2, "text": "Marshmallow", "label": "Organization"},
+            ],
+        ),
     ],
 )
 def test_singularize(language, entities, expected):
