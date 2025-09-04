@@ -326,6 +326,9 @@ def deduplicate_persons(entities: list[dict]) -> list[dict]:
 
 
 def singularize(entities: list[dict], language: str = "en") -> list[dict]:
+    # if there are multiple entities of the same "label", one as singular and one
+    # as plural -> keep the singular
+    # e.g. drone & drones -> drone
     prepped = []
     heads = []
 
@@ -341,31 +344,28 @@ def singularize(entities: list[dict], language: str = "en") -> list[dict]:
         heads.append(head)
 
     head_to_lemma = {h: singularize_word(h, language) for h in heads}
-    groups = {}
+    groups: dict[tuple, list[dict]] = {}
     for e, prefix, head in prepped:
         lemma = head_to_lemma.get(head, head)
-        key = (prefix, lemma.lower())
+        key = (prefix, lemma.lower(), e.get("label"))
         groups.setdefault(key, []).append(e)
 
     cleaned = []
-    for key, members in groups.items():
-        if len(members) == 1:
-            cleaned.append(members[0])
-            continue
+    for (prefix, lemma_lower, _), members in groups.items():
+        best = None
+        best_len = None
 
-        if len({e["text"] for e in members}) == 1:
-            cleaned.extend(members)
-            continue
-
-        lemma_lower = key[1]
-        ranked = []
         for e in members:
             toks = tokenize_name(e["text"])
-            head = (toks[-1] if toks else e["text"]).lower()
-            exact = int(head == lemma_lower)
-            ranked.append(((exact, -len(head), len(e["text"])), e))
-        ranked.sort(key=lambda x: x[0], reverse=True)
-        cleaned.append(ranked[0][1])
+            head_lower = (toks[-1] if toks else e["text"]).lower()
+            if head_lower == lemma_lower:
+                L = len(e["text"])
+                if best is None or L < best_len:
+                    best = e
+                    best_len = L
+        if best is None:
+            best = members[0]  # fallback: first seen
+        cleaned.append(best)
 
     cleaned_idx = {e["idx"] for e in cleaned}
     return [e for e in entities if e["idx"] in cleaned_idx]

@@ -224,62 +224,62 @@ def test_deduplicate_persons(entities, expected):
         (
             "en",
             [
-                {"idx": 1, "text": "prices"},
-                {"idx": 2, "text": "price"},
+                {"idx": 1, "text": "prices", "label": "MISC"},
+                {"idx": 2, "text": "price", "label": "MISC"},
             ],
             [
-                {"idx": 2, "text": "price"},
-            ],
-        ),
-        (
-            "en",
-            [
-                {"idx": 1, "text": "Wolves"},
-                {"idx": 2, "text": "Wolf"},
-            ],
-            [
-                {"idx": 2, "text": "Wolf"},
+                {"idx": 2, "text": "price", "label": "MISC"},
             ],
         ),
         (
             "en",
             [
-                {"idx": 1, "text": "Apple Stores"},
-                {"idx": 2, "text": "Apple Store"},
+                {"idx": 1, "text": "drones", "label": "Product"},
+                {"idx": 2, "text": "drone", "label": "Product"},
             ],
             [
-                {"idx": 2, "text": "Apple Store"},
+                {"idx": 2, "text": "drone", "label": "Product"},
             ],
         ),
         (
             "en",
             [
-                {"idx": 1, "text": "dogs"},
-                {"idx": 2, "text": "smartphones"},
+                {"idx": 1, "text": "Apple Stores", "label": "Location"},
+                {"idx": 2, "text": "Apple Store", "label": "Location"},
             ],
             [
-                {"idx": 1, "text": "dogs"},
-                {"idx": 2, "text": "smartphones"},
+                {"idx": 2, "text": "Apple Store", "label": "Location"},
+            ],
+        ),
+        (
+            "en",
+            [
+                {"idx": 1, "text": "busses", "label": "Product"},
+                {"idx": 2, "text": "smartphones", "label": "Product"},
+            ],
+            [
+                {"idx": 1, "text": "busses", "label": "Product"},
+                {"idx": 2, "text": "smartphones", "label": "Product"},
             ],
         ),
         (
             "de",
             [
-                {"idx": 1, "text": "Katzen"},
-                {"idx": 2, "text": "Katze"},
+                {"idx": 1, "text": "Schulen", "label": "Location"},
+                {"idx": 2, "text": "Schule", "label": "Location"},
             ],
             [
-                {"idx": 2, "text": "Katze"},
+                {"idx": 2, "text": "Schule", "label": "Location"},
             ],
         ),
         (
             "de",
             [
-                {"idx": 1, "text": "Technische Universitäten"},
-                {"idx": 2, "text": "Technische Universität"},
+                {"idx": 1, "text": "Technische Universitäten", "label": "Organization"},
+                {"idx": 2, "text": "Technische Universität", "label": "Organization"},
             ],
             [
-                {"idx": 2, "text": "Technische Universität"},
+                {"idx": 2, "text": "Technische Universität", "label": "Organization"},
             ],
         ),
         (
