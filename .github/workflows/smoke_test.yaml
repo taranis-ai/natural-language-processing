@@ -9,14 +9,17 @@ jobs:
   test_docker_deployment:
     if: ${{ github.event.review.state == 'approved' || github.event_name == 'workflow_dispatch' || true }}
     runs-on: ubuntu-latest
+    env:
+      DOCKER_IMAGE_NAMESPACE: ghcr.io/taranis-ai
+      GITHUB_REPOSITORY_OWNER: ghcr.io/taranis-ai
+      TARANIS_BOT_TAG: latest
+      BOT_API_KEY: testkey
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Build Docker images from PR code
-        env:
-            GITHUB_REPOSITORY_OWNER: ghcr.io/taranis-ai
         run: |
           chmod +x build_container.sh
           ./build_container.sh
@@ -39,10 +42,6 @@ jobs:
           EOF
 
       - name: Run docker compose for last commit
-        env:
-          BOT_API_KEY: testkey
-          DOCKER_IMAGE_NAMESPACE: ghcr.io/taranis-ai
-          TARANIS_BOT_TAG: latest
         run: |
           docker compose -f compose.e2e.yml up --pull=never --wait-timeout=60 --wait
           echo "Echo docker ps -a:"
