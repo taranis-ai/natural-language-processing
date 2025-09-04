@@ -16,7 +16,7 @@ jobs:
 
       - name: Build Docker images from PR code
         env:
-            DOCKER_REPOSITORY_OWNER: ghcr.io/taranis-ai
+            GITHUB_REPOSITORY_OWNER: ghcr.io/taranis-ai
         run: |
           chmod +x build_container.sh
           ./build_container.sh
