@@ -1,6 +1,6 @@
 services:
   nlp_bot:
-    image: "ghcr.io/taranis-ai/taranis-nlp-bot:${TARANIS_BOT_TAG:-latest}"
+    image: "${DOCKER_IMAGE_NAMESPACE:-ghcr.io/taranis-ai}/taranis-nlp-bot:${TARANIS_BOT_TAG:-latest}"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import requests; requests.get('http://localhost:8000/health', timeout=5).raise_for_status()\""]
       interval: 1m30s
@@ -8,5 +8,5 @@ services:
       retries: 5
       start_period: 30s
     environment:
-      API_KEY: "${BOT_API_KEY}"
-      DEBUG: "${DEBUG:-False}"
+      API_KEY: "${BOT_API_KEY:-testkey}"
+      DEBUG: "${DEBUG:-True}"

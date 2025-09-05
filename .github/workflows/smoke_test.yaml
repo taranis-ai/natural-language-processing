@@ -10,8 +10,7 @@ jobs:
     if: ${{ github.event.review.state == 'approved' || github.event_name == 'workflow_dispatch' || true }}
     runs-on: ubuntu-latest
     env:
-      TARANIS_BOT_TAG: latest
-      BOT_API_KEY: testkey
+      TARANIS_BOT_TAG: ${{ github.ref_name }}
 
     steps:
       - name: Build, no push
