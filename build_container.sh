@@ -17,3 +17,4 @@ docker buildx build --file Containerfile \
   --tag "${GITHUB_REPOSITORY_OWNER}/taranis-nlp-bot:${CURRENT_BRANCH}" \
   --tag "${GITHUB_REPOSITORY_OWNER}/taranis-nlp-bot:${MODEL}" \
   --load .
+  
