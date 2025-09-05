@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TARANIS_BOT_TAG: ${{ github.ref_name }}
+      REPO_NAME: ${{ github.event.repository.name }}
 
     steps:
       - name: Build, no push
