@@ -30,6 +30,6 @@ jobs:
           docker compose -f compose.e2e.yml up --pull=never --wait-timeout=60 --wait
           echo "Echo docker ps -a:"
           docker ps -a
-          echo "Echo core logs:"
-          docker compose logs core
+          echo "Echo logs:"
+          docker compose logs
           docker compose down
