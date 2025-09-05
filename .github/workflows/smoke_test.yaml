@@ -21,6 +21,9 @@ jobs:
           push: false
           tags: ghcr.io/${{ github.repository }}:${{ github.ref_name }}
 
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Run docker compose for last commit
         working-directory: docker/
         run: |
