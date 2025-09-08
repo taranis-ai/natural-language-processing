@@ -198,21 +198,27 @@ def deduplicate_persons(entities: list[dict]) -> list[dict]:
     # -> drop the entity with only the last name
 
     persons = [e for e in entities if e["label"] == "Person"]
-    singletons = []
-    multi = []
+    single_word_list = []
+    multi_word_list = []
+
+    # split persons into single-word and multi-word (e.g. "Defoe" & "Willem Defoe")
     for p in persons:
         tokens = tokenize_name(normalize(p["text"]))
-        (multi if len(tokens) >= 2 else singletons).append((p, tokens))
+        if len(tokens) >= 2:
+            multi_word_list.append((p, tokens))
+        else:
+            single_word_list.append((p, tokens))
 
     to_drop_idcs = set()
 
-    for single_ent, singular_tokens in singletons:
-        s = singular_tokens[0] if singular_tokens else ""
+    # for each single-word entity, check if it is contained in any of the multi-word entities
+    for single_word_entity, single_word_tokens in single_word_list:
+        s = single_word_tokens[0] if single_word_tokens else ""
         if not s:
             continue
-        for _, multi_tokens in multi:
+        for _, multi_tokens in multi_word_list:
             if any(t == s for t in multi_tokens):
-                to_drop_idcs.add(id(single_ent))
+                to_drop_idcs.add(id(single_word_entity))
                 break
     return [e for e in entities if id(e) not in to_drop_idcs]
 
