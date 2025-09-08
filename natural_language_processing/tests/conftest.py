@@ -3,10 +3,6 @@ import pytest
 from natural_language_processing.roberta_ner import RobertaNER
 from natural_language_processing.flair_ner import FlairNER
 from natural_language_processing.gliner import GLiNERModel
-from natural_language_processing.config import Config
-
-
-Config.SPACY_MODEL_PATH = "/tmp/natural_language_processing_test/de_core_news_sm"
 
 
 @pytest.fixture(scope="session")
@@ -209,7 +205,7 @@ def extended_output_schema():
 
 @pytest.fixture
 def entities_en():
-    return [
+    entities = [
         {"idx": 1, "text": "Russia", "label": "Location"},
         {"idx": 2, "text": "russian", "label": "Location"},
         {"idx": 3, "text": "Willem Defoe", "label": "Person"},
@@ -217,11 +213,17 @@ def entities_en():
         {"idx": 5, "text": "prices", "label": "Misc"},
         {"idx": 6, "text": "price", "label": "Misc"},
     ]
+    text = (
+        "Russia was mentioned in the article, and a russian diplomat was quoted. "
+        "The actor Willem Defoe gave a speech, and later only Defoe was mentioned. "
+        "The prices have been falling, but the word price is also common in the text."
+    )
+    return entities, text
 
 
 @pytest.fixture
 def entities_de():
-    return [
+    entities = [
         {"idx": 1, "text": "Spanien", "label": "Location"},
         {"idx": 2, "text": "Spanier", "label": "Location"},
         {"idx": 3, "text": "Russland", "label": "Location"},
@@ -231,3 +233,10 @@ def entities_de():
         {"idx": 7, "text": "Burroughs", "label": "Person"},
         {"idx": 8, "text": "William S. Burroughs", "label": "Person"},
     ]
+    text = (
+        "Spanien wurde in dem Bericht erwähnt, ebenso ein Spanier. "
+        "Russland ist ein großes Land, und die russischen Beziehungen wurden diskutiert. "
+        "Die Katzen spielten im Garten, aber eine einzelne Katze schlief auf dem Sofa. "
+        "Der Autor William S. Burroughs schrieb viele Bücher, später wurde nur Burroughs genannt."
+    )
+    return entities, text

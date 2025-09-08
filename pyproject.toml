@@ -24,8 +24,7 @@ dependencies = [
     "pydantic-settings",
     "python-dotenv",
     "gliner>=0.2.16",
-    "spacy>=3.7.0,<3.8.0",
-    "inflect>=7.5.0",
+    "simplemma>=1.1.2",
 ]
 dynamic = ["version"]
 

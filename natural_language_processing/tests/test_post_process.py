@@ -31,31 +31,6 @@ def test_tokenize_name(name, expected):
 
 
 @pytest.mark.parametrize(
-    "word,lang,expected",
-    [
-        ("dogs", "en", "dog"),
-        ("cars", "en", "car"),
-        ("houses", "en", "house"),
-        ("men", "en", "man"),
-        ("women", "en", "woman"),
-        ("children", "en", "child"),
-        ("mice", "en", "mouse"),
-        ("wolves", "en", "wolf"),
-        ("indices", "en", "index"),
-        ("matrices", "en", "matrix"),
-        ("Katzen", "de", "Katze"),
-        ("Häuser", "de", "Haus"),
-        ("Bücher", "de", "Buch"),
-        ("Männer", "de", "Mann"),
-        ("Frauen", "de", "Frau"),
-        ("Städte", "de", "Stadt"),
-    ],
-)
-def test_singularize_word(word, lang, expected):
-    assert pc.singularize_word(word, lang) == expected
-
-
-@pytest.mark.parametrize(
     "word,expected",
     [
         ("chinesische", "chinesisch"),
@@ -95,6 +70,45 @@ def test_normalize_de_demonym_form(word, expected):
 )
 def test_map_demonym_to_country(inp, expected):
     assert pc.map_demonym_to_country(inp) == expected
+
+
+@pytest.mark.parametrize(
+    "entities,expected",
+    [
+        (
+            [{"text": "Commodore 64.", "label": "Product"}],
+            [{"text": "Commodore 64", "label": "Product"}],
+        ),
+        (
+            [{"text": "Hello!", "label": "MISC"}],
+            [{"text": "Hello", "label": "MISC"}],
+        ),
+        (
+            [{"text": "?Berlin?", "label": "Location"}],
+            [{"text": "Berlin", "label": "Location"}],
+        ),
+        (
+            [{"text": "!!!Wow!!!", "label": "MISC"}],
+            [{"text": "Wow", "label": "MISC"}],
+        ),
+        (
+            [{"text": "Jean-Luc", "label": "Person"}],
+            [{"text": "Jean-Luc", "label": "Person"}],
+        ),
+        (
+            [
+                {"text": "Paris,", "label": "Location"},
+                {"text": "London;", "label": "Location"},
+            ],
+            [
+                {"text": "Paris", "label": "Location"},
+                {"text": "London", "label": "Location"},
+            ],
+        ),
+    ],
+)
+def test_remove_leading_trailing_punctuation(entities, expected):
+    assert pc.remove_leading_trailing_punctuation(entities) == expected
 
 
 def test_deduplication():
@@ -219,77 +233,99 @@ def test_deduplicate_persons(entities, expected):
 
 
 @pytest.mark.parametrize(
-    "language,entities,expected",
+    "entities,text,expected",
     [
         (
-            "en",
             [
-                {"idx": 1, "text": "prices"},
-                {"idx": 2, "text": "price"},
+                {"text": "prices", "label": "MISC"},
+                {"text": "price", "label": "MISC"},
             ],
-            [
-                {"idx": 2, "text": "price"},
-            ],
+            "We track the price daily.",
+            {("price", "MISC")},
         ),
         (
-            "en",
             [
-                {"idx": 1, "text": "Wolves"},
-                {"idx": 2, "text": "Wolf"},
+                {"text": "drones", "label": "Product"},
+                {"text": "drone", "label": "Product"},
             ],
-            [
-                {"idx": 2, "text": "Wolf"},
-            ],
+            "Multiple drones were sent out to detect unusual activity of the local wildlife.",
+            {("drone", "Product")},
         ),
         (
-            "en",
-            [
-                {"idx": 1, "text": "Apple Stores"},
-                {"idx": 2, "text": "Apple Store"},
-            ],
-            [
-                {"idx": 2, "text": "Apple Store"},
-            ],
+            [{"text": "Apple stores", "label": "Location"}, {"text": "Apple store", "label": "Location"}],
+            "Your local Apple stores will be restocked by the end of the week.",
+            {("Apple store", "Location")},
         ),
         (
-            "en",
             [
-                {"idx": 1, "text": "dogs"},
-                {"idx": 2, "text": "smartphones"},
+                {"text": "Paläste", "label": "Location"},
             ],
-            [
-                {"idx": 1, "text": "dogs"},
-                {"idx": 2, "text": "smartphones"},
-            ],
+            "Die Paläste wurden renoviert.",
+            {("Paläste", "Location")},
         ),
         (
-            "de",
             [
-                {"idx": 1, "text": "Katzen"},
-                {"idx": 2, "text": "Katze"},
+                {"text": "Katzen", "label": "MISC"},
+                {"text": "Katze", "label": "MISC"},
             ],
-            [
-                {"idx": 2, "text": "Katze"},
-            ],
+            "Mehrere Katzen kamen zusammen um sich über die Aufnahme einer neuen Katze zu beraten.",
+            {("Katze", "MISC")},
         ),
         (
-            "de",
             [
-                {"idx": 1, "text": "Technische Universitäten"},
-                {"idx": 2, "text": "Technische Universität"},
+                {"text": "Marshmallow", "label": "Product"},
+                {"text": "Marshmallow", "label": "Organization"},
             ],
+            "Marshmallows by the company aptly named Marshmallow, are really good.",
+            {("Marshmallow", "Product"), ("Marshmallow", "Organization")},
+        ),
+        (
             [
-                {"idx": 2, "text": "Technische Universität"},
+                {"text": "Nachbarn", "label": "Person"},
+                {"text": "Nachbar", "label": "Person"},
             ],
+            "Die Nachbarn störten schon wieder einmal die Nachtruhe",
+            {("Nachbar", "Person")},
+        ),
+        (
+            [
+                {"text": "Technischen Universitäten", "label": "Organization"},
+                {"text": "Technische Universität", "label": "Organization"},
+            ],
+            "Die Technischen Universitäten sind von zweifelhaftem Ruf. Überhaupt die Technische Universität Wels.",
+            {("Technische Universität", "Organization")},
+        ),
+        (
+            [{"text": "geese", "label": "Animal"}],
+            "Many geese form a gaggle.",
+            {("geese", "Animal")},
+        ),
+        (
+            [{"text": "Handy", "label": "Product"}, {"text": "Handy", "label": "Product"}],
+            "Bundesweiter Warntag: Donnerstag bimmeln auch die Handys wieder. Am bundesweiten Warntag werden wieder Warnmeldungen per Handy, Radio und über weitere Kanäle verbreitet",
+            {("Handy", "Product")},
+        ),
+        (
+            [{"text": "Premium-Smartphones", "label": "Product"}, {"text": "Premium-Smartphone", "label": "Product"}],
+            "Premium-Smartphones sind immer noch heiß begehrt. Jedoch erhält man für um die 600 euro mittlerweile auch ein Premium-Smartphone aus dem Vorjahr.",
+            {("Premium-Smartphone", "Product")},
+        ),
+        (
+            [{"text": "Fliegers", "label": "Product"}],
+            "Vor Kurzem war das GPS des Fliegers von der Leyens betroffen.",
+            {("Flieger", "Product")},
         ),
     ],
 )
-def test_singularize(language, entities, expected):
-    assert pc.singularize(entities, language) == expected
+def test_deduplicate_by_lemma(entities, text, expected):
+    result = pc.deduplicate_by_lemma(entities, text)
+    got = {(e["text"], e["label"]) for e in result}
+    assert got == expected
 
 
 def test_clean_entities_en(entities_en):
-    cleaned = pc.clean_entities(entities_en, lang="en")
+    entities, text = entities_en
+    cleaned = pc.clean_entities(entities, text)
 
     assert any(e["text"] == "Russia" for e in cleaned)
     assert all(e["text"] != "russian" for e in cleaned)
@@ -302,7 +338,8 @@ def test_clean_entities_en(entities_en):
 
 
 def test_clean_entities_de(entities_de):
-    cleaned = pc.clean_entities(entities_de, lang="de")
+    entities, text = entities_de
+    cleaned = pc.clean_entities(entities, text)
 
     assert any(e["text"] == "Spanien" for e in cleaned)
     assert all(e["text"] != "Spanier" for e in cleaned)
