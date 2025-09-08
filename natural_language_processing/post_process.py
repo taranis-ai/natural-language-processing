@@ -1,21 +1,6 @@
 import re
-import inflect
-import spacy
-from pathlib import Path
-from huggingface_hub import snapshot_download
-
-from natural_language_processing.log import logger
-from natural_language_processing.config import Config
-
-NLP_DE = None
-
-
-def get_nlp_de():
-    global NLP_DE
-    if NLP_DE is None:
-        NLP_DE = load_spacy_model(Config.SPACY_MODEL_PATH)
-    return NLP_DE
-
+import simplemma
+from collections import defaultdict
 
 DEMONYM_TO_COUNTRY_EN = {
     "russian": "russia",
@@ -101,85 +86,6 @@ DEMONYM_TO_COUNTRY_DE = {
     "litauisch": "litauen",
 }
 
-IRREGULAR_PLURALS = {
-    "people": "person",
-    "men": "man",
-    "women": "woman",
-    "children": "child",
-    "mice": "mouse",
-    "geese": "goose",
-    "teeth": "tooth",
-    "feet": "foot",
-    "oxen": "ox",
-    "lice": "louse",
-    "dice": "die",
-    "cacti": "cactus",
-    "fungi": "fungus",
-    "nuclei": "nucleus",
-    "alumni": "alumnus",
-    "syllabi": "syllabus",
-    "indices": "index",
-    "matrices": "matrix",
-    "criteria": "criterion",
-    "phenomena": "phenomenon",
-    "appendices": "appendix",
-    "theses": "thesis",
-    "analyses": "analysis",
-    "diagnoses": "diagnosis",
-    "crises": "crisis",
-    "data": "datum",
-    "media": "medium",
-    "barracks": "barracks",
-    "police": "police",
-    "behörden": "behörde",
-    "unternehmen": "unternehmen",
-    "universitäten": "universität",
-    "parteien": "partei",
-    "regierungen": "regierung",
-    "städte": "stadt",
-    "länder": "land",
-    "regionen": "region",
-    "zeiten": "zeit",
-    "männer": "mann",
-    "frauen": "frau",
-    "häuser": "haus",
-    "bücher": "buch",
-    "lieder": "lied",
-    "bäume": "baum",
-    "mäuse": "maus",
-    "füße": "fuß",
-    "kühe": "kuh",
-    "eier": "ei",
-    "wörter": "wort",
-    "worte": "wort",
-    "bilder": "bild",
-    "töchter": "tochter",
-    "brüder": "bruder",
-    "väter": "vater",
-    "mütter": "mutter",
-}
-
-
-def load_spacy_model(model_path: str) -> spacy.language.Language | None:
-    p = Path(model_path)
-    if not p.exists():
-        download_spacy_model(model_path)
-    try:
-        return spacy.load(model_path)
-    except Exception as e:
-        logger.error(f"Cannot load spacy model from {model_path}: {e}")
-        return None
-
-
-def download_spacy_model(model_path: str):
-    # try to create parent path of model_path
-    Path(model_path).parent.mkdir(exist_ok=True, parents=True)
-    try:
-        logger.info("Downloading spacy model spacy/de_core_news_sm")
-        snapshot_download("spacy/de_core_news_sm", local_dir=model_path)
-    except Exception as e:
-        logger.error(f"Failed to download model to {model_path}: {e}")
-
 
 def normalize(s: str) -> str:
     # remove whitespaces and cast to lowercase
@@ -191,28 +97,6 @@ def tokenize_name(name: str) -> list[str]:
     # split on whitespace and simple punctuation
     # "ralf schumacher" -> ["ralf", "schumacher"]
     return [t for t in re.split(r"[^\wÀ-ÖØ-öø-ÿ]+", name) if t]
-
-
-def singularize_word(word: str, language: str = "en") -> str:
-    # infer singular of a word based on the language
-    # e.g. prices -> price, Katzen -> Katze
-
-    if word in IRREGULAR_PLURALS:
-        return IRREGULAR_PLURALS[word]
-
-    if language == "en":
-        singular = inflect.engine().singular_noun(word)
-        return singular or word
-
-    nlp = get_nlp_de()
-    if nlp is None:
-        return word
-
-    doc = nlp(word)
-    if not doc or len(doc) == 0:
-        return word
-    token = doc[0]
-    return token.lemma_ or word
 
 
 def normalize_de_demonym_form(word: str) -> str:
@@ -303,7 +187,7 @@ def drop_demonyms(entities: list[dict]) -> list[dict]:
 
 def deduplicate_persons(entities: list[dict]) -> list[dict]:
     # if a person is mentioned twice in a text (e.g. Willem Defoe & Defoe)
-    # -> drop the tag with only the last name
+    # -> drop the entity with only the last name
 
     persons = [e for e in entities if e["label"] == "Person"]
     singletons = []
@@ -325,59 +209,44 @@ def deduplicate_persons(entities: list[dict]) -> list[dict]:
     return [e for e in entities if id(e) not in to_drop_idcs]
 
 
-def singularize(entities: list[dict], language: str = "en") -> list[dict]:
-    # if there are multiple entities of the same "label", one as singular and one
-    # as plural -> keep the singular
-    # e.g. drone & drones -> drone
-    prepped = []
-    heads = []
+def deduplicate_by_lemma(entities: list[dict], text: str) -> list[dict]:
+    # check if multiple entities of the same "label" share the same lemma
+    # if yes, and the lemma is also in the text use the lemmatized form
+    # otherwise keep the shortest entity
+    # e.g.: LEDs -> LED, mouse & mice -> mouse, Palästen & Paläste -> Paläste (if Palast not in text)
 
-    for e in entities:
-        text = e["text"]
-        if toks := tokenize_name(text):
-            prefix = " ".join(toks[:-1]).lower()
-            head = toks[-1]
+    duplicate_candidates = defaultdict(list)
+    cleaned_entities = []
+
+    # group entities by label and lemma
+    for entity in entities:
+        entity_text = entity["text"]
+
+        # need to tokenize entity, because simplemma cannot handle multi-word entities (e.g. "apple stores")
+        lemma = " ".join([simplemma.lemmatize(token, lang=("de", "en")) for token in tokenize_name(entity_text)])
+        duplicate_candidates[(lemma, entity["label"])].append(entity)
+
+    for (lemma, _), duplicate_entities in duplicate_candidates.items():
+        if len(duplicate_entities) == 1:
+            entity = duplicate_entities[0]
         else:
-            prefix = ""
-            head = text
-        prepped.append((e, prefix, head))
-        heads.append(head)
+            entity = min(duplicate_entities, key=lambda entity: len(entity["text"]))
 
-    head_to_lemma = {h: singularize_word(h, language) for h in heads}
-    groups: dict[tuple, list[dict]] = {}
-    for e, prefix, head in prepped:
-        lemma = head_to_lemma.get(head, head)
-        key = (prefix, lemma.lower(), e.get("label"))
-        groups.setdefault(key, []).append(e)
+        if lemma in text:
+            cleaned_entities.append({**entity, "text": lemma})
+        else:
+            cleaned_entities.append(entity)
 
-    cleaned = []
-    for (prefix, lemma_lower, _), members in groups.items():
-        best = None
-        best_len = None
-
-        for e in members:
-            toks = tokenize_name(e["text"])
-            head_lower = (toks[-1] if toks else e["text"]).lower()
-            if head_lower == lemma_lower:
-                L = len(e["text"])
-                if best is None or L < best_len:
-                    best = e
-                    best_len = L
-        if best is None:
-            best = members[0]  # fallback: first seen
-        cleaned.append(best)
-
-    cleaned_idx = {e["idx"] for e in cleaned}
-    return [e for e in entities if e["idx"] in cleaned_idx]
+    return cleaned_entities
 
 
-def clean_entities(entities: list[dict], lang: str = "en") -> list[dict[str, str]]:
+def clean_entities(entities: list[dict], text: str) -> list[dict[str, str]]:
     cleaned_ents = [{**e, "idx": e.get("idx", id(e))} for e in entities if e.get("text", "").strip()]
 
     cleaned_ents = deduplication(cleaned_ents)
     cleaned_ents = drop_demonyms(cleaned_ents)
     cleaned_ents = deduplicate_persons(cleaned_ents)
-    cleaned_ents = singularize(cleaned_ents, lang)
+    cleaned_ents = deduplicate_by_lemma(cleaned_ents, text)
 
     # return the cleaned entities in their original form
     keep = {e["idx"] for e in cleaned_ents}
