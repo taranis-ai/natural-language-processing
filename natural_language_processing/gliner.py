@@ -2,7 +2,6 @@ from gliner import GLiNER
 from natural_language_processing.config import Config
 from natural_language_processing.predictor import Predictor
 from natural_language_processing.post_process import clean_entities
-import langdetect
 
 
 def map_cybersec_entities(cybersec_entities: list[dict[str, str]]) -> list[dict[str, str]]:
@@ -54,7 +53,7 @@ class GLiNERModel(Predictor):
         if not entities:
             return [] if extended_output else {}
 
-        entities = clean_entities(transform_result(entities), langdetect.detect(text))
+        entities = clean_entities(transform_result(entities), text)
 
         if extended_output:
             out_list = []
