@@ -156,6 +156,14 @@ def map_demonym_to_country(entity: str) -> str | None:
     return None
 
 
+def remove_leading_trailing_punctuation(entities: list[dict]) -> list[dict]:
+    cleaned_entities = []
+    for entity in entities:
+        clean_entity_text = re.sub(r"(^[\s.,!;?]+|[\s.,!;?]+$)", "", entity["text"], flags=re.UNICODE)
+        cleaned_entities.append({**entity, "text": clean_entity_text})
+    return cleaned_entities
+
+
 def deduplication(entities: list[dict]) -> list[dict]:
     # remove duplicates with different casing from same category
     unique = {}
@@ -243,6 +251,7 @@ def deduplicate_by_lemma(entities: list[dict], text: str) -> list[dict]:
 def clean_entities(entities: list[dict], text: str) -> list[dict[str, str]]:
     cleaned_ents = [{**e, "idx": e.get("idx", id(e))} for e in entities if e.get("text", "").strip()]
 
+    cleaned_ents = remove_leading_trailing_punctuation(cleaned_ents)
     cleaned_ents = deduplication(cleaned_ents)
     cleaned_ents = drop_demonyms(cleaned_ents)
     cleaned_ents = deduplicate_persons(cleaned_ents)

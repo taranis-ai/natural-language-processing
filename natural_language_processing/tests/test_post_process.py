@@ -72,6 +72,45 @@ def test_map_demonym_to_country(inp, expected):
     assert pc.map_demonym_to_country(inp) == expected
 
 
+@pytest.mark.parametrize(
+    "entities,expected",
+    [
+        (
+            [{"text": "Commodore 64.", "label": "Product"}],
+            [{"text": "Commodore 64", "label": "Product"}],
+        ),
+        (
+            [{"text": "Hello!", "label": "MISC"}],
+            [{"text": "Hello", "label": "MISC"}],
+        ),
+        (
+            [{"text": "?Berlin?", "label": "Location"}],
+            [{"text": "Berlin", "label": "Location"}],
+        ),
+        (
+            [{"text": "!!!Wow!!!", "label": "MISC"}],
+            [{"text": "Wow", "label": "MISC"}],
+        ),
+        (
+            [{"text": "Jean-Luc", "label": "Person"}],
+            [{"text": "Jean-Luc", "label": "Person"}],
+        ),
+        (
+            [
+                {"text": "Paris,", "label": "Location"},
+                {"text": "London;", "label": "Location"},
+            ],
+            [
+                {"text": "Paris", "label": "Location"},
+                {"text": "London", "label": "Location"},
+            ],
+        ),
+    ],
+)
+def test_remove_leading_trailing_punctuation(entities, expected):
+    assert pc.remove_leading_trailing_punctuation(entities) == expected
+
+
 def test_deduplication():
     raw_entities = [
         ("Drone", "Product"),
