@@ -31,7 +31,6 @@ COPY --chown=user:user README.md app.py LICENSE.md /app/
 
 USER user
 
-ENV HF_HUB_OFFLINE=1
 ENV PYTHONOPTIMIZE=1
 ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONPATH=/app
@@ -42,9 +41,11 @@ ENV GRANIAN_INTERFACE=wsgi
 ENV GRANIAN_HOST=0.0.0.0
 ENV MODEL=${MODEL}
 
-# bake models in to the image
+# bake models in to the image and prevent updates
 RUN python -c 'from natural_language_processing.predictor_factory import PredictorFactory; PredictorFactory()'
+ENV HF_HUB_OFFLINE=1
 
 EXPOSE 8000
 
 CMD ["granian", "app"]
+
