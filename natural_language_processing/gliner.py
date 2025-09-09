@@ -2,7 +2,6 @@ from gliner import GLiNER
 from natural_language_processing.config import Config
 from natural_language_processing.predictor import Predictor
 from natural_language_processing.post_process import clean_entities
-import langdetect
 
 
 def map_cybersec_entities(cybersec_entities: list[dict[str, str]]) -> list[dict[str, str]]:
@@ -37,7 +36,7 @@ def transform_result(entities: list[dict]) -> list[dict]:
 class GLiNERModel(Predictor):
     def __init__(self):
         self.general_model = GLiNER.from_pretrained("llinauer/gliner_de_en_news")
-        self.general_labels = ["Person", "Location", "Organization", "Event", "Product", "Address", "URL"]
+        self.general_labels = ["Person", "Location", "Organization", "Product", "Address"]
         self.cybersec_model = GLiNER.from_pretrained("selfconstruct3d/AITSecNER", load_tokenizer=True)
         self.cybersec_labels = ["CLICommand/CodeSnippet", "CON", "GROUP", "MALWARE", "SECTOR", "TACTIC", "TECHNIQUE", "TOOL"]
 
@@ -54,7 +53,7 @@ class GLiNERModel(Predictor):
         if not entities:
             return [] if extended_output else {}
 
-        entities = clean_entities(transform_result(entities), langdetect.detect(text))
+        entities = clean_entities(transform_result(entities), text)
 
         if extended_output:
             out_list = []
