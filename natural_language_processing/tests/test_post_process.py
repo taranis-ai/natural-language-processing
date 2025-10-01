@@ -376,6 +376,47 @@ def test_deduplicate_by_lemma(entities, text, expected):
     assert got == expected
 
 
+@pytest.mark.parametrize(
+    "entities, uri_map, expected",
+    [
+        # US & USA -> keep only USA
+        (
+            [
+                {"text": "US", "label": "Location"},
+                {"text": "USA", "label": "Location"},
+            ],
+            {"US": {"uri:United States", "uri:US Air Force"}, "USA": {"uri:United States", "uri:US Army"}},
+            [{"text": "USA", "label": "Location"}],
+        ),
+        # UK, United Kingdom & Great Britain
+        (
+            [
+                {"text": "UK", "label": "Location"},
+                {"text": "United Kingdom", "label": "Location"},
+                {"text": "Great Britain", "label": "Location"},
+            ],
+            {
+                "UK": {"uri:uk"},
+                "United Kingdom": {"uri:uk"},
+                "Great Britain": {"uri:uk"},
+            },
+            [
+                {"text": "United Kingdom", "label": "Location"},
+            ],
+        ),
+    ],
+)
+def test_deduplicate_by_linking_param(monkeypatch, entities, uri_map, expected):
+    def fake_lookup(q):
+        # Simulate dbpedia_lookup using normalized text keys.
+        return uri_map.get(pc.normalize(q), set())
+
+    monkeypatch.setattr(pc, "dbpedia_lookup", fake_lookup)
+
+    res = pc.deduplicate_by_linking(entities)
+    assert res == expected
+
+
 def test_clean_entities_en(entities_en):
     entities, text = entities_en
     cleaned = pc.clean_entities(entities, text)
