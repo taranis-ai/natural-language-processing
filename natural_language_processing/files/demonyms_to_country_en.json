@@ -1,0 +1,726 @@
+{
+  "afghan": [
+    "afghanistan"
+  ],
+  "albanian": [
+    "albania"
+  ],
+  "algerian": [
+    "algeria"
+  ],
+  "andorran": [
+    "andorra"
+  ],
+  "angolan": [
+    "angola"
+  ],
+  "antiguan": [
+    "antigua and barbuda"
+  ],
+  "barbudan": [
+    "antigua and barbuda"
+  ],
+  "argentine": [
+    "argentina"
+  ],
+  "argentinian": [
+    "argentina"
+  ],
+  "armenian": [
+    "armenia"
+  ],
+  "australian": [
+    "australia"
+  ],
+  "austrian": [
+    "austria"
+  ],
+  "azerbaijani": [
+    "azerbaijan"
+  ],
+  "azeri": [
+    "azerbaijan"
+  ],
+  "bahamian": [
+    "bahamas"
+  ],
+  "bahraini": [
+    "bahrain"
+  ],
+  "bangladeshi": [
+    "bangladesh"
+  ],
+  "barbadian": [
+    "barbados"
+  ],
+  "bajan": [
+    "barbados"
+  ],
+  "belarusian": [
+    "belarus"
+  ],
+  "belgian": [
+    "belgium"
+  ],
+  "belizean": [
+    "belize"
+  ],
+  "beninese": [
+    "benin"
+  ],
+  "bhutanese": [
+    "bhutan"
+  ],
+  "bolivian": [
+    "bolivia"
+  ],
+  "bosnian": [
+    "bosnia",
+    "bosnia and herzegovina"
+  ],
+  "herzegovinian": [
+    "bosnia and herzegovina"
+  ],
+  "botswanan": [
+    "botswana"
+  ],
+  "brazilian": [
+    "brazil"
+  ],
+  "bruneian": [
+    "brunei"
+  ],
+  "bulgarian": [
+    "bulgaria"
+  ],
+  "burkinab\u00e9": [
+    "burkina faso"
+  ],
+  "burundian": [
+    "burundi"
+  ],
+  "cabo verdean": [
+    "cabo verde"
+  ],
+  "cambodian": [
+    "cambodia"
+  ],
+  "cameroonian": [
+    "cameroon"
+  ],
+  "canadian": [
+    "canada"
+  ],
+  "central african": [
+    "central african republic"
+  ],
+  "chadian": [
+    "chad"
+  ],
+  "chilean": [
+    "chile"
+  ],
+  "chinese": [
+    "china"
+  ],
+  "colombian": [
+    "colombia"
+  ],
+  "comoran": [
+    "comoros"
+  ],
+  "comorian": [
+    "comoros"
+  ],
+  "congolese": [
+    "democratic republic of the congo",
+    "republic of the congo"
+  ],
+  "costa rican": [
+    "costa rica"
+  ],
+  "croatian": [
+    "croatia"
+  ],
+  "cuban": [
+    "cuba"
+  ],
+  "cypriot": [
+    "cyprus"
+  ],
+  "czech": [
+    "czech republic"
+  ],
+  "danish": [
+    "denmark"
+  ],
+  "djiboutian": [
+    "djibouti"
+  ],
+  "dominican": [
+    "dominica",
+    "dominican republic"
+  ],
+  "timorese": [
+    "east timor",
+    "timor-leste"
+  ],
+  "ecuadorian": [
+    "ecuador"
+  ],
+  "egyptian": [
+    "egypt"
+  ],
+  "salvadoran": [
+    "el salvador"
+  ],
+  "equatorial guinean": [
+    "equatorial guinea"
+  ],
+  "eritrean": [
+    "eritrea"
+  ],
+  "estonian": [
+    "estonia"
+  ],
+  "swazi": [
+    "eswatini"
+  ],
+  "ethiopian": [
+    "ethiopia"
+  ],
+  "fijian": [
+    "fiji"
+  ],
+  "finnish": [
+    "finland"
+  ],
+  "french": [
+    "france"
+  ],
+  "gabonese": [
+    "gabon"
+  ],
+  "gambian": [
+    "gambia"
+  ],
+  "georgian": [
+    "georgia"
+  ],
+  "german": [
+    "germany"
+  ],
+  "ghanaian": [
+    "ghana"
+  ],
+  "greek": [
+    "greece"
+  ],
+  "grenadian": [
+    "grenada"
+  ],
+  "guatemalan": [
+    "guatemala"
+  ],
+  "guinean": [
+    "guinea"
+  ],
+  "bissau-guinean": [
+    "guinea-bissau"
+  ],
+  "guyanese": [
+    "guyana"
+  ],
+  "haitian": [
+    "haiti"
+  ],
+  "honduran": [
+    "honduras"
+  ],
+  "hungarian": [
+    "hungary"
+  ],
+  "icelandic": [
+    "iceland"
+  ],
+  "indian": [
+    "india"
+  ],
+  "indonesian": [
+    "indonesia"
+  ],
+  "iranian": [
+    "iran"
+  ],
+  "iraqi": [
+    "iraq"
+  ],
+  "irish": [
+    "ireland"
+  ],
+  "israeli": [
+    "israel"
+  ],
+  "italian": [
+    "italy"
+  ],
+  "ivorian": [
+    "ivory coast"
+  ],
+  "jamaican": [
+    "jamaica"
+  ],
+  "japanese": [
+    "japan"
+  ],
+  "jordanian": [
+    "jordan"
+  ],
+  "kazakh": [
+    "kazakhstan"
+  ],
+  "kenyan": [
+    "kenya"
+  ],
+  "kiribati": [
+    "kiribati"
+  ],
+  "north korean": [
+    "north korea"
+  ],
+  "south korean": [
+    "south korea"
+  ],
+  "kosovar": [
+    "kosovo"
+  ],
+  "kosovan": [
+    "kosovo"
+  ],
+  "kuwaiti": [
+    "kuwait"
+  ],
+  "kyrgyz": [
+    "kyrgyzstan"
+  ],
+  "laotian": [
+    "laos"
+  ],
+  "latvian": [
+    "latvia"
+  ],
+  "lebanese": [
+    "lebanon"
+  ],
+  "basotho": [
+    "lesotho"
+  ],
+  "liberian": [
+    "liberia"
+  ],
+  "libyan": [
+    "libya"
+  ],
+  "liechtensteiner": [
+    "liechtenstein"
+  ],
+  "lithuanian": [
+    "lithuania"
+  ],
+  "luxembourgish": [
+    "luxembourg"
+  ],
+  "malagasy": [
+    "madagascar"
+  ],
+  "malawian": [
+    "malawi"
+  ],
+  "malaysian": [
+    "malaysia"
+  ],
+  "maldivian": [
+    "maldives"
+  ],
+  "malian": [
+    "mali"
+  ],
+  "maltese": [
+    "malta"
+  ],
+  "marshallese": [
+    "marshall islands"
+  ],
+  "mauritanian": [
+    "mauritania"
+  ],
+  "mauritian": [
+    "mauritius"
+  ],
+  "mexican": [
+    "mexico"
+  ],
+  "micronesian": [
+    "micronesia"
+  ],
+  "moldovan": [
+    "moldova"
+  ],
+  "mon\u00e9gasque": [
+    "monaco"
+  ],
+  "mongolian": [
+    "mongolia"
+  ],
+  "montenegrin": [
+    "montenegro"
+  ],
+  "moroccan": [
+    "morocco"
+  ],
+  "mozambican": [
+    "mozambique"
+  ],
+  "myanma": [
+    "myanmar"
+  ],
+  "burmese": [
+    "myanmar"
+  ],
+  "namibian": [
+    "namibia"
+  ],
+  "nauruan": [
+    "nauru"
+  ],
+  "nepalese": [
+    "nepal"
+  ],
+  "dutch": [
+    "netherlands"
+  ],
+  "new zealander": [
+    "new zealand"
+  ],
+  "nicaraguan": [
+    "nicaragua"
+  ],
+  "nigerien": [
+    "niger"
+  ],
+  "nigerian": [
+    "nigeria"
+  ],
+  "norwegian": [
+    "norway"
+  ],
+  "omani": [
+    "oman"
+  ],
+  "pakistani": [
+    "pakistan"
+  ],
+  "palestinian": [
+    "palestine"
+  ],
+  "panamanian": [
+    "panama"
+  ],
+  "papua new guinean": [
+    "papua new guinea"
+  ],
+  "paraguayan": [
+    "paraguay"
+  ],
+  "peruvian": [
+    "peru"
+  ],
+  "filipino": [
+    "philippines"
+  ],
+  "polish": [
+    "poland"
+  ],
+  "portuguese": [
+    "portugal"
+  ],
+  "qatari": [
+    "qatar"
+  ],
+  "romanian": [
+    "romania"
+  ],
+  "russian": [
+    "russia"
+  ],
+  "rwandan": [
+    "rwanda"
+  ],
+  "saint lucian": [
+    "saint lucia"
+  ],
+  "salvadorian": [
+    "el salvador"
+  ],
+  "sammarinese": [
+    "san marino"
+  ],
+  "s\u00e3o tom\u00e9an": [
+    "s\u00e3o tom\u00e9 and pr\u00edncipe"
+  ],
+  "saudi": [
+    "saudi arabia"
+  ],
+  "scottish": [
+    "united kingdom"
+  ],
+  "welsh": [
+    "united kingdom"
+  ],
+  "english": [
+    "england",
+    "united kingdom",
+    "uk"
+  ],
+  "northern irish": [
+    "united kingdom"
+  ],
+  "senegalese": [
+    "senegal"
+  ],
+  "serbian": [
+    "serbia"
+  ],
+  "seychellois": [
+    "seychelles"
+  ],
+  "sierra leonean": [
+    "sierra leone"
+  ],
+  "singaporean": [
+    "singapore"
+  ],
+  "slovak": [
+    "slovakia"
+  ],
+  "slovene": [
+    "slovenia"
+  ],
+  "solomon islander": [
+    "solomon islands"
+  ],
+  "somali": [
+    "somalia"
+  ],
+  "south african": [
+    "south africa"
+  ],
+  "south sudanese": [
+    "south sudan"
+  ],
+  "spanish": [
+    "spain"
+  ],
+  "sri lankan": [
+    "sri lanka"
+  ],
+  "sudanese": [
+    "sudan"
+  ],
+  "surinamese": [
+    "suriname"
+  ],
+  "swedish": [
+    "sweden"
+  ],
+  "swiss": [
+    "switzerland"
+  ],
+  "syrian": [
+    "syria"
+  ],
+  "taiwanese": [
+    "taiwan"
+  ],
+  "tajik": [
+    "tajikistan"
+  ],
+  "tanzanian": [
+    "tanzania"
+  ],
+  "thai": [
+    "thailand"
+  ],
+  "togolese": [
+    "togo"
+  ],
+  "tongan": [
+    "tonga"
+  ],
+  "trinidadian": [
+    "trinidad and tobago"
+  ],
+  "tobagonian": [
+    "trinidad and tobago"
+  ],
+  "tunisian": [
+    "tunisia"
+  ],
+  "turkish": [
+    "turkey"
+  ],
+  "turkmen": [
+    "turkmenistan"
+  ],
+  "tuvaluan": [
+    "tuvalu"
+  ],
+  "ugandan": [
+    "uganda"
+  ],
+  "ukrainian": [
+    "ukraine"
+  ],
+  "emirati": [
+    "united arab emirates"
+  ],
+  "british": [
+    "united kingdom",
+    "uk",
+    "great britain",
+    "britain"
+  ],
+  "american": [
+    "america",
+    "united states of america",
+    "united states",
+    "usa",
+    "us"
+  ],
+  "uruguayan": [
+    "uruguay"
+  ],
+  "uzbek": [
+    "uzbekistan"
+  ],
+  "ni-vanuatu": [
+    "vanuatu"
+  ],
+  "venezuelan": [
+    "venezuela"
+  ],
+  "vietnamese": [
+    "vietnam"
+  ],
+  "yemeni": [
+    "yemen"
+  ],
+  "zambian": [
+    "zambia"
+  ],
+  "zimbabwean": [
+    "zimbabwe"
+  ],
+  "sahrawi": [
+    "western sahara"
+  ],
+  "greenlander": [
+    "greenland"
+  ],
+  "faroese": [
+    "faroe islands"
+  ],
+  "new caledonian": [
+    "new caledonia"
+  ],
+  "puerto rican": [
+    "puerto rico"
+  ],
+  "martinican": [
+    "martinique"
+  ],
+  "guadeloupean": [
+    "guadeloupe"
+  ],
+  "r\u00e9unionese": [
+    "r\u00e9union"
+  ],
+  "r\u00e9unionnais": [
+    "r\u00e9union"
+  ],
+  "caymanian": [
+    "cayman islands"
+  ],
+  "gibraltarian": [
+    "gibraltar"
+  ],
+  "french guianese": [
+    "french guiana"
+  ],
+  "monacan": [
+    "monaco"
+  ],
+  "vatican": [
+    "vatican city"
+  ],
+  "beninois": [
+    "benin"
+  ],
+  "burkinabe": [
+    "burkina faso"
+  ],
+  "croat": [
+    "croatia"
+  ],
+  "cura\u00e7aoan": [
+    "cura\u00e7ao"
+  ],
+  "salvadorean": [
+    "el salvador"
+  ],
+  "equatoguinean": [
+    "equatorial guinea"
+  ],
+  "swati": [
+    "eswatini"
+  ],
+  "habesha": [
+    "ethiopia"
+  ],
+  "magyar": [
+    "hungary"
+  ],
+  "persian": [
+    "iran"
+  ],
+  "kazakhstani": [
+    "kazakhstan"
+  ],
+  "i-kiribati": [
+    "kiribati"
+  ],
+  "korean": [
+    "korea"
+  ],
+  "kyrgyzstani": [
+    "kyrgyzstan"
+  ],
+  "kirgiz": [
+    "kyrgyzstan"
+  ],
+  "kirghiz": [
+    "kyrgyzstan"
+  ],
+  "lao": [
+    "laos"
+  ],
+  "lettish": [
+    "latvia"
+  ],
+  "luxembourger": [
+    "luxembourg"
+  ],
+  "madagascan": [
+    "madagascar"
+  ]
+}
