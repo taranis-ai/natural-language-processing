@@ -190,7 +190,7 @@ def dbpedia_lookup(entity_name: str, top_n: int = 5, score_threshold: int = 1000
             }
             for doc in docs
         )
-        return {doc["uri"] for doc in docs if doc["score"] > score_threshold}
+        return {doc["uri"] for doc in results if doc["score"] > score_threshold}
 
     except ValueError:
         logger.error(f"DBPedia query for {entity_name} failed: Could not parse results")
