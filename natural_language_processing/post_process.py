@@ -1,6 +1,10 @@
 import re
 import simplemma
 from collections import defaultdict
+import requests
+
+from natural_language_processing.log import logger
+
 
 DEMONYM_TO_COUNTRY_EN = {
     "russian": "russia",
@@ -154,6 +158,34 @@ def map_demonym_to_country(entity: str) -> str | None:
             return DEMONYM_TO_COUNTRY_DE[adj]
 
     return None
+
+
+def dbpedia_lookup(entity_name: str, top_n: int = 5, language: str = "en", timeout: float = 10.0) -> set[str] | None:
+    # Query DBPedia for the entity name and get the top n results as a set
+
+    url = "https://lookup.dbpedia.org/api/search"
+    headers = {"Accept": "application/json", "Accept-Language": language, "User-Agent": "python-requests-dbplookup/1.0"}
+    params = {"query": entity_name, "maxResults": max(1, top_n), "format": "json"}
+
+    try:
+        logger.debug(f"Query DBPedia for entity {entity_name}")
+        resp = requests.get(url, headers=headers, params=params, timeout=timeout)
+        resp.raise_for_status()
+    except TimeoutError:
+        logger.error(f"DBPedia query for {entity_name} timed out")
+        return set()
+    except requests.exceptions.HTTPError as e:
+        logger.error(f"DBPedia query for {entity_name} failed: {e}")
+        return set()
+
+    try:
+        data = resp.json()
+        docs = data.get("docs", [])[:top_n]
+        return {doc["uri"] for doc in docs}
+
+    except ValueError:
+        logger.error(f"DBPedia query for {entity_name} failed: Could not parse results")
+    return set()
 
 
 def remove_leading_trailing_punctuation(entities: list[dict]) -> list[dict]:
