@@ -72,6 +72,59 @@ def test_map_demonym_to_country(inp, expected):
     assert pc.map_demonym_to_country(inp) == expected
 
 
+def test_dbpedia_lookup_filters_and_extracts_uris(requests_mock, dbpedia_url):
+    docs = [
+        {"resource": ["http://dbpedia.org/resource/Apple_II"], "score": [16163.686]},
+        {"resource": ["http://dbpedia.org/resource/Apple_Inc."], "score": 14846.572},
+        {"resource": ["http://dbpedia.org/resource/IOS"], "score": 12254.968},
+        {"resource": ["http://dbpedia.org/resource/MacOS"], "score": 10904.498},
+        {"resource": ["http://dbpedia.org/resource/Apple_Records"], "score": 10097.711},
+    ]
+    requests_mock.get(dbpedia_url, json={"docs": docs})
+    res = pc.dbpedia_lookup("Apple", top_n=5, score_threshold=1000)
+    assert res == {
+        "http://dbpedia.org/resource/Apple_II",
+        "http://dbpedia.org/resource/Apple_Inc.",
+        "http://dbpedia.org/resource/IOS",
+        "http://dbpedia.org/resource/MacOS",
+        "http://dbpedia.org/resource/Apple_Records",
+    }
+
+
+def test_dbpedia_lookup_honors_top_n(requests_mock, dbpedia_url):
+    docs = [
+        {"resource": ["uri:1"], "score": 5000},
+        {"resource": ["uri:2"], "score": 5000},
+        {"resource": ["uri:3"], "score": 5000},  # ignored if top_n=2
+    ]
+    requests_mock.get(dbpedia_url, json={"docs": docs})
+
+    res = pc.dbpedia_lookup("something", top_n=2, score_threshold=1000)
+    assert res == {"uri:1", "uri:2"}
+
+
+def test_dbpedia_lookup_http_error_returns_empty_set(requests_mock, dbpedia_url):
+    requests_mock.get(dbpedia_url, status_code=503)
+
+    res = pc.dbpedia_lookup("anything")
+    assert res == set()
+
+
+def test_dbpedia_lookup_timeout_returns_empty_set(monkeypatch, dbpedia_url):
+    def raise_timeout(*args, **kwargs):
+        raise TimeoutError("simulated timeout")
+
+    monkeypatch.setattr(pc.requests, "get", raise_timeout)
+    res = pc.dbpedia_lookup("anything")
+    assert res == set()
+
+
+def test_dbpedia_lookup_bad_json_returns_empty_set(requests_mock, dbpedia_url):
+    requests_mock.get(dbpedia_url, text="not a json")
+    res = pc.dbpedia_lookup("anything")
+    assert res == set()
+
+
 @pytest.mark.parametrize(
     "entities,expected",
     [
