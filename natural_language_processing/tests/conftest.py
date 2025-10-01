@@ -5,6 +5,11 @@ from natural_language_processing.flair_ner import FlairNER
 from natural_language_processing.gliner import GLiNERModel
 
 
+@pytest.fixture
+def dbpedia_url():
+    return "https://lookup.dbpedia.org/api/search"
+
+
 @pytest.fixture(scope="session")
 def flair_model():
     yield FlairNER()
