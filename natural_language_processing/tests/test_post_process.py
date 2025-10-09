@@ -445,18 +445,23 @@ def test_deduplicate_by_lemma(entities, text, expected):
     ],
 )
 def test_deduplicate_by_linking(monkeypatch, entities, uri_map, expected):
-    def fake_lookup(_):
-        # Simulate dbpedia_lookup using normalized text keys.
+    def dbpedia_lookup_mock(_):
         return uri_map
 
-    monkeypatch.setattr(pc, "dbpedia_lookup", fake_lookup)
+    monkeypatch.setattr(pc, "dbpedia_lookup", dbpedia_lookup_mock)
 
     res = pc.deduplicate_by_linking(entities)
     assert res == expected
 
 
-def test_clean_entities_en(entities_en):
+def test_clean_entities_en(monkeypatch, entities_en, entity_map_en):
     entities, text = entities_en
+
+    def dbpedia_lookup_mock(entity):
+        return entity_map_en[entity]
+
+    monkeypatch.setattr(pc, "dbpedia_lookup", dbpedia_lookup_mock)
+
     cleaned = pc.clean_entities(entities, text)
 
     assert any(e["text"] == "Russia" for e in cleaned)
@@ -468,9 +473,21 @@ def test_clean_entities_en(entities_en):
     assert any(e["text"] == "price" for e in cleaned)
     assert all(e["text"] != "prices" for e in cleaned)
 
+    assert any(e["text"] == "Department of Defense" for e in cleaned)
+    assert all(e["text"] != "DoD" for e in cleaned)
 
-def test_clean_entities_de(entities_de):
+    assert any(e["text"] == "USA" for e in cleaned)
+    assert all(e["text"] != "US" for e in cleaned)
+
+
+def test_clean_entities_de(monkeypatch, entities_de, entity_map_de):
     entities, text = entities_de
+
+    def dbpedia_lookup_mock(entity):
+        return entity_map_de[entity]
+
+    monkeypatch.setattr(pc, "dbpedia_lookup", dbpedia_lookup_mock)
+
     cleaned = pc.clean_entities(entities, text)
 
     assert any(e["text"] == "Spanien" for e in cleaned)
@@ -484,3 +501,9 @@ def test_clean_entities_de(entities_de):
 
     assert any(e["text"] == "William S. Burroughs" for e in cleaned)
     assert all(e["text"] != "Burroughs" for e in cleaned)
+
+    assert any(e["text"] == "Amerika" for e in cleaned)
+    assert all(e["text"] != "USA" for e in cleaned)
+
+    assert any(e["text"] == "Bundesministerium für Inneres" for e in cleaned)
+    assert all(e["text"] != "BMI" for e in cleaned)

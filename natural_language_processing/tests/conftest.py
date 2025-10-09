@@ -217,6 +217,10 @@ def entities_en():
         {"idx": 4, "text": "Defoe", "label": "Person"},
         {"idx": 5, "text": "prices", "label": "Misc"},
         {"idx": 6, "text": "price", "label": "Misc"},
+        {"idx": 7, "text": "Department of Defense", "label": "Organization"},
+        {"idx": 8, "text": "DoD", "label": "Organization"},
+        {"idx": 9, "text": "US", "label": "Location"},
+        {"idx": 10, "text": "USA", "label": "Location"},
     ]
     text = (
         "Russia was mentioned in the article, and a russian diplomat was quoted. "
@@ -224,6 +228,22 @@ def entities_en():
         "The prices have been falling, but the word price is also common in the text."
     )
     return entities, text
+
+
+@pytest.fixture
+def entity_map_en():
+    return {
+        "russia": {"uri:Russia"},
+        "russian": {"uri:Russia"},
+        "willem defoe": {"uri:Willem Defoe"},
+        "defoe": {"uri:Defoe Shipbuilding Company", "uri:Jermain_Defoe", "uri:Daniel_Defoe", "uri:Willem Defoe"},
+        "prices": {},
+        "price": {},
+        "department of defense": {"uri:US Department of Defense"},
+        "dod": {"uri:US Department of Defense"},
+        "us": {"uri:United States of America"},
+        "usa": {"uri:United States of America"},
+    }
 
 
 @pytest.fixture
@@ -237,6 +257,10 @@ def entities_de():
         {"idx": 6, "text": "Katze", "label": "Misc"},
         {"idx": 7, "text": "Burroughs", "label": "Person"},
         {"idx": 8, "text": "William S. Burroughs", "label": "Person"},
+        {"idx": 9, "text": "USA", "label": "Location"},
+        {"idx": 10, "text": "Amerika", "label": "Location"},
+        {"idx": 11, "text": "BMI", "label": "Organization"},
+        {"idx": 12, "text": "Bundesministerium für Inneres", "label": "Organization"},
     ]
     text = (
         "Spanien wurde in dem Bericht erwähnt, ebenso ein Spanier. "
@@ -245,3 +269,21 @@ def entities_de():
         "Der Autor William S. Burroughs schrieb viele Bücher, später wurde nur Burroughs genannt."
     )
     return entities, text
+
+
+@pytest.fixture
+def entity_map_de():
+    return {
+        "spanien": {"uri:Spanien"},
+        "spanier": {"uri:Spanien"},
+        "russland": {"uri:Russland"},
+        "russischen": {"uri:Russland", "uri:Russiche Delegation"},
+        "katzen": {"uri:Felis catus"},
+        "katze": {"uri:Felis catus"},
+        "burroughs": {"uri:Edgar Rice Burroughs", "uri:William S. Burroughs", "uri:Burroughs Corporation"},
+        "william s. burroughs": {"uri:William S. Burroughs", "uri:William S. Burroughs Jr.", "uri:William S. Burroughs on the road"},
+        "usa": {"uri:Vereinigte Staaten von Amerika"},
+        "amerika": {"uri:Vereinigte Staaten von Amerika"},
+        "bundesministerium für inneres": {"uri:Bundesministerium für Inneres"},
+        "bmi": {"uri:Bundesministerium für Inneres"},
+    }

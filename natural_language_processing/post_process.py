@@ -331,6 +331,7 @@ def clean_entities(entities: list[dict], text: str) -> list[dict[str, str]]:
     cleaned_ents = drop_demonyms(cleaned_ents)
     cleaned_ents = deduplicate_persons(cleaned_ents)
     cleaned_ents = deduplicate_by_lemma(cleaned_ents, text)
+    cleaned_ents = deduplicate_by_linking(cleaned_ents)
 
     # return the cleaned entities in their original form
     keep = {e["idx"] for e in cleaned_ents}
