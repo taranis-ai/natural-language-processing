@@ -160,13 +160,13 @@ def map_demonym_to_country(entity: str) -> str | None:
     return None
 
 
-def dbpedia_lookup(entity_name: str, top_n: int = 5, score_threshold: int = 1000, timeout: float = 10.0) -> set[str] | None:
-    # Query DBPedia for the entity name and get the top n results as a set
+def dbpedia_lookup(entity_name: str, score_threshold: int = 1000, timeout: float = 10.0) -> str | None:
+    # Query DBPedia for the entity name
     # drop results with score < score_threshold
 
     url = "https://lookup.dbpedia.org/api/search"
     headers = {"Accept": "application/json", "Accept-Language": "en,de;q=0.8", "User-Agent": "python-requests-dbplookup/1.0"}
-    params = {"query": entity_name, "maxResults": max(1, top_n), "format": "json"}
+    params = {"query": entity_name, "maxResults": 1, "format": "json"}
 
     try:
         logger.debug(f"Query DBPedia for entity {entity_name}")
@@ -174,26 +174,26 @@ def dbpedia_lookup(entity_name: str, top_n: int = 5, score_threshold: int = 1000
         resp.raise_for_status()
     except TimeoutError:
         logger.error(f"DBPedia query for {entity_name} timed out")
-        return set()
+        return None
     except requests.exceptions.HTTPError as e:
         logger.error(f"DBPedia query for {entity_name} failed: {e}")
-        return set()
+        return None
 
     try:
         data = resp.json()
-        docs = data.get("docs", [])[:top_n]
-        results = []
-        for doc in docs:
-            result = {"uri": (doc.get("resource") or [None])[0], "score": (doc.get("score") or [None])[0]}
-            if result["uri"] is None or result["score"] is None:
-                continue
-            results.append(result)
-
-        return {doc["uri"] for doc in results if float(doc["score"]) > score_threshold}
+        docs = data.get("docs", None)
+        if not docs:
+            return None
+        doc = docs[0] if isinstance(docs, list) else docs
+        uri = (doc.get("resource") or [None])[0] if isinstance(doc.get("resource"), list) else doc.get("resource")
+        score = (doc.get("score") or [None])[0] if isinstance(doc.get("score"), list) else doc.get("score")
+        if uri is None or score is None or score < score_threshold:
+            return None
+        return uri
 
     except ValueError:
         logger.error(f"DBPedia query for {entity_name} failed: Could not parse results")
-    return set()
+    return None
 
 
 def remove_leading_trailing_punctuation(entities: list[dict]) -> list[dict]:
@@ -298,28 +298,32 @@ def deduplicate_by_linking(entities: list[dict]) -> list[dict]:
     # try to match entities to external DBPedia resources
     # if multiple entities map to the same resource, keep only the longest
 
-    linked_entity_idx = {}
+    entity_link_map = {}
     keep_idcs = []
 
+    # for each entity, map its index to top result of the dbpedia lookup
     for i, entity in enumerate(entities):
-        linked_entities = dbpedia_lookup(normalize(entity["text"])) or set()
-
-        # could not map entity to DBPedia resource, leave entity as is
-        if not linked_entities:
+        if linked_entity := dbpedia_lookup(normalize(entity["text"])):
+            if linked_entity in entity_link_map:
+                entity_link_map[linked_entity].append(i)
+            else:
+                entity_link_map[linked_entity] = [i]
+        else:
             keep_idcs.append(i)
+
+    # if two or more entities share the same link, remove the shorter one
+    for connected_entity_idcs in entity_link_map.values():
+        if len(connected_entity_idcs) == 1:
+            keep_idcs.append(connected_entity_idcs[0])
             continue
 
-        for linked_entity in linked_entities:
-            if linked_entity not in linked_entity_idx:
-                linked_entity_idx[linked_entity] = i
-            else:
-                current_best_idx = linked_entity_idx[linked_entity]
-                # keep longest entity
-                if len(entity["text"]) > len(entities[current_best_idx]["text"]):
-                    linked_entity_idx[linked_entity] = i
+        top_idx = connected_entity_idcs[0]
+        for idx in connected_entity_idcs:
+            if len(entities[idx]["text"]) > len(entities[top_idx]["text"]):
+                top_idx = idx
+        keep_idcs.append(top_idx)
 
-    kept_indices = set(keep_idcs) | set(linked_entity_idx.values())
-    return [entities[i] for i in range(len(entities)) if i in kept_indices]
+    return [entities[i] for i in range(len(entities)) if i in keep_idcs]
 
 
 def clean_entities(entities: list[dict], text: str) -> list[dict[str, str]]:

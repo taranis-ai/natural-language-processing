@@ -233,16 +233,16 @@ def entities_en():
 @pytest.fixture
 def entity_map_en():
     return {
-        "russia": {"uri:Russia"},
-        "russian": {"uri:Russia"},
-        "willem defoe": {"uri:Willem Defoe"},
-        "defoe": {"uri:Defoe Shipbuilding Company", "uri:Jermain_Defoe", "uri:Daniel_Defoe", "uri:Willem Defoe"},
-        "prices": {},
-        "price": {},
-        "department of defense": {"uri:US Department of Defense"},
-        "dod": {"uri:US Department of Defense"},
-        "us": {"uri:United States of America"},
-        "usa": {"uri:United States of America"},
+        "russia": "uri:Russia",
+        "russian": "uri:Russia",
+        "willem defoe": "uri:Willem Defoe",
+        "defoe": "uri:Daniel Defoe",
+        "prices": None,
+        "price": None,
+        "department of defense": "uri:US Department of Defense",
+        "dod": "uri:US Department of Defense",
+        "us": "uri:United States of America",
+        "usa": "uri:United States of America",
     }
 
 
@@ -274,16 +274,16 @@ def entities_de():
 @pytest.fixture
 def entity_map_de():
     return {
-        "spanien": {"uri:Spanien"},
-        "spanier": {"uri:Spanien"},
-        "russland": {"uri:Russland"},
-        "russischen": {"uri:Russland", "uri:Russiche Delegation"},
-        "katzen": {"uri:Felis catus"},
-        "katze": {"uri:Felis catus"},
-        "burroughs": {"uri:Edgar Rice Burroughs", "uri:William S. Burroughs", "uri:Burroughs Corporation"},
-        "william s. burroughs": {"uri:William S. Burroughs", "uri:William S. Burroughs Jr.", "uri:William S. Burroughs on the road"},
-        "usa": {"uri:Vereinigte Staaten von Amerika"},
-        "amerika": {"uri:Vereinigte Staaten von Amerika"},
-        "bundesministerium für inneres": {"uri:Bundesministerium für Inneres"},
-        "bmi": {"uri:Bundesministerium für Inneres"},
+        "spanien": "uri:Spanien",
+        "spanier": "uri:Spanien",
+        "russland": "uri:Russland",
+        "russischen": "uri:Russland",
+        "katzen": "uri:Felis catus",
+        "katze": "uri:Felis catus",
+        "burroughs": "uri:Edgar Rice Burroughs",
+        "william s. burroughs": "uri:William S. Burroughs",
+        "usa": "uri:Vereinigte Staaten von Amerika",
+        "amerika": "uri:Vereinigte Staaten von Amerika",
+        "bundesministerium für inneres": "uri:Bundesministerium für Inneres",
+        "bmi": "uri:Bundesministerium für Inneres",
     }
