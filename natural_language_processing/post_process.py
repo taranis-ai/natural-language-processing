@@ -183,14 +183,13 @@ def dbpedia_lookup(entity_name: str, top_n: int = 5, score_threshold: int = 1000
         data = resp.json()
         docs = data.get("docs", [])[:top_n]
         results = []
-        results.extend(
-            {
-                "uri": (doc.get("resource") or [None])[0],
-                "score": ((doc.get("score") or [None])[0] if isinstance(doc.get("score"), list) else doc.get("score")),
-            }
-            for doc in docs
-        )
-        return {doc["uri"] for doc in results if doc["score"] > score_threshold}
+        for doc in docs:
+            result = {"uri": (doc.get("resource") or [None])[0], "score": (doc.get("score") or [None])[0]}
+            if result["uri"] is None or result["score"] is None:
+                continue
+            results.append(result)
+
+        return {doc["uri"] for doc in results if float(doc["score"]) > score_threshold}
 
     except ValueError:
         logger.error(f"DBPedia query for {entity_name} failed: Could not parse results")
