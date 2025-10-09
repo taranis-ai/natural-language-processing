@@ -404,12 +404,50 @@ def test_deduplicate_by_lemma(entities, text, expected):
                 {"text": "United Kingdom", "label": "Location"},
             ],
         ),
+        # MoI, Ministry of the Interior -> keep Ministry ...
+        (
+            [
+                {"text": "MoI", "label": "Organization"},
+                {"text": "Ministry of the Interior", "label": "Organization"},
+            ],
+            {
+                "MoI": {"uri:Ministry of Interior"},
+                "Ministry of the Interior": {"uri:Ministry of Interior"},
+            },
+            [{"text": "Ministry of the Interior", "label": "Organization"}],
+        ),
+        # no lookup hits -> keep everything as-is ---
+        (
+            [
+                {"text": "Xanadu", "label": "Location"},
+                {"text": "Neverland", "label": "Location"},
+            ],
+            {},
+            [
+                {"text": "Xanadu", "label": "Location"},
+                {"text": "Neverland", "label": "Location"},
+            ],
+        ),
+        # --- tie length for same URI -> keep the first occurrence ---
+        (
+            [
+                {"text": "GB", "label": "Location"},
+                {"text": "UK", "label": "Location"},
+            ],
+            {
+                "GB": {"uri:uk"},
+                "UK": {"uri:uk"},
+            },
+            [
+                {"text": "GB", "label": "Location"},
+            ],
+        ),
     ],
 )
-def test_deduplicate_by_linking_param(monkeypatch, entities, uri_map, expected):
-    def fake_lookup(q):
+def test_deduplicate_by_linking(monkeypatch, entities, uri_map, expected):
+    def fake_lookup(_):
         # Simulate dbpedia_lookup using normalized text keys.
-        return uri_map.get(pc.normalize(q), set())
+        return uri_map
 
     monkeypatch.setattr(pc, "dbpedia_lookup", fake_lookup)
 
