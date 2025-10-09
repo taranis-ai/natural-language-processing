@@ -21,6 +21,9 @@ class NLPHandler(MethodView):
             return jsonify({"error": "JSON payload must be an object with 'text' field"}), 400
 
         is_cybersecurity = data.get("cybersecurity", False)
+        threshold = data.get("threshold", 0.8)
+        Config.confidence_threshold = threshold
+        print(Config.confidence_threshold)
 
         text = data.get("text", "")
         if not text:

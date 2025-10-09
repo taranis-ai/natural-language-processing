@@ -53,7 +53,7 @@ class GLiNERModel(Predictor):
         if not entities:
             return [] if extended_output else {}
 
-        entities = clean_entities(transform_result(entities), text)
+        cleaned_entities = clean_entities(transform_result(entities), text)
 
         if extended_output:
             out_list = []
@@ -64,13 +64,21 @@ class GLiNERModel(Predictor):
                     "probability": entity.get("score", 0.0),
                     "position": f"{entity.get('start', '')}-{entity.get('end', '')}",
                 }
-                for entity in entities
+                for entity in cleaned_entities
                 if isinstance(entity, dict) and entity.get("score", 0) > Config.confidence_threshold and entity.get("text") is not None
             )
             return out_list
 
-        return {
+        raw_entities = {
             entity["text"]: entity.get("label", "")
             for entity in entities
             if isinstance(entity, dict) and entity.get("score", 0) > Config.confidence_threshold and entity.get("text") is not None
         }
+
+        processed_entities = {
+            entity["text"]: entity.get("label", "")
+            for entity in cleaned_entities
+            if isinstance(entity, dict) and entity.get("score", 0) > Config.confidence_threshold and entity.get("text") is not None
+        }
+
+        return {"raw": raw_entities, "processed": processed_entities}
