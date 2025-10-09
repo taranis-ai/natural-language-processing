@@ -187,7 +187,7 @@ def dbpedia_lookup(entity_name: str, score_threshold: int = 1000, timeout: float
         doc = docs[0] if isinstance(docs, list) else docs
         uri = (doc.get("resource") or [None])[0] if isinstance(doc.get("resource"), list) else doc.get("resource")
         score = (doc.get("score") or [None])[0] if isinstance(doc.get("score"), list) else doc.get("score")
-        if uri is None or score is None or score < score_threshold:
+        if uri is None or score is None or float(score) < score_threshold:
             return None
         return uri
 
