@@ -1,9 +1,8 @@
 from transformers import pipeline
 from natural_language_processing.config import Config
-from natural_language_processing.predictor import Predictor
 
 
-class RobertaGermanNER(Predictor):
+class RobertaGerman:
     model_name = "xlm-roberta-large-finetuned-conll03-german"
 
     def __init__(self):
