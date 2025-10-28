@@ -2,10 +2,9 @@ from flair.models import SequenceTagger
 from flair.data import Sentence
 
 from natural_language_processing.config import Config
-from natural_language_processing.predictor import Predictor
 
 
-class FlairNER(Predictor):
+class Flair:
     model_name = "flair/ner-english"
 
     def __init__(self):
