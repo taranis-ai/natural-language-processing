@@ -1,5 +1,5 @@
 [project]
-name = "natural_language_processing"
+name = "natural-language-processing"
 description = "NLP Bot for Natural Language Processing in Taranis AI"
 readme = "README.md"
 license = {file = "LICENSE.md"}
@@ -7,36 +7,29 @@ maintainers = [{ name = "AIT", email = "stefania.sava@ait.ac.at" }]
 classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Security",
 ]
-requires-python = ">=3.12,<3.13"
+requires-python = ">=3.13, <3.14"
 dependencies = [
-    "networkx",
-    "flask",
-    "requests",
-    "granian",
-    "sentencepiece",
-    "flair @ git+https://github.com/flairNLP/flair@master",
+    "taranis-base-bot",
+    "transformers",
     "torch",
-    "huggingface_hub",
-    "pydantic-settings",
-    "python-dotenv",
+    "flair @ git+https://github.com/flairNLP/flair@master",
     "gliner>=0.2.16",
     "simplemma>=1.1.2",
 ]
 dynamic = ["version"]
 
 [project.optional-dependencies]
-dev = ["pytest", "jsonschema", "ruff"]
+dev = ["pytest", "ruff"]
 
 [project.urls]
-"Source Code" = "https://github.com/taranis-ai/natural_language_processing"
+"Source Code" = "https://github.com/taranis-ai/natural-language-processing"
 
 [build-system]
 requires = [
-    "setuptools>=45",
+    "setuptools>=61",
     "setuptools_scm[toml]>=6.2",
     "wheel"
 ]
@@ -51,7 +44,7 @@ packages = ["natural_language_processing"]
 
 [tool.ruff]
 line-length = 142
-target-version = "py312"
+target-version = "py313"
 
 [tool.pytest.ini_options]
 filterwarnings = [
