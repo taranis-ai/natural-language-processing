@@ -40,9 +40,9 @@ class Gliner:
         self.cybersec_labels = ["CLICommand/CodeSnippet", "CON", "GROUP", "MALWARE", "SECTOR", "TACTIC", "TECHNIQUE", "TOOL"]
 
     def predict(self, text: str, extended_output: bool = False, is_cybersecurity: bool = False) -> dict[str, str] | list[dict]:
-        general_entities = self.general_model.predict_entities(text, self.general_labels, threshold=Config.confidence_threshold)
+        general_entities = self.general_model.predict_entities(text, self.general_labels, threshold=Config.CONFIDENCE_THRESHOLD)
         if is_cybersecurity:
-            cybersec_entities = self.cybersec_model.predict_entities(text, self.cybersec_labels, threshold=Config.confidence_threshold)
+            cybersec_entities = self.cybersec_model.predict_entities(text, self.cybersec_labels, threshold=Config.CONFIDENCE_THRESHOLD)
             cybersec_entities = map_cybersec_entities(cybersec_entities)
         else:
             cybersec_entities = []
@@ -64,12 +64,12 @@ class Gliner:
                     "position": f"{entity.get('start', '')}-{entity.get('end', '')}",
                 }
                 for entity in entities
-                if isinstance(entity, dict) and entity.get("score", 0) > Config.confidence_threshold and entity.get("text") is not None
+                if isinstance(entity, dict) and entity.get("score", 0) > Config.CONFIDENCE_THRESHOLD and entity.get("text") is not None
             )
             return out_list
 
         return {
             entity["text"]: entity.get("label", "")
             for entity in entities
-            if isinstance(entity, dict) and entity.get("score", 0) > Config.confidence_threshold and entity.get("text") is not None
+            if isinstance(entity, dict) and entity.get("score", 0) > Config.CONFIDENCE_THRESHOLD and entity.get("text") is not None
         }

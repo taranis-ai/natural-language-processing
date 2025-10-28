@@ -19,11 +19,11 @@ class Flair:
             out_list.extend(
                 {"value": span.text, "type": span.tag, "probability": span.score, "position": f"{span.start_position}-{span.end_position}"}
                 for span in sentence.get_spans("ner")
-                if span.score >= Config.confidence_threshold
+                if span.score >= Config.CONFIDENCE_THRESHOLD
             )
             return out_list
         return {
             ner_result.data_point.text: ner_result.value
             for ner_result in sentence.get_labels()
-            if ner_result.score >= Config.confidence_threshold
+            if ner_result.score >= Config.CONFIDENCE_THRESHOLD
         }

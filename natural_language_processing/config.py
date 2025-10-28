@@ -7,6 +7,7 @@ class Settings(CommonSettings):
     PACKAGE_NAME: str = "natural_language_processing"
     HF_MODEL_INFO: bool = True
     PAYLOAD_KEY: str = "key"
+    CONFIDENCE_THRESHOLD: float = 0.9
 
 
 Config = Settings()
