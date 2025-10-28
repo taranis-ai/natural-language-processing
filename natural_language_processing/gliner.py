@@ -1,6 +1,5 @@
 from gliner import GLiNER
 from natural_language_processing.config import Config
-from natural_language_processing.predictor import Predictor
 from natural_language_processing.post_process import clean_entities
 
 
@@ -33,7 +32,7 @@ def transform_result(entities: list[dict]) -> list[dict]:
     return [{**e, "type": e.get("label"), "idx": i} for i, e in enumerate(entities)]
 
 
-class GLiNERModel(Predictor):
+class Gliner:
     def __init__(self):
         self.general_model = GLiNER.from_pretrained("llinauer/gliner_de_en_news")
         self.general_labels = ["Person", "Location", "Organization", "Product", "Address"]
