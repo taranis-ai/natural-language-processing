@@ -1,28 +1,39 @@
 import pytest
 
-from natural_language_processing.roberta_ner import RobertaNER
-from natural_language_processing.flair_ner import FlairNER
-from natural_language_processing.gliner import GLiNERModel
+from natural_language_processing.roberta import Roberta
+from natural_language_processing.roberta_german import RobertaGerman
+from natural_language_processing.flair import Flair
+from natural_language_processing.gliner import Gliner
 
 
 @pytest.fixture(scope="session")
-def flair_model():
-    yield FlairNER()
+def flair():
+    yield Flair()
 
 
 @pytest.fixture(scope="session")
-def roberta_model():
-    yield RobertaNER()
+def roberta():
+    yield Roberta()
 
 
 @pytest.fixture(scope="session")
-def gliner_model():
-    yield GLiNERModel()
+def roberta_german():
+    yield RobertaGerman()
+
+
+@pytest.fixture(scope="session")
+def gliner():
+    yield Gliner()
 
 
 @pytest.fixture(scope="session")
 def example_text():
     yield "This is an example for NER, about the ACME Corporation which is producing Dynamite in Acme City, which is in Australia and run by Mr. Wile E. Coyote"
+
+
+@pytest.fixture(scope="session")
+def example_text_de():
+    yield "Dies ist ein Beispiel für NER, über die ACME Corporation, die Dynamit produziert. Das Unternahmen ist in Acme City, Australien ansässig und wird geführt von Mr. Wile E. Coyote"
 
 
 @pytest.fixture(scope="session")
