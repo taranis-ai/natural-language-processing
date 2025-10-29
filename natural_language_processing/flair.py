@@ -2,6 +2,7 @@ from flair.models import SequenceTagger
 from flair.data import Sentence
 
 from natural_language_processing.config import Config
+from natural_language_processing.post_process import map_entity_types
 
 
 class Flair:
@@ -17,13 +18,18 @@ class Flair:
         if extended_output:
             out_list = []
             out_list.extend(
-                {"value": span.text, "type": span.tag, "probability": span.score, "position": f"{span.start_position}-{span.end_position}"}
+                {
+                    "value": span.text,
+                    "type": map_entity_types(span.tag),
+                    "probability": span.score,
+                    "position": f"{span.start_position}-{span.end_position}",
+                }
                 for span in sentence.get_spans("ner")
                 if span.score >= Config.CONFIDENCE_THRESHOLD
             )
             return out_list
         return {
-            ner_result.data_point.text: ner_result.value
+            ner_result.data_point.text: map_entity_types(ner_result.value)
             for ner_result in sentence.get_labels()
             if ner_result.score >= Config.CONFIDENCE_THRESHOLD
         }

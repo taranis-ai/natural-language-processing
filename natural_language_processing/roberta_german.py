@@ -1,5 +1,6 @@
 from transformers import pipeline
 from natural_language_processing.config import Config
+from natural_language_processing.post_process import map_entity_types
 
 
 class RobertaGerman:
@@ -18,7 +19,7 @@ class RobertaGerman:
             out_list.extend(
                 {
                     "value": entity.get("word", ""),
-                    "type": entity.get("entity_group", ""),
+                    "type": map_entity_types(entity.get("entity_group", "")),
                     "probability": float(entity.get("score", 0.0)),
                     "position": f"{entity.get('start', '')}-{entity.get('end', '')}",
                 }
@@ -28,7 +29,7 @@ class RobertaGerman:
             return out_list
 
         return {
-            entity["word"]: entity["entity_group"]
+            entity["word"]: map_entity_types(entity["entity_group"])
             for entity in entities
             if isinstance(entity, dict) and entity.get("score", 0) > Config.CONFIDENCE_THRESHOLD and entity.get("word") is not None
         }
