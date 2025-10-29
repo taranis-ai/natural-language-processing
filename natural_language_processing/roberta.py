@@ -9,7 +9,7 @@ class Roberta:
     def __init__(self):
         self.model = pipeline(task="ner", model=self.model_name, aggregation_strategy="simple")
 
-    def predict(self, text: str, extended_output: bool = False, is_cybersecurity: bool = False) -> dict[str, str] | list[dict]:
+    def predict(self, text: str, extended_output: bool = False) -> dict[str, str] | list[dict]:
         entities = self.model(text)
         if not entities:
             return {}
