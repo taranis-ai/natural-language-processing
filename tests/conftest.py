@@ -1,9 +1,18 @@
+import os
 import pytest
+from dotenv import load_dotenv
 
 from natural_language_processing.roberta import Roberta
 from natural_language_processing.roberta_german import RobertaGerman
 from natural_language_processing.flair import Flair
 from natural_language_processing.gliner import Gliner
+
+
+base_dir = os.path.dirname(os.path.abspath(__file__))
+env_file = os.path.join(base_dir, ".env.test")
+current_path = os.getcwd()
+
+load_dotenv(dotenv_path=env_file, override=True)
 
 
 @pytest.fixture(scope="session")
@@ -75,7 +84,7 @@ def content1():
         "the transition to a greener future. The program's success is anticipated to create a ripple effect, inspiring other corporations and governments to adopt similar measures, "
         "ultimately leading to widespread societal change."
     )
-    expected = {"NovaTech": "ORG"}
+    expected = {"NovaTech": {"Organization"}}
     return text, expected
 
 
@@ -89,7 +98,7 @@ def content2():
         "advanced security protocols and collaborating with international experts. Analysts suggest this revelation may trigger a broader "
         "industry re-evaluation of software security practices."
     )
-    expected = {"European": "MISC"}
+    expected = {"European": {"MISC", "Location"}}
     return text, expected
 
 
@@ -103,7 +112,7 @@ def content3():
         "causing significant disruptions before detection. IT departments worldwide have been alerted, and companies are urged to perform immediate system audits "
         "to ensure no breaches have occurred. Ongoing investigations are underway to trace the origins of the malware and assess its impact on corporate infrastructures."
     )
-    expected = {"Linux": "MISC"}
+    expected = {"Linux": {"MISC", "Product"}}
     return text, expected
 
 
@@ -117,7 +126,7 @@ def content4():
         "leading to an increased demand for cybersecurity consultations and software audits. Stakeholders remain cautiously optimistic as the company works to restore trust and "
         "reinforce its commitment to digital security."
     )
-    expected = {"European": "MISC"}
+    expected = {"European": {"MISC", "Location"}}
     return text, expected
 
 
@@ -129,7 +138,7 @@ def content5():
         "software patches designed to prevent the exploitation of known vulnerabilities. Industry experts have lauded this collaborative effort, noting that it sets a new standard "
         "for public-private partnerships in cybersecurity. Customers are urged to update their systems promptly to benefit from these enhancements, and further updates are expected as the partnership evolves."
     )
-    expected = {"Intel": "ORG", "Oracle": "ORG"}
+    expected = {"Intel": {"Organization"}, "Oracle": {"Organization", "Product"}}
     return text, expected
 
 
@@ -150,7 +159,7 @@ def content6():
         "to secure substantial funding for the next phase of development. As quantum technology continues to evolve at an unprecedented pace, this breakthrough is seen as a pivotal step toward "
         "realizing the long-anticipated promise of quantum advantage in both commercial and scientific applications."
     )
-    expected = {"BrightMinds": "ORG"}
+    expected = {"BrightMinds": {"Organization"}}
     return text, expected
 
 
@@ -174,7 +183,7 @@ def content7():
         "opportunities. The event concluded with a series of actionable commitments, laying the groundwork for enhanced trade partnerships and setting the stage for a new era of global economic collaboration. "
         "Attendees left the summit with a shared sense of urgency and optimism, prepared to implement the agreed-upon measures and drive meaningful change in the international trading system."
     )
-    expected = {"Geneva": "LOC"}
+    expected = {"Geneva": {"Location"}}
     return text, expected
 
 

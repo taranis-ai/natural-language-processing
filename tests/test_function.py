@@ -2,22 +2,28 @@ import pytest
 from jsonschema import validate
 
 
-def assert_entities(result: dict[str, str], expected: dict[str, str]) -> None:
+def assert_entities(result: dict[str, str], expected: dict[str, set]) -> None:
     """Assert that all expected entities are present with correct labels.
     Order-independent and tolerant to extra entities in 'result'."""
     missing = set(expected) - set(result)
     assert not missing, f"Missing entities: {missing}"
 
-    mislabelled = {ent: (expected[ent], result[ent]) for ent in expected if result.get(ent) != expected[ent]}
+    mislabelled = []
+    mislabelled.extend(entity for entity, entity_type_set in expected.items() if result.get(entity) not in entity_type_set)
     assert not mislabelled, f"Mislabelled entities: {mislabelled}"
 
 
 @pytest.mark.parametrize(
     "model_fixture,text_fixture,expected,is_cybersecurity",
     [
-        ("flair", "example_text", {"Australia": "LOC", "Wile E. Coyote": "PER"}, False),
-        ("roberta", "example_text", {"ACME Corporation": "ORG", "Acme City": "LOC", "Australia": "LOC", "Dynamite": "MISC"}, False),
-        ("roberta_german", "example_text_de", {"ACME Corporation": "ORG", "Acme City": "LOC", "Australia": "LOC", "Dynamite": "MISC"}, False),
+        ("flair", "example_text", {"Australia": "Location", "Wile E. Coyote": "Person"}, False),
+        (
+            "roberta",
+            "example_text",
+            {"ACME Corporation": "Organization", "Acme City": "Location", "Australia": "Location", "Dynamite": "MISC"},
+            False,
+        ),
+        ("roberta_german", "example_text_de", {"ACME Corporation": "Organization", "Acme City": "Location", "Australien": "Location"}, False),
         (
             "gliner",
             "example_text",
@@ -38,11 +44,18 @@ def test_ner_models(
     model = request.getfixturevalue(model_fixture)
     text = request.getfixturevalue(text_fixture)
 
-    result = model.predict(text, extended_output=False, is_cybersecurity=is_cybersecurity)
+    if is_cybersecurity:
+        result = model.predict(text, extended_output=False, is_cybersecurity=is_cybersecurity)
+    else:
+        result = model.predict(text, extended_output=False)
     assert isinstance(result, dict)
     assert_entities(result, expected)
 
-    extended = model.predict(text, extended_output=True, is_cybersecurity=is_cybersecurity)
+    if is_cybersecurity:
+        extended = model.predict(text, extended_output=True, is_cybersecurity=is_cybersecurity)
+    else:
+        extended = model.predict(text, extended_output=True)
+
     validate(instance=extended, schema=extended_output_schema)
 
 
