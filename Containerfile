@@ -43,6 +43,8 @@ ENV MODEL=${MODEL}
 # bake models in to the image
 RUN python -c 'from natural_language_processing.config import Config; from taranis_base_bot.misc import get_model; get_model(Config)'
 
+ENV HF_HUB_OFFLINE=1
+
 EXPOSE 8000
 
 CMD ["granian", "app"]
