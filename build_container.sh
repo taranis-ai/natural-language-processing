@@ -2,11 +2,6 @@
 
 set -eou pipefail
 
-if [ ! -d .git ]; then
-    echo "This script must be run from the root of a git repository"
-    exit 1
-fi
-
 cd $(git rev-parse --show-toplevel)
 
 GITHUB_REPOSITORY_OWNER=${GITHUB_REPOSITORY_OWNER:-"ghcr.io/taranis-ai"}
