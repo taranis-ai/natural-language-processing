@@ -14,7 +14,7 @@ def assert_entities(result: dict[str, str], expected: dict[str, set]) -> None:
 
 
 @pytest.mark.parametrize(
-    "model_fixture,text_fixture,expected,is_cybersecurity",
+    "model_fixture,text_fixture,expected,cybersecurity",
     [
         ("flair", "example_text", {"Australia": "Location", "Wile E. Coyote": "Person"}, False),
         (
@@ -38,21 +38,21 @@ def test_ner_models(
     model_fixture: str,
     text_fixture: str,
     expected: dict,
-    is_cybersecurity: bool,
+    cybersecurity: bool,
     extended_output_schema: dict,
 ):
     model = request.getfixturevalue(model_fixture)
     text = request.getfixturevalue(text_fixture)
 
-    if is_cybersecurity:
-        result = model.predict(text, extended_output=False, is_cybersecurity=is_cybersecurity)
+    if cybersecurity:
+        result = model.predict(text, extended_output=False, cybersecurity=cybersecurity)
     else:
         result = model.predict(text, extended_output=False)
     assert isinstance(result, dict)
     assert_entities(result, expected)
 
-    if is_cybersecurity:
-        extended = model.predict(text, extended_output=True, is_cybersecurity=is_cybersecurity)
+    if cybersecurity:
+        extended = model.predict(text, extended_output=True, cybersecurity=cybersecurity)
     else:
         extended = model.predict(text, extended_output=True)
 

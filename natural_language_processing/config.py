@@ -9,7 +9,7 @@ class Settings(CommonSettings):
     PAYLOAD_SCHEMA: dict[str, dict] = {
         "text": {"type": "str", "required": True},
         "extended_output": {"type": "bool", "required": False},
-        "is_cybersecurity": {"type": "bool", "required": False},
+        "cybersecurity": {"type": "bool", "required": False},
     }
     CONFIDENCE_THRESHOLD: float = 0.7
 

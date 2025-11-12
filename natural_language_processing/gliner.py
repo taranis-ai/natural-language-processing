@@ -39,9 +39,9 @@ class Gliner:
         self.cybersec_model = GLiNER.from_pretrained("selfconstruct3d/AITSecNER", load_tokenizer=True)
         self.cybersec_labels = ["CLICommand/CodeSnippet", "CON", "GROUP", "MALWARE", "SECTOR", "TACTIC", "TECHNIQUE", "TOOL"]
 
-    def predict(self, text: str, extended_output: bool = False, is_cybersecurity: bool = False) -> dict[str, str] | list[dict]:
+    def predict(self, text: str, extended_output: bool = False, cybersecurity: bool = False) -> dict[str, str] | list[dict]:
         general_entities = self.general_model.predict_entities(text, self.general_labels, threshold=Config.CONFIDENCE_THRESHOLD)
-        if is_cybersecurity:
+        if cybersecurity:
             cybersec_entities = self.cybersec_model.predict_entities(text, self.cybersec_labels, threshold=Config.CONFIDENCE_THRESHOLD)
             cybersec_entities = map_cybersec_entities(cybersec_entities)
         else:
