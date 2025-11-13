@@ -64,12 +64,18 @@ class Gliner:
                     "position": f"{entity.get('start', '')}-{entity.get('end', '')}",
                 }
                 for entity in entities
-                if isinstance(entity, dict) and entity.get("score", 0) > Config.CONFIDENCE_THRESHOLD and entity.get("text") is not None
+                if isinstance(entity, dict)
+                and entity.get("score", 0) > Config.CONFIDENCE_THRESHOLD
+                and entity.get("text") is not None
+                and entity.get("type", "") in Config.ENTITIES
             )
             return out_list
 
         return {
             entity["text"]: entity.get("label", "")
             for entity in entities
-            if isinstance(entity, dict) and entity.get("score", 0) > Config.CONFIDENCE_THRESHOLD and entity.get("text") is not None
+            if isinstance(entity, dict)
+            and entity.get("score", 0) > Config.CONFIDENCE_THRESHOLD
+            and entity.get("text") is not None
+            and entity.get("type", "") in Config.ENTITIES
         }

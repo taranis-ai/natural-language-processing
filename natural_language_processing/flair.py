@@ -25,11 +25,11 @@ class Flair:
                     "position": f"{span.start_position}-{span.end_position}",
                 }
                 for span in sentence.get_spans("ner")
-                if span.score >= Config.CONFIDENCE_THRESHOLD
+                if span.score >= Config.CONFIDENCE_THRESHOLD and map_entity_types(span.tag) in Config.ENTITIES
             )
             return out_list
         return {
             ner_result.data_point.text: map_entity_types(ner_result.value)
             for ner_result in sentence.get_labels()
-            if ner_result.score >= Config.CONFIDENCE_THRESHOLD
+            if ner_result.score >= Config.CONFIDENCE_THRESHOLD and map_entity_types(ner_result.value) in Config.ENTITIES
         }

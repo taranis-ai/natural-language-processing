@@ -12,6 +12,21 @@ class Settings(CommonSettings):
         "cybersecurity": {"type": "bool", "required": False},
     }
     CONFIDENCE_THRESHOLD: float = 0.7
+    ENTITIES: list = [
+        "Person",
+        "Location",
+        "Organization",
+        "Product",
+        "Address",
+        "CLICommand/CodeSnippet",
+        "CON",
+        "GROUP",
+        "MALWARE",
+        "SECTOR",
+        "TACTIC",
+        "TECHNIQUE",
+        "TOOL",
+    ]
 
 
 Config = Settings()

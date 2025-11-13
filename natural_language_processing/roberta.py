@@ -24,12 +24,18 @@ class Roberta:
                     "position": f"{entity.get('start', '')}-{entity.get('end', '')}",
                 }
                 for entity in entities
-                if isinstance(entity, dict) and entity.get("score", 0) > Config.CONFIDENCE_THRESHOLD and entity.get("word") is not None
+                if isinstance(entity, dict)
+                and entity.get("score", 0) > Config.CONFIDENCE_THRESHOLD
+                and entity.get("word") is not None
+                and map_entity_types(entity.get("entity_group", "")) in Config.ENTITIES
             )
             return out_list
 
         return {
             entity["word"]: map_entity_types(entity["entity_group"])
             for entity in entities
-            if isinstance(entity, dict) and entity.get("score", 0) > Config.CONFIDENCE_THRESHOLD and entity.get("word") is not None
+            if isinstance(entity, dict)
+            and entity.get("score", 0) > Config.CONFIDENCE_THRESHOLD
+            and entity.get("word") is not None
+            and map_entity_types(entity["entity_group"]) in Config.ENTITIES
         }
