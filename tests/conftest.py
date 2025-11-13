@@ -98,7 +98,7 @@ def content2():
         "advanced security protocols and collaborating with international experts. Analysts suggest this revelation may trigger a broader "
         "industry re-evaluation of software security practices."
     )
-    expected = {"European": {"MISC", "Location"}}
+    expected = {"European": {"Misc", "Location"}}
     return text, expected
 
 
@@ -112,7 +112,7 @@ def content3():
         "causing significant disruptions before detection. IT departments worldwide have been alerted, and companies are urged to perform immediate system audits "
         "to ensure no breaches have occurred. Ongoing investigations are underway to trace the origins of the malware and assess its impact on corporate infrastructures."
     )
-    expected = {"Linux": {"MISC", "Product"}}
+    expected = {"Linux": {"Misc", "Product"}}
     return text, expected
 
 
@@ -126,7 +126,7 @@ def content4():
         "leading to an increased demand for cybersecurity consultations and software audits. Stakeholders remain cautiously optimistic as the company works to restore trust and "
         "reinforce its commitment to digital security."
     )
-    expected = {"European": {"MISC", "Location"}}
+    expected = {"European": {"Misc", "Location"}}
     return text, expected
 
 

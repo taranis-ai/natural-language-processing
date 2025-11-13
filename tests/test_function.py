@@ -21,7 +21,7 @@ def assert_entities(result: dict[str, str], expected: dict[str, set]) -> None:
         (
             "roberta",
             "example_text",
-            {"ACME Corporation": "Organization", "Acme City": "Location", "Australia": "Location", "Dynamite": "MISC"},
+            {"ACME Corporation": "Organization", "Acme City": "Location", "Australia": "Location", "Dynamite": "Misc"},
             False,
         ),
         ("roberta_german", "example_text_de", {"ACME Corporation": "Organization", "Acme City": "Location", "Australien": "Location"}, False),
