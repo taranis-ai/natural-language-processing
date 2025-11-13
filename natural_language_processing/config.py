@@ -19,13 +19,14 @@ class Settings(CommonSettings):
         "Product",
         "Address",
         "CLICommand/CodeSnippet",
-        "CON",
-        "GROUP",
-        "MALWARE",
-        "SECTOR",
-        "TACTIC",
-        "TECHNIQUE",
-        "TOOL",
+        "Con",
+        "Group",
+        "Malware",
+        "Sector",
+        "Tactic",
+        "Technique",
+        "Tool",
+        "Misc",
     ]
 
 

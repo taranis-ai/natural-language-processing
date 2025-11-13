@@ -90,8 +90,12 @@ DEMONYM_TO_COUNTRY_DE = {
 def map_entity_types(entity_type: str) -> str:
     # map entity types ORG, LOC, PER ->
     # Organization, Location, Person resp.
-    entity_type_map = {"ORG": "Organization", "LOC": "Location", "PER": "Person"}
+    entity_type_map = {"ORG": "Organization", "LOC": "Location", "PER": "Person", "MISC": "Misc"}
     return entity_type_map.get(entity_type, entity_type)
+
+
+def is_entity_allowed(entity_type: str, allowed_entities: list[str]) -> bool:
+    return entity_type.lower() in [ent.lower() for ent in allowed_entities]
 
 
 def normalize(s: str) -> str:

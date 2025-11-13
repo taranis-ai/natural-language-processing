@@ -1,6 +1,6 @@
 from transformers import pipeline
 from natural_language_processing.config import Config
-from natural_language_processing.post_process import map_entity_types
+from natural_language_processing.post_process import map_entity_types, is_entity_allowed
 
 
 class Roberta:
@@ -27,7 +27,7 @@ class Roberta:
                 if isinstance(entity, dict)
                 and entity.get("score", 0) > Config.CONFIDENCE_THRESHOLD
                 and entity.get("word") is not None
-                and map_entity_types(entity.get("entity_group", "")) in Config.ENTITIES
+                and is_entity_allowed(map_entity_types(entity.get("entity_group", "")), Config.ENTITIES)
             )
             return out_list
 
@@ -37,5 +37,5 @@ class Roberta:
             if isinstance(entity, dict)
             and entity.get("score", 0) > Config.CONFIDENCE_THRESHOLD
             and entity.get("word") is not None
-            and map_entity_types(entity["entity_group"]) in Config.ENTITIES
+            and is_entity_allowed(map_entity_types(entity.get("entity_group", "")), Config.ENTITIES)
         }
