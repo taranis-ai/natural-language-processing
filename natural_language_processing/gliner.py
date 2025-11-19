@@ -1,6 +1,5 @@
 from gliner import GLiNER
 from natural_language_processing.config import Config
-from natural_language_processing.predictor import Predictor
 from natural_language_processing.post_process import clean_entities
 
 
@@ -33,17 +32,17 @@ def transform_result(entities: list[dict]) -> list[dict]:
     return [{**e, "type": e.get("label"), "idx": i} for i, e in enumerate(entities)]
 
 
-class GLiNERModel(Predictor):
+class Gliner:
     def __init__(self):
         self.general_model = GLiNER.from_pretrained("llinauer/gliner_de_en_news")
         self.general_labels = ["Person", "Location", "Organization", "Product", "Address"]
         self.cybersec_model = GLiNER.from_pretrained("selfconstruct3d/AITSecNER", load_tokenizer=True)
         self.cybersec_labels = ["CLICommand/CodeSnippet", "CON", "GROUP", "MALWARE", "SECTOR", "TACTIC", "TECHNIQUE", "TOOL"]
 
-    def predict(self, text: str, extended_output: bool = False, is_cybersecurity: bool = False) -> dict[str, str] | list[dict]:
-        general_entities = self.general_model.predict_entities(text, self.general_labels, threshold=Config.confidence_threshold)
-        if is_cybersecurity:
-            cybersec_entities = self.cybersec_model.predict_entities(text, self.cybersec_labels, threshold=Config.confidence_threshold)
+    def predict(self, text: str, extended_output: bool = False, cybersecurity: bool = False) -> dict[str, str] | list[dict]:
+        general_entities = self.general_model.predict_entities(text, self.general_labels, threshold=Config.CONFIDENCE_THRESHOLD)
+        if cybersecurity:
+            cybersec_entities = self.cybersec_model.predict_entities(text, self.cybersec_labels, threshold=Config.CONFIDENCE_THRESHOLD)
             cybersec_entities = map_cybersec_entities(cybersec_entities)
         else:
             cybersec_entities = []
@@ -65,12 +64,12 @@ class GLiNERModel(Predictor):
                     "position": f"{entity.get('start', '')}-{entity.get('end', '')}",
                 }
                 for entity in entities
-                if isinstance(entity, dict) and entity.get("score", 0) > Config.confidence_threshold and entity.get("text") is not None
+                if isinstance(entity, dict) and entity.get("score", 0) > Config.CONFIDENCE_THRESHOLD and entity.get("text") is not None
             )
             return out_list
 
         return {
             entity["text"]: entity.get("label", "")
             for entity in entities
-            if isinstance(entity, dict) and entity.get("score", 0) > Config.confidence_threshold and entity.get("text") is not None
+            if isinstance(entity, dict) and entity.get("score", 0) > Config.CONFIDENCE_THRESHOLD and entity.get("text") is not None
         }

@@ -1,8 +1,8 @@
 # built and cached files
 venv/
 .venv/
-.envrc
 .env
+.envrc
 __pycache__/
 *.pyc
 dist/

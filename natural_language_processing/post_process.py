@@ -87,6 +87,13 @@ DEMONYM_TO_COUNTRY_DE = {
 }
 
 
+def map_entity_types(entity_type: str) -> str:
+    # map entity types ORG, LOC, PER ->
+    # Organization, Location, Person resp.
+    entity_type_map = {"ORG": "Organization", "LOC": "Location", "PER": "Person"}
+    return entity_type_map.get(entity_type, entity_type)
+
+
 def normalize(s: str) -> str:
     # remove whitespaces and cast to lowercase
     # " Marty   Friedman"  -> "marty friedman"
