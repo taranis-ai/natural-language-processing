@@ -4,6 +4,6 @@ _src_path: https://github.com/taranis-ai/bot_template
 author_mail: stefania.sava@ait.ac.at
 description: NLP Bot for Natural Language Processing in Taranis AI
 init_git_repo: true
-models: gliner, flair, roberta, roberta_german
+models: gliner, roberta, roberta_german
 project_name: natural-language-processing
 repo_url: https://github.com/taranis-ai/natural-language-processing

@@ -16,7 +16,6 @@ def assert_entities(result: dict[str, str], expected: dict[str, set]) -> None:
 @pytest.mark.parametrize(
     "model_fixture,text_fixture,expected,cybersecurity",
     [
-        ("flair", "example_text", {"Australia": "Location", "Wile E. Coyote": "Person"}, False),
         (
             "roberta",
             "example_text",
@@ -61,7 +60,7 @@ def test_ner_models(
 
 @pytest.mark.parametrize(
     "model_fixture",
-    ["flair", "roberta", "roberta_german", "gliner"],
+    ["roberta", "roberta_german", "gliner"],
 )
 def test_ner_on_articles(request: pytest.FixtureRequest, model_fixture: str, article: tuple[str, dict]):
     content, expected = article
