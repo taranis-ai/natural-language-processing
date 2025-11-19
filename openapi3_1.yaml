@@ -1,0 +1,301 @@
+openapi: 3.1.0
+info:
+  title: Taranis AI Natural Language Processing Bot
+  description: |
+    Performs natural language processing on news items, extracting keywords and named entities for better topic tagging and content analysis.
+    
+    This API supports three different NLP models:
+    - **gliner**: General purpose NER with support for cybersecurity entities
+    - **roberta**: English language Named Entity Recognition
+    - **roberta_german**: German language Named Entity Recognition
+    
+    The model used is determined by the MODEL environment variable at deployment time.
+  version: 0.0.0
+  license:
+    name: EUPL-1.2
+    url: https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
+  contact:
+    name: AIT
+    email: stefania.sava@ait.ac.at
+  x-logo:
+    url: https://github.com/taranis-ai
+
+servers:
+  - url: http://localhost:5500
+    description: Local development server
+  - url: http://localhost:8000
+    description: Docker container server
+
+paths:
+  /:
+    post:
+      summary: Process text for named entity recognition
+      description: |
+        Analyzes the provided text and extracts named entities such as persons, organizations, locations, and other entity types.
+        
+        The response format depends on the `extended_output` parameter:
+        - When `false` (default): Returns a simple object mapping entity text to entity type
+        - When `true`: Returns detailed array with probability scores and positions
+      operationId: processText
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessRequest'
+            examples:
+              basic:
+                summary: Basic text processing
+                value:
+                  text: "This is an example for NER, about the ACME Corporation which is producing Dynamite in Acme City, which is in Australia and run by Mr. Wile E. Coyote"
+              extended:
+                summary: Extended output with details
+                value:
+                  text: "This is an example for NER, about the ACME Corporation which is producing Dynamite in Acme City, which is in Australia and run by Mr. Wile E. Coyote"
+                  extended_output: true
+              cybersecurity:
+                summary: Cybersecurity text analysis (gliner model only)
+                value:
+                  text: "Upon opening Emotet maldocs, victims are greeted with fake Microsoft 365 prompt that states 'THIS DOCUMENT IS PROTECTED,' and instructs victims on how to enable macros."
+                  cybersecurity: true
+                  extended_output: true
+      responses:
+        '200':
+          description: Successful text analysis
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/SimpleResponse'
+                  - $ref: '#/components/schemas/ExtendedResponse'
+              examples:
+                simple:
+                  summary: Simple response format
+                  value:
+                    "ACME Corporation": "Organization"
+                    "Acme City": "Location"
+                    "Australia": "Location"
+                    "Dynamite": "Product"
+                extended:
+                  summary: Extended response format
+                  value:
+                    - value: "ACME Corporation"
+                      type: "Organization"
+                      probability: 0.95
+                      position: "50-66"
+                    - value: "Acme City"
+                      type: "Location"
+                      probability: 0.89
+                      position: "97-106"
+                    - value: "Australia"
+                      type: "Location"
+                      probability: 0.92
+                      position: "120-129"
+                    - value: "Dynamite"
+                      type: "Product"
+                      probability: 0.87
+                      position: "84-92"
+        '400':
+          description: Bad request - invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Missing required field: text"
+        '422':
+          description: Unprocessable entity - validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Invalid payload schema"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Model inference failed"
+
+  /health:
+    get:
+      summary: Health check endpoint
+      description: Returns the health status of the service
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ok"
+        '503':
+          description: Service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /info:
+    get:
+      summary: Get model information
+      description: Returns information about the currently loaded NLP model
+      operationId: getModelInfo
+      responses:
+        '200':
+          description: Model information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelInfo'
+              example:
+                model_name: "gliner"
+                model_version: "0.2.16"
+                confidence_threshold: 0.7
+                supported_entities:
+                  - "Person"
+                  - "Organization"
+                  - "Location"
+                  - "Product"
+                  - "Malware"
+
+components:
+  schemas:
+    ProcessRequest:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          description: The text content to analyze for named entities
+          minLength: 1
+          example: "This is an example for NER, about the ACME Corporation which is producing Dynamite in Acme City, which is in Australia and run by Mr. Wile E. Coyote"
+        extended_output:
+          type: boolean
+          description: |
+            When true, returns detailed information including probability scores and positions.
+            When false (default), returns a simple entity-to-type mapping.
+          default: false
+        cybersecurity:
+          type: boolean
+          description: |
+            When true, uses cybersecurity-specific entity recognition (gliner model only).
+            Enables detection of malware, vulnerabilities, and security-related entities.
+          default: false
+
+    SimpleResponse:
+      type: object
+      description: Simple entity mapping where keys are entity texts and values are entity types
+      additionalProperties:
+        type: string
+        description: Entity type (e.g., Person, Organization, Location, Product, Malware, MISC)
+      example:
+        "ACME Corporation": "Organization"
+        "Acme City": "Location"
+        "Australia": "Location"
+        "Dynamite": "Product"
+
+    ExtendedResponse:
+      type: array
+      description: Detailed entity information including probability scores and positions
+      items:
+        $ref: '#/components/schemas/EntityInfo'
+
+    EntityInfo:
+      type: object
+      description: Detailed information about a single recognized entity
+      required:
+        - value
+        - type
+      properties:
+        value:
+          type: string
+          description: The text of the recognized entity
+          example: "ACME Corporation"
+        type:
+          type: string
+          description: The entity type/category
+          enum:
+            - Person
+            - Organization
+            - Location
+            - Product
+            - Malware
+            - MISC
+          example: "Organization"
+        probability:
+          type: number
+          format: float
+          description: Confidence score for the entity recognition (0.0 to 1.0)
+          minimum: 0
+          maximum: 1
+          example: 0.95
+        position:
+          type: string
+          description: Character position range in the original text (format "start-end")
+          pattern: '^\d+-\d+$'
+          example: "50-66"
+
+    ModelInfo:
+      type: object
+      description: Information about the currently loaded NLP model
+      properties:
+        model_name:
+          type: string
+          description: Name of the model being used
+          enum:
+            - gliner
+            - roberta
+            - roberta_german
+          example: "gliner"
+        model_version:
+          type: string
+          description: Version of the model
+          example: "0.2.16"
+        confidence_threshold:
+          type: number
+          format: float
+          description: Minimum confidence threshold for entity recognition
+          example: 0.7
+        supported_entities:
+          type: array
+          description: List of entity types supported by the model
+          items:
+            type: string
+          example:
+            - "Person"
+            - "Organization"
+            - "Location"
+            - "Product"
+        cybersecurity_mode:
+          type: boolean
+          description: Whether cybersecurity entity detection is available
+          example: true
+
+    Error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Error message describing what went wrong
+          example: "Missing required field: text"
+        details:
+          type: string
+          description: Additional error details (optional)
+          example: "The 'text' field is required and cannot be empty"
+
+tags:
+  - name: NLP
+    description: Natural Language Processing operations
+  - name: System
+    description: System health and information endpoints
