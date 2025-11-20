@@ -4,7 +4,7 @@ from collections import defaultdict
 import requests
 
 from taranis_base_bot.log import logger
-
+from natural_language_processing.config import Config
 
 DEMONYM_TO_COUNTRY_EN = {
     "russian": "russia",
@@ -167,17 +167,37 @@ def map_demonym_to_country(entity: str) -> str | None:
     return None
 
 
-def dbpedia_lookup(entity_name: str, score_threshold: int = 1000, timeout: float = 10.0) -> str | None:
+def extract_dbpedia_entity(response: requests.Response, score_threshold: float) -> str | None:
+    data = response.json()
+    docs = data.get("docs", None)
+    if not docs:
+        return None
+
+    doc = docs[0] if isinstance(docs, list) else docs
+    uri = doc.get("resource")
+
+    if isinstance(uri, list):
+        uri = uri[0]
+
+    score = doc.get("score")
+    if isinstance(score, list):
+        score = score[0]
+
+    if uri is None or score is None or float(score) < score_threshold:
+        return None
+    return uri
+
+
+def dbpedia_lookup(dbpedia_url: str, entity_name: str, score_threshold: int = 1000, timeout: float = 10.0) -> str | None:
     # Query DBPedia for the entity name
     # drop results with score < score_threshold
 
-    url = "https://lookup.dbpedia.org/api/search"
     headers = {"Accept": "application/json", "Accept-Language": "en,de;q=0.8", "User-Agent": "python-requests-dbplookup/1.0"}
     params = {"query": entity_name, "maxResults": 1, "format": "json"}
 
     try:
         logger.debug(f"Query DBPedia for entity {entity_name}")
-        resp = requests.get(url, headers=headers, params=params, timeout=timeout)
+        resp = requests.get(dbpedia_url, headers=headers, params=params, timeout=timeout)
         resp.raise_for_status()
     except TimeoutError:
         logger.error(f"DBPedia query for {entity_name} timed out")
@@ -187,17 +207,7 @@ def dbpedia_lookup(entity_name: str, score_threshold: int = 1000, timeout: float
         return None
 
     try:
-        data = resp.json()
-        docs = data.get("docs", None)
-        if not docs:
-            return None
-        doc = docs[0] if isinstance(docs, list) else docs
-        uri = (doc.get("resource") or [None])[0] if isinstance(doc.get("resource"), list) else doc.get("resource")
-        score = (doc.get("score") or [None])[0] if isinstance(doc.get("score"), list) else doc.get("score")
-        if uri is None or score is None or float(score) < score_threshold:
-            return None
-        return uri
-
+        return extract_dbpedia_entity(resp, score_threshold)
     except ValueError:
         logger.error(f"DBPedia query for {entity_name} failed: Could not parse results")
     return None
@@ -305,12 +315,15 @@ def deduplicate_by_linking(entities: list[dict]) -> list[dict]:
     # try to match entities to external DBPedia resources
     # if multiple entities map to the same resource, keep only the longest
 
+    if not Config.DBPEDIA_LOOKUP:
+        return []
+
     entity_link_map = {}
     keep_idcs = []
 
     # for each entity, map its index to top result of the dbpedia lookup
     for i, entity in enumerate(entities):
-        if linked_entity := dbpedia_lookup(normalize(entity["text"])):
+        if linked_entity := dbpedia_lookup(Config.DBPEDIA_URL, normalize(entity["text"])):
             if linked_entity in entity_link_map:
                 entity_link_map[linked_entity].append(i)
             else:
