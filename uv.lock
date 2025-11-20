@@ -370,6 +370,7 @@ source = { editable = "." }
 dependencies = [
     { name = "accelerate" },
     { name = "gliner" },
+    { name = "requests-mock" },
     { name = "simplemma" },
     { name = "taranis-base-bot" },
     { name = "torch" },
@@ -389,6 +390,7 @@ requires-dist = [
     { name = "gliner", specifier = ">=0.2.16" },
     { name = "jsonschema", marker = "extra == 'dev'" },
     { name = "pytest", marker = "extra == 'dev'" },
+    { name = "requests-mock", specifier = ">=1.12.1" },
     { name = "ruff", marker = "extra == 'dev'" },
     { name = "simplemma", specifier = ">=1.1.2" },
     { name = "taranis-base-bot" },
