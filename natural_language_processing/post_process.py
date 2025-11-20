@@ -3,7 +3,7 @@ import simplemma
 from collections import defaultdict
 import requests
 
-from taranis_base_bot.log import get_logger
+from taranis_base_bot.log import logger
 
 
 DEMONYM_TO_COUNTRY_EN = {
@@ -176,14 +176,14 @@ def dbpedia_lookup(entity_name: str, score_threshold: int = 1000, timeout: float
     params = {"query": entity_name, "maxResults": 1, "format": "json"}
 
     try:
-        get_logger().debug(f"Query DBPedia for entity {entity_name}")
+        logger.debug(f"Query DBPedia for entity {entity_name}")
         resp = requests.get(url, headers=headers, params=params, timeout=timeout)
         resp.raise_for_status()
     except TimeoutError:
-        get_logger().error(f"DBPedia query for {entity_name} timed out")
+        logger.error(f"DBPedia query for {entity_name} timed out")
         return None
     except requests.exceptions.HTTPError as e:
-        get_logger().error(f"DBPedia query for {entity_name} failed: {e}")
+        logger.error(f"DBPedia query for {entity_name} failed: {e}")
         return None
 
     try:
@@ -199,7 +199,7 @@ def dbpedia_lookup(entity_name: str, score_threshold: int = 1000, timeout: float
         return uri
 
     except ValueError:
-        get_logger().error(f"DBPedia query for {entity_name} failed: Could not parse results")
+        logger.error(f"DBPedia query for {entity_name} failed: Could not parse results")
     return None
 
 
