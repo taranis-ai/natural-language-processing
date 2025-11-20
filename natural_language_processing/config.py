@@ -12,6 +12,8 @@ class Settings(CommonSettings):
         "cybersecurity": {"type": "bool", "required": False},
     }
     CONFIDENCE_THRESHOLD: float = 0.7
+    DBPEDIA_URL: str = "https://lookup.dbpedia.org/api/search"
+    DBPEDIA_LOOKUP: bool = False
 
 
 Config = Settings()
