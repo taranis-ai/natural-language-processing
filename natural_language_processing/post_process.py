@@ -316,7 +316,7 @@ def deduplicate_by_linking(entities: list[dict]) -> list[dict]:
     # if multiple entities map to the same resource, keep only the longest
 
     if not Config.DBPEDIA_LOOKUP:
-        return []
+        return entities
 
     entity_link_map = {}
     keep_idcs = []
