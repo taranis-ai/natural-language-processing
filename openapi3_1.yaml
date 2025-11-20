@@ -1,14 +1,14 @@
 openapi: 3.1.0
 info:
-  title: Taranis AI Natural Language Processing Bot
+  title: NLP Bot for Natural Language Processing in Taranis AI
   description: |
     Performs natural language processing on news items, extracting keywords and named entities for better topic tagging and content analysis.
-    
-    This API supports three different NLP models:
+
+    This API supports three different models:
     - **gliner**: General purpose NER with support for cybersecurity entities
     - **roberta**: English language Named Entity Recognition
     - **roberta_german**: German language Named Entity Recognition
-    
+
     The model used is determined by the MODEL environment variable at deployment time.
   version: 0.0.0
   license:
@@ -32,7 +32,7 @@ paths:
       summary: Process text for named entity recognition
       description: |
         Analyzes the provided text and extracts named entities such as persons, organizations, locations, and other entity types.
-        
+
         The response format depends on the `extended_output` parameter:
         - When `false` (default): Returns a simple object mapping entity text to entity type
         - When `true`: Returns detailed array with probability scores and positions
@@ -146,7 +146,7 @@ paths:
   /info:
     get:
       summary: Get model information
-      description: Returns information about the currently loaded NLP model
+      description: Returns information about the currently loaded model
       operationId: getModelInfo
       responses:
         '200':
