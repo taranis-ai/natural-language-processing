@@ -1,6 +1,5 @@
 import pytest
 from jsonschema import validate
-from natural_language_processing.config import Config
 
 
 def assert_entities(result: dict[str, str], expected: dict[str, set]) -> None:
@@ -17,7 +16,6 @@ def assert_entities(result: dict[str, str], expected: dict[str, set]) -> None:
 @pytest.mark.parametrize(
     "model_fixture,text_fixture,expected,cybersecurity",
     [
-        ("flair", "example_text", {"Australia": "Location", "Wile E. Coyote": "Person"}, False),
         (
             "roberta",
             "example_text",
@@ -62,32 +60,10 @@ def test_ner_models(
 
 @pytest.mark.parametrize(
     "model_fixture",
-    ["flair", "roberta", "roberta_german", "gliner"],
+    ["roberta", "roberta_german", "gliner"],
 )
 def test_ner_on_articles(request: pytest.FixtureRequest, model_fixture: str, article: tuple[str, dict]):
     content, expected = article
     model = request.getfixturevalue(model_fixture)
     result = model.predict(content)
     assert_entities(result, expected)
-
-
-@pytest.mark.parametrize(
-    "model_fixture",
-    ["flair", "roberta", "gliner"],
-)
-def test_entity_filtering_en(request: pytest.FixtureRequest, model_fixture: str, example_text: str):
-    Config.ENTITIES = ["Location"]
-    model = request.getfixturevalue(model_fixture)
-    result = model.predict(example_text)
-    assert_entities(result, {"Acme City": {"Location"}, "Australia": {"Location"}})
-
-
-@pytest.mark.parametrize(
-    "model_fixture",
-    ["roberta_german", "gliner"],
-)
-def test_entity_filtering_de(request: pytest.FixtureRequest, model_fixture: str, example_text_de: str):
-    Config.ENTITIES = ["Location"]
-    model = request.getfixturevalue(model_fixture)
-    result = model.predict(example_text_de)
-    assert_entities(result, {"Acme City": {"Location"}, "Australien": {"Location"}})

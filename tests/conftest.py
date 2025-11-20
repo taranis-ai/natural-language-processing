@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 
 from natural_language_processing.roberta import Roberta
 from natural_language_processing.roberta_german import RobertaGerman
-from natural_language_processing.flair import Flair
 from natural_language_processing.gliner import Gliner
 
 
@@ -13,11 +12,6 @@ env_file = os.path.join(base_dir, ".env.test")
 current_path = os.getcwd()
 
 load_dotenv(dotenv_path=env_file, override=True)
-
-
-@pytest.fixture(scope="session")
-def flair():
-    yield Flair()
 
 
 @pytest.fixture(scope="session")

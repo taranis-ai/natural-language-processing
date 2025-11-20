@@ -15,7 +15,7 @@ dependencies = [
     "taranis-base-bot",
     "transformers",
     "torch",
-    "flair @ git+https://github.com/flairNLP/flair@master",
+    "accelerate",
     "gliner>=0.2.16",
     "simplemma>=1.1.2",
 ]
