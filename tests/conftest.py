@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from natural_language_processing.roberta import Roberta
 from natural_language_processing.roberta_german import RobertaGerman
 from natural_language_processing.gliner import Gliner
+from natural_language_processing.config import Config
 
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -16,7 +17,10 @@ load_dotenv(dotenv_path=env_file, override=True)
 
 @pytest.fixture
 def dbpedia_url():
-    return "https://lookup.dbpedia.org/api/search"
+    dbpedia_url = "https://lookup.dbpedia.org/api/search"
+    Config.DBPEDIA_URL = dbpedia_url
+    Config.DBPEDIA_LOOKUP = True
+    return dbpedia_url
 
 
 @pytest.fixture(scope="session")
