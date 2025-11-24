@@ -370,6 +370,7 @@ source = { editable = "." }
 dependencies = [
     { name = "accelerate" },
     { name = "gliner" },
+    { name = "requests-mock" },
     { name = "simplemma" },
     { name = "taranis-base-bot" },
     { name = "torch" },
@@ -389,6 +390,7 @@ requires-dist = [
     { name = "gliner", specifier = ">=0.2.16" },
     { name = "jsonschema", marker = "extra == 'dev'" },
     { name = "pytest", marker = "extra == 'dev'" },
+    { name = "requests-mock", specifier = ">=1.12.1" },
     { name = "ruff", marker = "extra == 'dev'" },
     { name = "simplemma", specifier = ">=1.1.2" },
     { name = "taranis-base-bot" },
@@ -825,6 +827,18 @@ wheels = [
 ]
 
 [[package]]
+name = "requests-mock"
+version = "1.12.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/92/32/587625f91f9a0a3d84688bf9cfc4b2480a7e8ec327cefd0ff2ac891fd2cf/requests-mock-1.12.1.tar.gz", hash = "sha256:e9e12e333b525156e82a3c852f22016b9158220d2f47454de9cae8a77d371401", size = 60901, upload-time = "2024-03-29T03:54:29.446Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/97/ec/889fbc557727da0c34a33850950310240f2040f3b1955175fdb2b36a8910/requests_mock-1.12.1-py2.py3-none-any.whl", hash = "sha256:b1e37054004cdd5e56c84454cc7df12b25f90f382159087f4b6915aaeef39563", size = 27695, upload-time = "2024-03-29T03:54:27.64Z" },
+]
+
+[[package]]
 name = "rpds-py"
 version = "0.29.0"
 source = { registry = "https://pypi.org/simple" }
@@ -965,7 +979,7 @@ wheels = [
 
 [[package]]
 name = "taranis-base-bot"
-version = "0.1.6"
+version = "0.1.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "flask" },
@@ -973,9 +987,9 @@ dependencies = [
     { name = "pydantic-settings" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5e/c8/9467f71c1b52ea85d90d87d03acae08856611776567a74192ef314784f2c/taranis_base_bot-0.1.6.tar.gz", hash = "sha256:1e87d1f45bd851e154aab359d5a1475302b176da56edc00c911a5ad938448ef2", size = 36809, upload-time = "2025-10-29T12:10:46.16Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f2/98/768ae6eb0ca4fc8fd2618e3b166e856b62d5a8e84faf52e5c35374ffc5e9/taranis_base_bot-0.1.7.tar.gz", hash = "sha256:3b3e6c90ebc42cba4160514360d197a3369384156ba7bd5e2e2b82acedb6b3c4", size = 36794, upload-time = "2025-11-20T09:25:37.394Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/30/51/922496ce8f117c26b04371151b4f33a0f3df591522045218990a88b65cc2/taranis_base_bot-0.1.6-py3-none-any.whl", hash = "sha256:22d9b006544be72a5595ea852c4e8c091713c6d1974adaf17a9d607cafbdc23f", size = 12878, upload-time = "2025-10-29T12:10:44.66Z" },
+    { url = "https://files.pythonhosted.org/packages/46/a9/0e120c5b263e2676975c366eeb6d6d953147b49ecaf01e90af8fdd6c8672/taranis_base_bot-0.1.7-py3-none-any.whl", hash = "sha256:e68ff04fe41f60239bc0a6cad096de346b3e02a02c9b9b6b1107a99493566f67", size = 12812, upload-time = "2025-11-20T09:25:36.117Z" },
 ]
 
 [[package]]
