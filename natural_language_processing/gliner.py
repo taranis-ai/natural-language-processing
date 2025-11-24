@@ -60,7 +60,7 @@ class Gliner:
                 {
                     "value": entity.get("text", ""),
                     "type": entity.get("type", ""),
-                    "probability": entity.get("score", 0.0),
+                    "probability": f'{entity.get("score", 0.0):.2f}',
                     "position": f"{entity.get('start', '')}-{entity.get('end', '')}",
                 }
                 for entity in entities

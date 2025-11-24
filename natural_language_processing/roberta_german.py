@@ -20,7 +20,7 @@ class RobertaGerman:
                 {
                     "value": entity.get("word", ""),
                     "type": map_entity_types(entity.get("entity_group", "")),
-                    "probability": float(entity.get("score", 0.0)),
+                    "probability": f'{entity.get("score", 0.0):.2f}',
                     "position": f"{entity.get('start', '')}-{entity.get('end', '')}",
                 }
                 for entity in entities
