@@ -54,18 +54,18 @@ def test_normalize_de_demonym_form(word, expected):
 @pytest.mark.parametrize(
     "inp,expected",
     [
-        ("russian", "russia"),
-        ("german", "germany"),
-        ("lithuanian", "lithuania"),
-        ("amerikanischen", "vereinigte staaten"),
-        ("russischen", "russland"),
+        ("russian", ["russia"]),
+        ("german", ["germany"]),
+        ("lithuanian", ["lithuania"]),
+        ("amerikanischen", ["amerika", "vereinigte staaten"]),
+        ("russischen", ["russland"]),
         ("unknown", None),
-        ("deutsche", "deutschland"),
-        ("schweizerisch", "schweiz"),
-        ("finnisch", "finnland"),
-        ("chinese", "china"),
-        ("spanier", "spanien"),
-        ("spanierinnen", "spanien"),
+        ("deutsche", ["deutschland"]),
+        ("schweizerisch", ["schweiz"]),
+        ("finnisch", ["finnland"]),
+        ("chinese", ["china"]),
+        ("spanier", ["spanien"]),
+        ("spanierinnen", ["spanien"]),
     ],
 )
 def test_map_demonym_to_country(inp, expected):
@@ -220,6 +220,18 @@ def test_deduplication():
         (
             [{"text": "Russia", "label": "Location"}, {"text": "russian", "label": "Organization"}],
             [{"text": "Russia", "label": "Location"}, {"text": "russian", "label": "Organization"}],
+        ),
+        (
+            [{"text": "America", "label": "Location"}, {"text": "American", "label": "Location"}],
+            [{"text": "America", "label": "Location"}],
+        ),
+        (
+            [{"text": "America", "label": "Location"}, {"text": "American", "label": "Location"}, {"text": "USA", "label": "Location"}],
+            [{"text": "America", "label": "Location"}, {"text": "USA", "label": "Location"}],
+        ),
+        (
+            [{"text": "british", "label": "Location"}, {"text": "Britain", "label": "Location"}],
+            [{"text": "Britain", "label": "Location"}],
         ),
     ],
 )

@@ -1,4 +1,6 @@
+import os
 import re
+import json
 import simplemma
 from collections import defaultdict
 import requests
@@ -6,89 +8,9 @@ import requests
 from taranis_base_bot.log import logger
 from natural_language_processing.config import Config
 
-DEMONYM_TO_COUNTRY_EN = {
-    "russian": "russia",
-    "chinese": "china",
-    "french": "france",
-    "spanish": "spain",
-    "german": "germany",
-    "italian": "italy",
-    "british": "united kingdom",
-    "english": "england",
-    "american": "united states",
-    "dutch": "netherlands",
-    "swiss": "switzerland",
-    "turkish": "turkey",
-    "polish": "poland",
-    "swedish": "sweden",
-    "norwegian": "norway",
-    "danish": "denmark",
-    "finnish": "finland",
-    "greek": "greece",
-    "portuguese": "portugal",
-    "austrian": "austria",
-    "ukrainian": "ukraine",
-    "belarusian": "belarus",
-    "czech": "czechia",
-    "slovak": "slovakia",
-    "hungarian": "hungary",
-    "romanian": "romania",
-    "bulgarian": "bulgaria",
-    "serbian": "serbia",
-    "croatian": "croatia",
-    "bosnian": "bosnia and herzegovina",
-    "slovenian": "slovenia",
-    "albanian": "albania",
-    "macedonian": "north macedonia",
-    "irish": "ireland",
-    "scottish": "scotland",
-    "welsh": "wales",
-    "estonian": "estonia",
-    "latvian": "latvia",
-    "lithuanian": "lithuania",
-}
-
-DEMONYM_TO_COUNTRY_DE = {
-    "russisch": "russland",
-    "chinesisch": "china",
-    "französisch": "frankreich",
-    "spanisch": "spanien",
-    "deutsch": "deutschland",
-    "italienisch": "italien",
-    "britisch": "vereinigtes königreich",
-    "englisch": "england",
-    "amerikanisch": "vereinigte staaten",
-    "niederländisch": "niederlande",
-    "schweizerisch": "schweiz",
-    "türkisch": "türkei",
-    "polnisch": "polen",
-    "schwedisch": "schweden",
-    "norwegisch": "norwegen",
-    "dänisch": "dänemark",
-    "finnisch": "finnland",
-    "griechisch": "griechenland",
-    "portugiesisch": "portugal",
-    "österreichisch": "österreich",
-    "ukrainisch": "ukraine",
-    "belarussisch": "belarus",
-    "tschechisch": "tschechien",
-    "slowakisch": "slowakei",
-    "ungarisch": "ungarn",
-    "rumänisch": "rumänien",
-    "bulgarisch": "bulgarien",
-    "serbisch": "serbien",
-    "kroatisch": "kroatien",
-    "bosnisch": "bosnien und herzegowina",
-    "slowenisch": "slowenien",
-    "albanisch": "albanien",
-    "makedonisch": "nordmazedonien",
-    "irisch": "irland",
-    "schottisch": "schottland",
-    "walisisch": "wales",
-    "estnisch": "estland",
-    "lettisch": "lettland",
-    "litauisch": "litauen",
-}
+CWD = os.path.dirname(os.path.realpath(__file__))
+DEMONYM_TO_COUNTRY_EN = json.load(open(f"{CWD}/files/demonyms_to_country_en.json"))
+DEMONYM_TO_COUNTRY_DE = json.load(open(f"{CWD}/files/demonyms_to_country_de.json"))
 
 
 def map_entity_types(entity_type: str) -> str:
@@ -128,7 +50,7 @@ def normalize_de_demonym_form(word: str) -> str:
     )
 
 
-def map_demonym_to_country(entity: str) -> str | None:
+def map_demonym_to_country(entity: str) -> list[str] | None:
     # nationality adjectives to country names
     # e.g. russian -> Russia
 
@@ -243,9 +165,9 @@ def drop_demonyms(entities: list[dict]) -> list[dict]:
         if e.get("label") != "Location":
             continue
         ent_txt = normalize(e["text"])
-        country = map_demonym_to_country(ent_txt)
-        if country and country in texts:
-            to_drop_idcs.add(id(e))
+        if country_candidates := map_demonym_to_country(ent_txt):
+            if any(country in texts for country in country_candidates):
+                to_drop_idcs.add(id(e))
 
     return [e for e in entities if id(e) not in to_drop_idcs]
 
