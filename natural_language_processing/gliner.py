@@ -1,6 +1,6 @@
 from gliner import GLiNER
 from natural_language_processing.config import Config
-from natural_language_processing.post_process import clean_entities
+from natural_language_processing.post_process import clean_entities, is_entity_allowed
 
 
 def map_cybersec_entities(cybersec_entities: list[dict[str, str]]) -> list[dict[str, str]]:
@@ -64,12 +64,18 @@ class Gliner:
                     "position": f"{entity.get('start', '')}-{entity.get('end', '')}",
                 }
                 for entity in entities
-                if isinstance(entity, dict) and entity.get("score", 0) > Config.CONFIDENCE_THRESHOLD and entity.get("text") is not None
+                if isinstance(entity, dict)
+                and entity.get("score", 0) > Config.CONFIDENCE_THRESHOLD
+                and entity.get("text") is not None
+                and is_entity_allowed(entity.get("type", ""), Config.ENTITIES)
             )
             return out_list
 
         return {
             entity["text"]: entity.get("label", "")
             for entity in entities
-            if isinstance(entity, dict) and entity.get("score", 0) > Config.CONFIDENCE_THRESHOLD and entity.get("text") is not None
+            if isinstance(entity, dict)
+            and entity.get("score", 0) > Config.CONFIDENCE_THRESHOLD
+            and entity.get("text") is not None
+            and is_entity_allowed(entity.get("type", ""), Config.ENTITIES)
         }
