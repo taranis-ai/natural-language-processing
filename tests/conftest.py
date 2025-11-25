@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from natural_language_processing.roberta import Roberta
 from natural_language_processing.roberta_german import RobertaGerman
 from natural_language_processing.gliner import Gliner
+from natural_language_processing.config import Config
 
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -12,6 +13,14 @@ env_file = os.path.join(base_dir, ".env.test")
 current_path = os.getcwd()
 
 load_dotenv(dotenv_path=env_file, override=True)
+
+
+@pytest.fixture
+def dbpedia_url():
+    dbpedia_url = "https://lookup.dbpedia.org/api/search"
+    Config.DBPEDIA_URL = dbpedia_url
+    Config.DBPEDIA_LOOKUP = True
+    return dbpedia_url
 
 
 @pytest.fixture(scope="session")
@@ -226,6 +235,10 @@ def entities_en():
         {"idx": 4, "text": "Defoe", "label": "Person"},
         {"idx": 5, "text": "prices", "label": "Misc"},
         {"idx": 6, "text": "price", "label": "Misc"},
+        {"idx": 7, "text": "Department of Defense", "label": "Organization"},
+        {"idx": 8, "text": "DoD", "label": "Organization"},
+        {"idx": 9, "text": "US", "label": "Location"},
+        {"idx": 10, "text": "USA", "label": "Location"},
     ]
     text = (
         "Russia was mentioned in the article, and a russian diplomat was quoted. "
@@ -233,6 +246,22 @@ def entities_en():
         "The prices have been falling, but the word price is also common in the text."
     )
     return entities, text
+
+
+@pytest.fixture
+def entity_map_en():
+    return {
+        "russia": "uri:Russia",
+        "russian": "uri:Russia",
+        "willem defoe": "uri:Willem Defoe",
+        "defoe": "uri:Daniel Defoe",
+        "prices": None,
+        "price": None,
+        "department of defense": "uri:US Department of Defense",
+        "dod": "uri:US Department of Defense",
+        "us": "uri:United States of America",
+        "usa": "uri:United States of America",
+    }
 
 
 @pytest.fixture
@@ -246,6 +275,10 @@ def entities_de():
         {"idx": 6, "text": "Katze", "label": "Misc"},
         {"idx": 7, "text": "Burroughs", "label": "Person"},
         {"idx": 8, "text": "William S. Burroughs", "label": "Person"},
+        {"idx": 9, "text": "USA", "label": "Location"},
+        {"idx": 10, "text": "Amerika", "label": "Location"},
+        {"idx": 11, "text": "BMI", "label": "Organization"},
+        {"idx": 12, "text": "Bundesministerium für Inneres", "label": "Organization"},
     ]
     text = (
         "Spanien wurde in dem Bericht erwähnt, ebenso ein Spanier. "
@@ -254,3 +287,21 @@ def entities_de():
         "Der Autor William S. Burroughs schrieb viele Bücher, später wurde nur Burroughs genannt."
     )
     return entities, text
+
+
+@pytest.fixture
+def entity_map_de():
+    return {
+        "spanien": "uri:Spanien",
+        "spanier": "uri:Spanien",
+        "russland": "uri:Russland",
+        "russischen": "uri:Russland",
+        "katzen": "uri:Felis catus",
+        "katze": "uri:Felis catus",
+        "burroughs": "uri:Edgar Rice Burroughs",
+        "william s. burroughs": "uri:William S. Burroughs",
+        "usa": "uri:Vereinigte Staaten von Amerika",
+        "amerika": "uri:Vereinigte Staaten von Amerika",
+        "bundesministerium für inneres": "uri:Bundesministerium für Inneres",
+        "bmi": "uri:Bundesministerium für Inneres",
+    }

@@ -1,90 +1,16 @@
+import os
 import re
+import json
 import simplemma
 from collections import defaultdict
+import requests
 
-DEMONYM_TO_COUNTRY_EN = {
-    "russian": "russia",
-    "chinese": "china",
-    "french": "france",
-    "spanish": "spain",
-    "german": "germany",
-    "italian": "italy",
-    "british": "united kingdom",
-    "english": "england",
-    "american": "united states",
-    "dutch": "netherlands",
-    "swiss": "switzerland",
-    "turkish": "turkey",
-    "polish": "poland",
-    "swedish": "sweden",
-    "norwegian": "norway",
-    "danish": "denmark",
-    "finnish": "finland",
-    "greek": "greece",
-    "portuguese": "portugal",
-    "austrian": "austria",
-    "ukrainian": "ukraine",
-    "belarusian": "belarus",
-    "czech": "czechia",
-    "slovak": "slovakia",
-    "hungarian": "hungary",
-    "romanian": "romania",
-    "bulgarian": "bulgaria",
-    "serbian": "serbia",
-    "croatian": "croatia",
-    "bosnian": "bosnia and herzegovina",
-    "slovenian": "slovenia",
-    "albanian": "albania",
-    "macedonian": "north macedonia",
-    "irish": "ireland",
-    "scottish": "scotland",
-    "welsh": "wales",
-    "estonian": "estonia",
-    "latvian": "latvia",
-    "lithuanian": "lithuania",
-}
+from taranis_base_bot.log import logger
+from natural_language_processing.config import Config
 
-DEMONYM_TO_COUNTRY_DE = {
-    "russisch": "russland",
-    "chinesisch": "china",
-    "französisch": "frankreich",
-    "spanisch": "spanien",
-    "deutsch": "deutschland",
-    "italienisch": "italien",
-    "britisch": "vereinigtes königreich",
-    "englisch": "england",
-    "amerikanisch": "vereinigte staaten",
-    "niederländisch": "niederlande",
-    "schweizerisch": "schweiz",
-    "türkisch": "türkei",
-    "polnisch": "polen",
-    "schwedisch": "schweden",
-    "norwegisch": "norwegen",
-    "dänisch": "dänemark",
-    "finnisch": "finnland",
-    "griechisch": "griechenland",
-    "portugiesisch": "portugal",
-    "österreichisch": "österreich",
-    "ukrainisch": "ukraine",
-    "belarussisch": "belarus",
-    "tschechisch": "tschechien",
-    "slowakisch": "slowakei",
-    "ungarisch": "ungarn",
-    "rumänisch": "rumänien",
-    "bulgarisch": "bulgarien",
-    "serbisch": "serbien",
-    "kroatisch": "kroatien",
-    "bosnisch": "bosnien und herzegowina",
-    "slowenisch": "slowenien",
-    "albanisch": "albanien",
-    "makedonisch": "nordmazedonien",
-    "irisch": "irland",
-    "schottisch": "schottland",
-    "walisisch": "wales",
-    "estnisch": "estland",
-    "lettisch": "lettland",
-    "litauisch": "litauen",
-}
+CWD = os.path.dirname(os.path.realpath(__file__))
+DEMONYM_TO_COUNTRY_EN = json.load(open(f"{CWD}/files/demonyms_to_country_en.json"))
+DEMONYM_TO_COUNTRY_DE = json.load(open(f"{CWD}/files/demonyms_to_country_de.json"))
 
 
 def map_entity_types(entity_type: str) -> str:
@@ -128,7 +54,7 @@ def normalize_de_demonym_form(word: str) -> str:
     )
 
 
-def map_demonym_to_country(entity: str) -> str | None:
+def map_demonym_to_country(entity: str) -> list[str] | None:
     # nationality adjectives to country names
     # e.g. russian -> Russia
 
@@ -167,6 +93,52 @@ def map_demonym_to_country(entity: str) -> str | None:
     return None
 
 
+def extract_dbpedia_entity(response: requests.Response, score_threshold: float) -> str | None:
+    data = response.json()
+    docs = data.get("docs", None)
+    if not docs:
+        return None
+
+    doc = docs[0] if isinstance(docs, list) else docs
+    uri = doc.get("resource")
+
+    if isinstance(uri, list):
+        uri = uri[0]
+
+    score = doc.get("score")
+    if isinstance(score, list):
+        score = score[0]
+
+    if uri is None or score is None or float(score) < score_threshold:
+        return None
+    return uri
+
+
+def dbpedia_lookup(dbpedia_url: str, entity_name: str, score_threshold: int = 1000, timeout: float = 10.0) -> str | None:
+    # Query DBPedia for the entity name
+    # drop results with score < score_threshold
+
+    headers = {"Accept": "application/json", "Accept-Language": "en,de;q=0.8", "User-Agent": "python-requests-dbplookup/1.0"}
+    params = {"query": entity_name, "maxResults": 1, "format": "json"}
+
+    try:
+        logger.debug(f"Query DBPedia for entity {entity_name}")
+        resp = requests.get(dbpedia_url, headers=headers, params=params, timeout=timeout)
+        resp.raise_for_status()
+    except TimeoutError:
+        logger.error(f"DBPedia query for {entity_name} timed out")
+        return None
+    except requests.exceptions.HTTPError as e:
+        logger.error(f"DBPedia query for {entity_name} failed: {e}")
+        return None
+
+    try:
+        return extract_dbpedia_entity(resp, score_threshold)
+    except ValueError:
+        logger.error(f"DBPedia query for {entity_name} failed: Could not parse results")
+    return None
+
+
 def remove_leading_trailing_punctuation(entities: list[dict]) -> list[dict]:
     cleaned_entities = []
     for entity in entities:
@@ -197,9 +169,9 @@ def drop_demonyms(entities: list[dict]) -> list[dict]:
         if e.get("label") != "Location":
             continue
         ent_txt = normalize(e["text"])
-        country = map_demonym_to_country(ent_txt)
-        if country and country in texts:
-            to_drop_idcs.add(id(e))
+        if country_candidates := map_demonym_to_country(ent_txt):
+            if any(country in texts for country in country_candidates):
+                to_drop_idcs.add(id(e))
 
     return [e for e in entities if id(e) not in to_drop_idcs]
 
@@ -265,6 +237,41 @@ def deduplicate_by_lemma(entities: list[dict], text: str) -> list[dict]:
     return cleaned_entities
 
 
+def deduplicate_by_linking(entities: list[dict]) -> list[dict]:
+    # try to match entities to external DBPedia resources
+    # if multiple entities map to the same resource, keep only the longest
+
+    if not Config.DBPEDIA_LOOKUP:
+        return entities
+
+    entity_link_map = {}
+    keep_idcs = []
+
+    # for each entity, map its index to top result of the dbpedia lookup
+    for i, entity in enumerate(entities):
+        if linked_entity := dbpedia_lookup(Config.DBPEDIA_URL, normalize(entity["text"])):
+            if linked_entity in entity_link_map:
+                entity_link_map[linked_entity].append(i)
+            else:
+                entity_link_map[linked_entity] = [i]
+        else:
+            keep_idcs.append(i)
+
+    # if two or more entities share the same link, remove the shorter one
+    for connected_entity_idcs in entity_link_map.values():
+        if len(connected_entity_idcs) == 1:
+            keep_idcs.append(connected_entity_idcs[0])
+            continue
+
+        top_idx = connected_entity_idcs[0]
+        for idx in connected_entity_idcs:
+            if len(entities[idx]["text"]) > len(entities[top_idx]["text"]):
+                top_idx = idx
+        keep_idcs.append(top_idx)
+
+    return [entities[i] for i in range(len(entities)) if i in keep_idcs]
+
+
 def clean_entities(entities: list[dict], text: str) -> list[dict[str, str]]:
     cleaned_ents = [{**e, "idx": e.get("idx", id(e))} for e in entities if e.get("text", "").strip()]
 
@@ -273,6 +280,7 @@ def clean_entities(entities: list[dict], text: str) -> list[dict[str, str]]:
     cleaned_ents = drop_demonyms(cleaned_ents)
     cleaned_ents = deduplicate_persons(cleaned_ents)
     cleaned_ents = deduplicate_by_lemma(cleaned_ents, text)
+    cleaned_ents = deduplicate_by_linking(cleaned_ents)
 
     # return the cleaned entities in their original form
     keep = {e["idx"] for e in cleaned_ents}

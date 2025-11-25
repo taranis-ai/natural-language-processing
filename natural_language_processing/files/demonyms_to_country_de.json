@@ -1,0 +1,581 @@
+{
+  "afghanisch": [
+    "afghanistan"
+  ],
+  "albanisch": [
+    "albanien"
+  ],
+  "algerisch": [
+    "algerien"
+  ],
+  "amerikanisch": [
+    "amerika",
+    "vereinigte staaten"
+  ],
+  "andorranisch": [
+    "andorra"
+  ],
+  "angolanisch": [
+    "angola"
+  ],
+  "antiguanisch": [
+    "antigua und barbuda"
+  ],
+  "argentinisch": [
+    "argentinien"
+  ],
+  "armenisch": [
+    "armenien"
+  ],
+  "aserbaidschanisch": [
+    "aserbaidschan"
+  ],
+  "äthiopisch": [
+    "äthiopien"
+  ],
+  "australisch": [
+    "australien"
+  ],
+  "österreichisch": [
+    "österreich"
+  ],
+  "bahamaisch": [
+    "bahamas"
+  ],
+  "bahrainisch": [
+    "bahrain"
+  ],
+  "bangladeschisch": [
+    "bangladesch"
+  ],
+  "barbadisch": [
+    "barbados"
+  ],
+  "belarussisch": [
+    "belarus"
+  ],
+  "weißrsussisch": [
+    "weißrussland"
+  ],
+  "belgisch": [
+    "belgien"
+  ],
+  "belizisch": [
+    "belize"
+  ],
+  "beninisch": [
+    "benin"
+  ],
+  "bhutanisch": [
+    "bhutan"
+  ],
+  "bolivianisch": [
+    "bolivien"
+  ],
+  "bosnisch": [
+    "bosnien",
+    "bosnien und herzegowina"
+  ],
+  "botswanisch": [
+    "botswana"
+  ],
+  "brasilianisch": [
+    "brasilien"
+  ],
+  "bruneiisch": [
+    "brunei"
+  ],
+  "bulgarisch": [
+    "bulgarien"
+  ],
+  "burkinisch": [
+    "burkina faso"
+  ],
+  "burundisch": [
+    "burundi"
+  ],
+  "cabo-verdisch": [
+    "cabo verde"
+  ],
+  "chilenisch": [
+    "chile"
+  ],
+  "chinesisch": [
+    "china"
+  ],
+  "columbianisch": [
+    "kolumbien"
+  ],
+  "komorisch": [
+    "komoren"
+  ],
+  "kongolesisch": [
+    "demokratische republik kongo"
+  ],
+  "costaricanisch": [
+    "costa rica"
+  ],
+  "kroatisch": [
+    "kroatien"
+  ],
+  "kubanisch": [
+    "kuba"
+  ],
+  "zypriotisch": [
+    "zypern"
+  ],
+  "tschechisch": [
+    "tschechien"
+  ],
+  "dänisch": [
+    "dänemark"
+  ],
+  "djiboutisch": [
+    "dschibuti"
+  ],
+  "dominikanisch": [
+    "dominikanische republik"
+  ],
+  "ecuadorianisch": [
+    "ecuador"
+  ],
+  "ägyptisch": [
+    "ägypten"
+  ],
+  "salvadorianisch": [
+    "el salvador"
+  ],
+  "äquatorialguineisch": [
+    "äquatorialguinea"
+  ],
+  "eritreisch": [
+    "eritrea"
+  ],
+  "estnisch": [
+    "estland"
+  ],
+  "eswatinisch": [
+    "eswatini"
+  ],
+  "fidschianisch": [
+    "fidschi"
+  ],
+  "finnisch": [
+    "finnland"
+  ],
+  "französisch": [
+    "frankreich"
+  ],
+  "gabunisch": [
+    "gabun"
+  ],
+  "gambisch": [
+    "gambia"
+  ],
+  "georgisch": [
+    "georgien"
+  ],
+  "deutsch": [
+    "deutschland"
+  ],
+  "ghanaisch": [
+    "ghana"
+  ],
+  "griechisch": [
+    "griechenland"
+  ],
+  "grenadisch": [
+    "grenada"
+  ],
+  "guatemaltekisch": [
+    "guatemala"
+  ],
+  "guineisch": [
+    "guinea"
+  ],
+  "guyanesisch": [
+    "guyana"
+  ],
+  "haitianisch": [
+    "haiti"
+  ],
+  "honduranisch": [
+    "honduras"
+  ],
+  "ungarisch": [
+    "ungarn"
+  ],
+  "isländisch": [
+    "island"
+  ],
+  "indisch": [
+    "indien"
+  ],
+  "indonesisch": [
+    "indonesien"
+  ],
+  "iranisch": [
+    "iran"
+  ],
+  "irakisch": [
+    "irak"
+  ],
+  "irisch": [
+    "irland"
+  ],
+  "israelisch": [
+    "israel"
+  ],
+  "italienisch": [
+    "italien"
+  ],
+  "ivorisch": [
+    "elfenbeinküste"
+  ],
+  "jamaikanisch": [
+    "jamaika"
+  ],
+  "japanisch": [
+    "japan"
+  ],
+  "jordanisch": [
+    "jordanien"
+  ],
+  "kasachisch": [
+    "kasachstan"
+  ],
+  "kenianisch": [
+    "kenia"
+  ],
+  "kiribatisch": [
+    "kiribati"
+  ],
+  "koreanisch": [
+    "korea"
+  ],
+  "nordkoreanisch": [
+    "nordkorea"
+  ],
+  "südkoreanisch": [
+    "südkorea"
+  ],
+  "kosovarisch": [
+    "kosovo"
+  ],
+  "kuwaitisch": [
+    "kuwait"
+  ],
+  "kirgisisch": [
+    "kirgisistan"
+  ],
+  "laotisch": [
+    "laos"
+  ],
+  "lettisch": [
+    "lettland"
+  ],
+  "libanesisch": [
+    "libanon"
+  ],
+  "lesothisch": [
+    "lesotho"
+  ],
+  "liberianisch": [
+    "liberia"
+  ],
+  "libysch": [
+    "libyen"
+  ],
+  "liechtensteinisch": [
+    "liechtenstein"
+  ],
+  "litauisch": [
+    "litauen"
+  ],
+  "luxemburgisch": [
+    "luxemburg"
+  ],
+  "madagassisch": [
+    "madagaskar"
+  ],
+  "malawisch": [
+    "malawi"
+  ],
+  "malaysisch": [
+    "malaysia"
+  ],
+  "maledivisch": [
+    "malediven"
+  ],
+  "malisch": [
+    "mali"
+  ],
+  "maltesisch": [
+    "malta"
+  ],
+  "marokkanisch": [
+    "marokko"
+  ],
+  "mauretanisch": [
+    "mauretanien"
+  ],
+  "mauritisch": [
+    "mauritius"
+  ],
+  "mexikanisch": [
+    "mexiko"
+  ],
+  "mikronesisch": [
+    "mikronesien"
+  ],
+  "moldauisch": [
+    "moldau"
+  ],
+  "monégassisch": [
+    "monaco"
+  ],
+  "mongolisch": [
+    "mongolei"
+  ],
+  "montenegrinisch": [
+    "montenegro"
+  ],
+  "mosambikanisch": [
+    "mosambik"
+  ],
+  "myanmarisch": [
+    "myanmar"
+  ],
+  "namibisch": [
+    "namibia"
+  ],
+  "nauruisch": [
+    "nauru"
+  ],
+  "nepalesisch": [
+    "nepal"
+  ],
+  "neuseeländisch": [
+    "neuseeland"
+  ],
+  "nicaraguanisch": [
+    "nicaragua"
+  ],
+  "nigrisch": [
+    "niger"
+  ],
+  "nigerianisch": [
+    "nigeria"
+  ],
+  "norwegisch": [
+    "norwegen"
+  ],
+  "omanisch": [
+    "oman"
+  ],
+  "pakistanisch": [
+    "pakistan"
+  ],
+  "palästinensisch": [
+    "palästina"
+  ],
+  "panamaisch": [
+    "panama"
+  ],
+  "papua-neuguineisch": [
+    "papua-neuguinea"
+  ],
+  "paraguayisch": [
+    "paraguay"
+  ],
+  "peruanisch": [
+    "peru"
+  ],
+  "philippinisch": [
+    "philippinen"
+  ],
+  "polnisch": [
+    "polen"
+  ],
+  "portugiesisch": [
+    "portugal"
+  ],
+  "katarisch": [
+    "katar"
+  ],
+  "rumänisch": [
+    "rumänien"
+  ],
+  "russisch": [
+    "russland"
+  ],
+  "ruandisch": [
+    "ruanda"
+  ],
+  "salomonisch": [
+    "salomonen"
+  ],
+  "samoanisch": [
+    "samoa"
+  ],
+  "san-marinesisch": [
+    "san marino"
+  ],
+  "saudi-arabisch": [
+    "saudi-arabien"
+  ],
+  "senegalesisch": [
+    "senegal"
+  ],
+  "serbisch": [
+    "serbien"
+  ],
+  "seychellisch": [
+    "seychellen"
+  ],
+  "sierra-leonisch": [
+    "sierra leone"
+  ],
+  "singapurisch": [
+    "singapur"
+  ],
+  "slowakisch": [
+    "slowakei"
+  ],
+  "slowenisch": [
+    "slowenien"
+  ],
+  "somalisch": [
+    "somalia"
+  ],
+  "südafrikanisch": [
+    "südafrika"
+  ],
+  "südsudanesisch": [
+    "südsudan"
+  ],
+  "spanisch": [
+    "spanien"
+  ],
+  "sri-lankisch": [
+    "sri lanka"
+  ],
+  "sudanesisch": [
+    "sudan"
+  ],
+  "surinamisch": [
+    "suriname"
+  ],
+  "schwedisch": [
+    "schweden"
+  ],
+  "schweizerisch": [
+    "schweiz"
+  ],
+  "syrisch": [
+    "syrien"
+  ],
+  "taiwanesisch": [
+    "taiwan"
+  ],
+  "tadschikisch": [
+    "tadschikistan"
+  ],
+  "tansanisch": [
+    "tansania"
+  ],
+  "thailändisch": [
+    "thailand"
+  ],
+  "togolesisch": [
+    "togo"
+  ],
+  "tongaisch": [
+    "tonga"
+  ],
+  "trinidadisch": [
+    "trinidad und tobago"
+  ],
+  "tunesisch": [
+    "tunesien"
+  ],
+  "türkisch": [
+    "türkei"
+  ],
+  "turkmenisch": [
+    "turkmenistan"
+  ],
+  "tuvaluisch": [
+    "tuvalu"
+  ],
+  "ugandisch": [
+    "uganda"
+  ],
+  "ukrainisch": [
+    "ukraine"
+  ],
+  "emiratisch": [
+    "vereinigte arabische emirate"
+  ],
+  "britisch": [
+    "uk",
+    "großbritannien",
+    "vereinigtes königreich"
+  ],
+  "englisch": [
+    "uk",
+    "england",
+    "vereinigtes königreich"
+  ],
+  "uruguayisch": [
+    "uruguay"
+  ],
+  "usbekisch": [
+    "usbekistan"
+  ],
+  "vanuatuisch": [
+    "vanuatu"
+  ],
+  "vatikanisch": [
+    "vatikanstadt"
+  ],
+  "venezolanisch": [
+    "venezuela"
+  ],
+  "vietnamesisch": [
+    "vietnam"
+  ],
+  "jemenitisch": [
+    "jemen"
+  ],
+  "sambisch": [
+    "sambia"
+  ],
+  "simbabwisch": [
+    "simbabwe"
+  ],
+  "us-amerikanisch": [
+    "usa",
+    "us",
+    "vereinigte staaten"
+  ],
+  "holländisch": [
+    "holland",
+    "niederlande"
+  ],
+  "niederländisch": [
+    "niederlande"
+  ],
+  "schottisch": [
+    "schottland"
+  ],
+  "walisisch": [
+    "wales"
+  ],
+  "nordirisch": [
+    "nordirland"
+  ],
+  "burmesisch": [
+    "myanmar"
+  ]
+}

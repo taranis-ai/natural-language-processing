@@ -28,6 +28,8 @@ class Settings(CommonSettings):
         "Tool",
         "Misc",
     ]
+    DBPEDIA_URL: str = "https://lookup.dbpedia.org/api/search"
+    DBPEDIA_LOOKUP: bool = False
 
 
 Config = Settings()
