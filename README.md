@@ -2,9 +2,9 @@
 
 Bot for extracting named entities (e.g. Location, Person, etc.) from texts.
 Available models:
-- gliner (+ cybersec gliner)
-- roberta
-- roberta_german
+- gliner (+ cybersec gliner) (https://huggingface.co/llinauer/gliner_de_en_news) - *Default*
+- roberta (https://huggingface.co/FacebookAI/xlm-roberta-large-finetuned-conll03-english)
+- roberta_german (https://huggingface.co/FacebookAI/xlm-roberta-large-finetuned-conll03-german)
 
 The following entities can be extracted:
 - Person, Location, Organization (for all three models)
@@ -35,6 +35,8 @@ flask run --port 5500
 granian app --port 5500
 ```
 
+You can set configs either via a `.env` file or by setting environment variables directly.
+available configs are in the `config.py`
 You can select the model via the `MODEL` env var. E.g.:
 
 ```bash
@@ -79,7 +81,7 @@ The bot accepts the key `extended_output` in the payload, which causes it to ret
 You can also set up authorization via the `API_KEY` env var. In this case, you need to send the API_KEY as an Authorization header:
 
 ```bash
-> curl -X POST http://127.0.0.1:5000/  -H "Authorization: Bearer test" -H "Content-Type: application/json"   -d '{"text": "This is an example for NER, about the ACME Corporation which is producing Dy#namite in Acme City, which is in Australia and run by Mr. Wile E. Coyote."}'
+> curl -X POST http://127.0.0.1:5000/  -H "Authorization: Bearer api_key" -H "Content-Type: application/json"   -d '{"text": "This is an example for NER, about the ACME Corporation which is producing Dy#namite in Acme City, which is in Australia and run by Mr. Wile E. Coyote."}'
 > {"ACME Corporation":"Organization","Acme City":"Location","Australia":"Location","Dynamite":"Product","NER":"Organization","Wile E. Coyote":"Person"}
 ```
 
