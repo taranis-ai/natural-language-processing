@@ -81,7 +81,7 @@ The bot accepts the key `extended_output` in the payload, which causes it to ret
 You can also set up authorization via the `API_KEY` env var. In this case, you need to send the API_KEY as an Authorization header:
 
 ```bash
-> curl -X POST http://127.0.0.1:5000/  -H "Authorization: Bearer api_key" -H "Content-Type: application/json"   -d '{"text": "This is an example for NER, about the ACME Corporation which is producing Dy#namite in Acme City, which is in Australia and run by Mr. Wile E. Coyote."}'
+> curl -X POST http://127.0.0.1:5500/  -H "Authorization: Bearer api_key" -H "Content-Type: application/json"   -d '{"text": "This is an example for NER, about the ACME Corporation which is producing Dy#namite in Acme City, which is in Australia and run by Mr. Wile E. Coyote."}'
 > {"ACME Corporation":"Organization","Acme City":"Location","Australia":"Location","Dynamite":"Product","NER":"Organization","Wile E. Coyote":"Person"}
 ```
 
