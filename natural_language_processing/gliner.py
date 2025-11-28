@@ -33,6 +33,9 @@ def transform_result(entities: list[dict]) -> list[dict]:
 
 
 class Gliner:
+
+    model_name = "llinauer/gliner_de_en_news"
+
     def __init__(self):
         self.general_model = GLiNER.from_pretrained("llinauer/gliner_de_en_news")
         self.general_labels = ["Person", "Location", "Organization", "Product", "Address"]
@@ -60,7 +63,7 @@ class Gliner:
                 {
                     "value": entity.get("text", ""),
                     "type": entity.get("type", ""),
-                    "probability": entity.get("score", 0.0),
+                    "probability": round(entity.get("score", 0.0), 2),
                     "position": f"{entity.get('start', '')}-{entity.get('end', '')}",
                 }
                 for entity in entities

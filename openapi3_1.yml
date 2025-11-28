@@ -135,7 +135,8 @@ paths:
                 properties:
                   status:
                     type: string
-                    example: "ok"
+                example:
+                  status: "ok"
         '503':
           description: Service unavailable
           content:
