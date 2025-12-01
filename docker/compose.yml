@@ -1,0 +1,12 @@
+services:
+  natural-language-processing:
+    image: ghcr.io/taranis-ai/taranis-natural-language-processing:latest
+    environment:
+      MODEL: "${MODEL:-gliner}"                
+      API_KEY: "${API_KEY:-testkey}"            
+      CONFIDENCE_THRESHOLD: "${CONFIDENCE_THRESHOLD:-0.7}"
+      DBPEDIA_LOOKUP: "${DBPEDIA_LOOKUP:-False}"
+      DBPEDIA_URL: "${DBPEDIA_URL:-https://lookup.dbpedia.org/api/search}"
+    ports:
+      - "5500:8000"  
+    restart: unless-stopped
