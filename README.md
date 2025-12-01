@@ -43,6 +43,11 @@ You can select the model via the `MODEL` env var. E.g.:
 MODEL=roberta flask run
 ```
 
+You can specify a Confidence threshold for extracted entities via the `CONFIDENCE_THRESHOLD` env variable. It should be a float and between 0.0 and 1.0. All entities that get assigned a confidence score < CONFIDENCE_THRESHOLD will be disregarded.
+
+You can also configure entity disambiguation by entity linking to a DBPEDIA instance. You need to set `DBPEDIA_LOOKUP=True` and set `DBPEDIA_URL` to the URL of a running DBPEDIA search endpoint (e.g. https://lookup.dbpedia.org/api/search) to enable this features.
+The bot will query the DBPEDIA instance to get valid common names for entities such as U.S., USA, U.S.A. and try to match them.
+
 
 ## Docker
 
