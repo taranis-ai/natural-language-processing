@@ -1,5 +1,5 @@
 services:
-  natural-language-processing:
+  natural_language_processing:
     image: ghcr.io/taranis-ai/taranis-natural-language-processing:latest
     environment:
       MODEL: "${MODEL:-gliner}"                
