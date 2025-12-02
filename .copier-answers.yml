@@ -1,9 +1,8 @@
 # DO NOT CHANGE -> WILL BREAK copier LOGIC
-_commit: v0.9.5
+_commit: v0.9.7
 _src_path: https://github.com/taranis-ai/bot_template
 author_mail: stefania.sava@ait.ac.at
 description: NLP Bot for Natural Language Processing in Taranis AI
-init_git_repo: true
 models: gliner, roberta, roberta_german
 project_name: natural-language-processing
 repo_url: https://github.com/taranis-ai/natural-language-processing
