@@ -1,7 +1,7 @@
 from transformers import pipeline
 from natural_language_processing.config import Config
 from natural_language_processing.post_process import map_entity_types, is_entity_allowed
-
+from natural_language_processing.ioc_finder import extract_ioc
 
 class RobertaGerman:
     model_name = "xlm-roberta-large-finetuned-conll03-german"
@@ -11,8 +11,16 @@ class RobertaGerman:
 
     def predict(self, text: str, extended_output: bool = False) -> dict[str, str] | list[dict]:
         entities = self.model(text)
+        ioc = extract_ioc(text)
+        ioc = [{**e,
+                "word": e.get("ioc", ""),
+                "entity_group": e.get("type", ""),
+               }
+               for e in ioc
+        ]
+        entities = entities + ioc
         if not entities:
-            return {}
+            return [] if extended_output else {}
 
         if extended_output:
             out_list = []

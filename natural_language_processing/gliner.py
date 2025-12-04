@@ -1,7 +1,7 @@
 from gliner import GLiNER
 from natural_language_processing.config import Config
 from natural_language_processing.post_process import clean_entities, is_entity_allowed
-
+from natural_language_processing.ioc_finder import extract_ioc
 
 def map_cybersec_entities(cybersec_entities: list[dict[str, str]]) -> list[dict[str, str]]:
     mapped_entities = []
@@ -52,6 +52,15 @@ class Gliner:
 
         entities = merge_with_cybersec_priority(general_entities, cybersec_entities)
 
+        ioc = extract_ioc(text)
+        ioc = [{**e,
+                "text": e.get("ioc", ""),
+                "label": e.get("type", ""),
+               }
+               for e in ioc
+        ]
+        import pdb; pdb.set_trace()
+        entities = entities + ioc
         if not entities:
             return [] if extended_output else {}
 
