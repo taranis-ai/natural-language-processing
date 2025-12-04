@@ -115,6 +115,101 @@ wheels = [
 ]
 
 [[package]]
+name = "d8s-dicts"
+version = "0.6.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "d8s-hypothesis" },
+    { name = "dictdiffer" },
+    { name = "hypothesis" },
+    { name = "more-itertools" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/94/ab/0ca7a968f18fc3ef3aef7ff6d09367470483c185599e9b31b1fbf5ffde1a/d8s_dicts-0.6.0.tar.gz", hash = "sha256:7d70da66350a4d24451c74b062c2017743b34c06df6ef50050dab7d64b6a46c6", size = 29245, upload-time = "2021-05-07T10:53:13.786Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/44/60/c02a1419fb4d2545522649532aad79d79c61487e9a650044b91505ad76e1/d8s_dicts-0.6.0-py2.py3-none-any.whl", hash = "sha256:54906ef88b5a2bc145a30f4317e8eca8b5b3182ec449562be83a347311c9572a", size = 24562, upload-time = "2021-05-07T10:53:11.642Z" },
+]
+
+[[package]]
+name = "d8s-hypothesis"
+version = "0.6.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "hypothesis" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/10/42/c09a779ccd2b8cc299287aff1e2060faed4376bb991cbb6e3ad86ff94cad/d8s_hypothesis-0.6.0.tar.gz", hash = "sha256:d3219bf4b1edb1742a0a2fe429c39b5b776374ecabe41e575bda2ee6980da058", size = 23014, upload-time = "2021-05-07T10:54:48.346Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8b/24/f3e4967b1f058e1b79cf353b5ecd37bacfb1ed0f2de71580e3178bf0491b/d8s_hypothesis-0.6.0-py2.py3-none-any.whl", hash = "sha256:1d883c06fd05adc8c8f9f13de180f70ecc41cdfa1fee21055341b5ddc49a091d", size = 19377, upload-time = "2021-05-07T10:54:46.822Z" },
+]
+
+[[package]]
+name = "d8s-lists"
+version = "0.8.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "d8s-dicts" },
+    { name = "more-itertools" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/8d/1e/5303df0a4b55f3db49805e9a34c20eecb67ea7855ac348d17ee80d7816a9/d8s_lists-0.8.0.tar.gz", hash = "sha256:6a7709a9a64a64f77a85051d6887117ec216a2dd71d02477bcd0277e9fd4477e", size = 27395, upload-time = "2021-05-07T10:55:01.354Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/aa/b2/9d2839b7da38b97afca11cd7192638b1c240f0e513b98de428420ab81357/d8s_lists-0.8.0-py2.py3-none-any.whl", hash = "sha256:93b7f6f402af580467a058d941673dcc3911084aa58cdc95f458f58ad8d81af4", size = 23251, upload-time = "2021-05-07T10:54:59.05Z" },
+]
+
+[[package]]
+name = "d8s-math"
+version = "0.7.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "d8s-strings" },
+    { name = "number-tools" },
+    { name = "sympy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/3c/ba/1d675b372f82665f2c04c79b4a7cb668603c84bf531e82f7305187eca80e/d8s_math-0.7.0.tar.gz", hash = "sha256:32acfc784842def2e1f9a5c69cfb9e09887f8151a8483f434752badd40f7959f", size = 39561, upload-time = "2021-05-21T11:35:42.756Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cd/8f/8339663a443ab74d894c761fdb12edbf47f3096d50a6478a35247800529b/d8s_math-0.7.0-py2.py3-none-any.whl", hash = "sha256:a474237b72aee6669f343eb0cac056ba79673214e5976b923acdfd5898620719", size = 30204, upload-time = "2021-05-21T11:35:41.608Z" },
+]
+
+[[package]]
+name = "d8s-strings"
+version = "0.5.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "d8s-dicts" },
+    { name = "d8s-hypothesis" },
+    { name = "d8s-lists" },
+    { name = "d8s-math" },
+    { name = "d8s-uuids" },
+    { name = "hypothesis" },
+    { name = "inflect" },
+    { name = "more-itertools" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/9f/d4/57949627e245ad733cbf7f753cad9f8bd43d79b91c9720fa279dcb2690d4/d8s_strings-0.5.0.tar.gz", hash = "sha256:5271d08f49d73228801a29a70cad53661b063effb50a7abd42aacf781ded5de9", size = 49181, upload-time = "2021-05-26T18:22:53.685Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b3/1f/6c6a9c1de2e16551d8ae56d87b5c53520017b3d2fd44a3bab8745bb6942a/d8s_strings-0.5.0-py2.py3-none-any.whl", hash = "sha256:4fc926120ce027d7ada5af225d9557b9c6923675f148817fb1b49bbd1f721116", size = 37665, upload-time = "2021-05-26T18:22:52.221Z" },
+]
+
+[[package]]
+name = "d8s-uuids"
+version = "0.6.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "d8s-hypothesis" },
+    { name = "hypothesis" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c4/da/b10b5ce30cf9da9db1bbef89f3f320a4b94ad0ca4fa8aac81cc9cc84afa4/d8s_uuids-0.6.0.tar.gz", hash = "sha256:1bf9ff07dfe4b11c258dc7ef8c5008579872ee5a318bd1839eb73232fde20c68", size = 23179, upload-time = "2021-05-07T10:58:47.714Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d9/93/7713481aca13fd7e4056edad921e29c996a1a455e21893b03a076bb50ab0/d8s_uuids-0.6.0-py2.py3-none-any.whl", hash = "sha256:8aa71fdf60dcdb26949643971734e25b5acfcb17e115bad345d9247b5855b7f5", size = 19372, upload-time = "2021-05-07T10:58:43.646Z" },
+]
+
+[[package]]
+name = "dictdiffer"
+version = "0.9.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/61/7b/35cbccb7effc5d7e40f4c55e2b79399e1853041997fcda15c9ff160abba0/dictdiffer-0.9.0.tar.gz", hash = "sha256:17bacf5fbfe613ccf1b6d512bd766e6b21fb798822a133aa86098b8ac9997578", size = 31513, upload-time = "2021-07-22T13:24:29.276Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/47/ef/4cb333825d10317a36a1154341ba37e6e9c087bac99c1990ef07ffdb376f/dictdiffer-0.9.0-py2.py3-none-any.whl", hash = "sha256:442bfc693cfcadaf46674575d2eba1c53b42f5e404218ca2c2ff549f2df56595", size = 16754, upload-time = "2021-07-22T13:24:26.783Z" },
+]
+
+[[package]]
 name = "filelock"
 version = "3.20.0"
 source = { registry = "https://pypi.org/simple" }
@@ -260,6 +355,18 @@ wheels = [
 ]
 
 [[package]]
+name = "hypothesis"
+version = "6.148.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "sortedcontainers" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/13/3b/36d12da8dde97520bbec240de77765291cf764e46f96030604c5724ddd94/hypothesis-6.148.5.tar.gz", hash = "sha256:bb0c67bff155b8d8cfe8fbc1f1218028f7e2f0ee7f24d8ccc89f4c14ee4e65c0", size = 470519, upload-time = "2025-12-01T07:28:06.283Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/76/df/ad7750513f38913f27ade4d578d2ba6963ea546fc77f84e5c4e380ae756a/hypothesis-6.148.5-py3-none-any.whl", hash = "sha256:63cde596a48cdbbabac0591ea19a1bffa812c30afbe3d948bc2a8ee8ed49a11a", size = 537454, upload-time = "2025-12-01T07:28:04.258Z" },
+]
+
+[[package]]
 name = "idna"
 version = "3.11"
 source = { registry = "https://pypi.org/simple" }
@@ -269,12 +376,52 @@ wheels = [
 ]
 
 [[package]]
+name = "inflect"
+version = "7.5.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "more-itertools" },
+    { name = "typeguard" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/78/c6/943357d44a21fd995723d07ccaddd78023eace03c1846049a2645d4324a3/inflect-7.5.0.tar.gz", hash = "sha256:faf19801c3742ed5a05a8ce388e0d8fe1a07f8d095c82201eb904f5d27ad571f", size = 73751, upload-time = "2024-12-28T17:11:18.897Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8a/eb/427ed2b20a38a4ee29f24dbe4ae2dafab198674fe9a85e3d6adf9e5f5f41/inflect-7.5.0-py3-none-any.whl", hash = "sha256:2aea70e5e70c35d8350b8097396ec155ffd68def678c7ff97f51aa69c1d92344", size = 35197, upload-time = "2024-12-28T17:11:15.931Z" },
+]
+
+[[package]]
 name = "iniconfig"
 version = "2.3.0"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/72/34/14ca021ce8e5dfedc35312d08ba8bf51fdd999c576889fc2c24cb97f4f10/iniconfig-2.3.0.tar.gz", hash = "sha256:c76315c77db068650d49c5b56314774a7804df16fee4402c1f19d6d15d8c4730", size = 20503, upload-time = "2025-10-18T21:55:43.219Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/cb/b1/3846dd7f199d53cb17f49cba7e651e9ce294d8497c8c150530ed11865bb8/iniconfig-2.3.0-py3-none-any.whl", hash = "sha256:f631c04d2c48c52b84d0d0549c99ff3859c98df65b3101406327ecc7d53fbf12", size = 7484, upload-time = "2025-10-18T21:55:41.639Z" },
+]
+
+[[package]]
+name = "ioc-fanger"
+version = "4.2.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "click" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ff/72/fad00a23dfa666d391879654ad7dd166211a9d8fd74f83a228f5e5fa4164/ioc_fanger-4.2.1.tar.gz", hash = "sha256:8e4d96d3bc591b3976d697eb0024d15cdf557ddec0d5dc392c0e932d73e74806", size = 19542, upload-time = "2022-09-27T11:34:40.877Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/29/cd/eadada1cdcf7d7b9b5053e583239e59b9e05902a2983032d790fbfc7bad7/ioc_fanger-4.2.1-py2.py3-none-any.whl", hash = "sha256:f96ac3085613891df9af0b08580bb4c476e79e4a6a6869cb478f4054a7a78044", size = 6443, upload-time = "2022-09-27T11:34:38.7Z" },
+]
+
+[[package]]
+name = "ioc-finder"
+version = "7.3.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "click" },
+    { name = "d8s-strings" },
+    { name = "ioc-fanger" },
+    { name = "pyparsing" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/db/3f/e83b240a74b381e8dc0d4d017f1a44a03e767204d2cc961adaca277b5796/ioc_finder-7.3.0.tar.gz", hash = "sha256:577b980ffbb4975c043bcf47f073c82d4ca7d16c0192b7375032b75610457305", size = 74816, upload-time = "2022-12-22T13:54:02.638Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/31/8a/7ea71af4cface46f43dabd864d8e8f5b831ba3ddc57ad160607a56e4741c/ioc_finder-7.3.0-py2.py3-none-any.whl", hash = "sha256:c5a35883faacb93d6d1f768dfeb5d5bb6420884edb5829625cc7396386289182", size = 56651, upload-time = "2022-12-22T13:54:00.631Z" },
 ]
 
 [[package]]
@@ -356,6 +503,15 @@ wheels = [
 ]
 
 [[package]]
+name = "more-itertools"
+version = "10.8.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ea/5d/38b681d3fce7a266dd9ab73c66959406d565b3e85f21d5e66e1181d93721/more_itertools-10.8.0.tar.gz", hash = "sha256:f638ddf8a1a0d134181275fb5d58b086ead7c6a72429ad725c67503f13ba30bd", size = 137431, upload-time = "2025-09-02T15:23:11.018Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a4/8e/469e5a4a2f5855992e425f3cb33804cc07bf18d48f2db061aec61ce50270/more_itertools-10.8.0-py3-none-any.whl", hash = "sha256:52d4362373dcf7c52546bc4af9a86ee7c4579df9a8dc268be0a2f949d376cc9b", size = 69667, upload-time = "2025-09-02T15:23:09.635Z" },
+]
+
+[[package]]
 name = "mpmath"
 version = "1.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -370,6 +526,8 @@ source = { editable = "." }
 dependencies = [
     { name = "accelerate" },
     { name = "gliner" },
+    { name = "ioc-fanger" },
+    { name = "ioc-finder" },
     { name = "requests-mock" },
     { name = "simplemma" },
     { name = "taranis-base-bot" },
@@ -388,6 +546,8 @@ dev = [
 requires-dist = [
     { name = "accelerate" },
     { name = "gliner", specifier = ">=0.2.16" },
+    { name = "ioc-fanger", specifier = ">=4.2.1" },
+    { name = "ioc-finder", specifier = ">=7.3.0" },
     { name = "jsonschema", marker = "extra == 'dev'" },
     { name = "pytest", marker = "extra == 'dev'" },
     { name = "requests-mock", specifier = ">=1.12.1" },
@@ -406,6 +566,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/e8/fc/7b6fd4d22c8c4dc5704430140d8b3f520531d4fe7328b8f8d03f5a7950e8/networkx-3.6.tar.gz", hash = "sha256:285276002ad1f7f7da0f7b42f004bcba70d381e936559166363707fdad3d72ad", size = 2511464, upload-time = "2025-11-24T03:03:47.158Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/07/c7/d64168da60332c17d24c0d2f08bdf3987e8d1ae9d84b5bbd0eec2eb26a55/networkx-3.6-py3-none-any.whl", hash = "sha256:cdb395b105806062473d3be36458d8f1459a4e4b98e236a66c3a48996e07684f", size = 2063713, upload-time = "2025-11-24T03:03:45.21Z" },
+]
+
+[[package]]
+name = "number-tools"
+version = "0.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ef/bb/83c867157fc62f8f998183560e0f3db22478550521c868026519a7c6cec3/number-tools-0.1.0.tar.gz", hash = "sha256:585ff62d2298edbe8f5cb08deef998e6679bd9f385b9edf59ffbaced5acfd7ce", size = 2943, upload-time = "2019-06-29T16:57:32.091Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0b/4e/591970dd0d11c577c7aae788910d517c1db800eca8a8273081370494292e/number_tools-0.1.0-py3-none-any.whl", hash = "sha256:f6b39c1fae1eaabff4c490035bed3abceed7b36bd9545a69b881b2ca157f2a95", size = 3350, upload-time = "2019-06-29T16:57:29.973Z" },
 ]
 
 [[package]]
@@ -711,6 +880,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pyparsing"
+version = "3.0.9"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/71/22/207523d16464c40a0310d2d4d8926daffa00ac1f5b1576170a32db749636/pyparsing-3.0.9.tar.gz", hash = "sha256:2b020ecf7d21b687f219b71ecad3631f644a47f01403fa1d1036b0c6416d70fb", size = 1999906, upload-time = "2022-05-10T23:26:05.963Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6c/10/a7d0fa5baea8fe7b50f448ab742f26f52b80bfca85ac2be9d35cdd9a3246/pyparsing-3.0.9-py3-none-any.whl", hash = "sha256:5026bae9a10eeaefb61dab2f09052b9f4307d44aee4eda64b309723d8d206bbc", size = 98338, upload-time = "2022-05-10T23:26:03.201Z" },
+]
+
+[[package]]
 name = "pyreadline3"
 version = "3.5.4"
 source = { registry = "https://pypi.org/simple" }
@@ -966,6 +1144,15 @@ wheels = [
 ]
 
 [[package]]
+name = "sortedcontainers"
+version = "2.4.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/e8/c4/ba2f8066cceb6f23394729afe52f3bf7adec04bf9ed2c820b39e19299111/sortedcontainers-2.4.0.tar.gz", hash = "sha256:25caa5a06cc30b6b83d11423433f65d1f9d76c4c6a0c90e3379eaa43b9bfdb88", size = 30594, upload-time = "2021-05-16T22:03:42.897Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/32/46/9cb0e58b2deb7f82b84065f37f3bffeb12413f947f9388e4cac22c4621ce/sortedcontainers-2.4.0-py2.py3-none-any.whl", hash = "sha256:a163dcaede0f1c021485e957a39245190e74249897e2ae4b2aa38595db237ee0", size = 29575, upload-time = "2021-05-16T22:03:41.177Z" },
+]
+
+[[package]]
 name = "sympy"
 version = "1.14.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1097,6 +1284,18 @@ source = { registry = "https://pypi.org/simple" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/27/46/8c3bbb5b0a19313f50edcaa363b599e5a1a5ac9683ead82b9b80fe497c8d/triton-3.5.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:f3f4346b6ebbd4fad18773f5ba839114f4826037c9f2f34e0148894cd5dd3dba", size = 170470410, upload-time = "2025-11-11T17:41:06.319Z" },
     { url = "https://files.pythonhosted.org/packages/37/92/e97fcc6b2c27cdb87ce5ee063d77f8f26f19f06916aa680464c8104ef0f6/triton-3.5.1-cp313-cp313t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:0b4d2c70127fca6a23e247f9348b8adde979d2e7a20391bfbabaac6aebc7e6a8", size = 170579924, upload-time = "2025-11-11T17:41:12.455Z" },
+]
+
+[[package]]
+name = "typeguard"
+version = "4.4.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c7/68/71c1a15b5f65f40e91b65da23b8224dad41349894535a97f63a52e462196/typeguard-4.4.4.tar.gz", hash = "sha256:3a7fd2dffb705d4d0efaed4306a704c89b9dee850b688f060a8b1615a79e5f74", size = 75203, upload-time = "2025-06-18T09:56:07.624Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1b/a9/e3aee762739c1d7528da1c3e06d518503f8b6c439c35549b53735ba52ead/typeguard-4.4.4-py3-none-any.whl", hash = "sha256:b5f562281b6bfa1f5492470464730ef001646128b180769880468bd84b68b09e", size = 34874, upload-time = "2025-06-18T09:56:05.999Z" },
 ]
 
 [[package]]
