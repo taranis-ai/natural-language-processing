@@ -9,5 +9,5 @@ services:
       DBPEDIA_LOOKUP: "${DBPEDIA_LOOKUP:-False}"
       DBPEDIA_URL: "${DBPEDIA_URL:-https://lookup.dbpedia.org/api/search}"
     ports:
-      - "5500:8000"  
+      - "${BOT_PORT:-5500}:8000"
     restart: unless-stopped
