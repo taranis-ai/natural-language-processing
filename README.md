@@ -2,7 +2,7 @@
 
 Bot for extracting named entities (e.g. Location, Person, etc.) from texts.
 Available models:
-- gliner (+ cybersec gliner) (https://huggingface.co/llinauer/gliner_de_en_news) - *Default*
+- gliner (+ cybersec gliner) (https://huggingface.co/taranis-ai/gliner_de_en_news) - *Default*
 - roberta (https://huggingface.co/FacebookAI/xlm-roberta-large-finetuned-conll03-english)
 - roberta_german (https://huggingface.co/FacebookAI/xlm-roberta-large-finetuned-conll03-german)
 
