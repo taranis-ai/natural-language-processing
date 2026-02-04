@@ -73,28 +73,36 @@ If you encounter errors, make sure that port 5500 is not in use by another appli
 Once the bot is running, you can send test data to it on which it runs its inference method:
 
 ```bash
-> curl -X POST http://127.0.0.1:5500 -H "Content-Type: application/json" -d '{"text": "This is an example for NER, about the ACME Corporation which is producing Dynamite in Acme City, which is in Australia and run by Mr. Wile E. Coyote"}'
-> {"ACME Corporation":"Organization","Acme City":"Location","Australia":"Location","Dynamite":"Product","NER":"Organization","Wile E. Coyote":"Person"}
+curl -X POST http://127.0.0.1:5500 -H "Content-Type: application/json" -d '{"text": "This is an example for NER, about the ACME Corporation which is producing Dynamite in Acme City, which is in Australia and run by Mr. Wile E. Coyote"}'
+```
+```bash
+{"ACME Corporation":"Organization","Acme City":"Location","Australia":"Location","Dynamite":"Product","NER":"Organization","Wile E. Coyote":"Person"}
 ```
 
 The bot accepts the key `extended_output` in the payload, which causes it to return more information.
 ```bash
->curl -X POST http://127.0.0.1:5500 -H "Content-Type: application/json" -d '{"text": "This is an example for NER, about the ACME Corporation which is producing Dynamite in Acme City, which is in Australia and run by Mr. Wile E. Coyote", "extended_output": true}'
->[{"position":"23-26","probability":"0.93","type":"Organization","value":"NER"},{"position":"38-54","probability":"1.00","type":"Organization","value":"ACME Corporation"},{"position":"74-82","probability":"0.90","type":"Product","value":"Dynamite"},{"position":"86-95","probability":"0.92","type":"Location","value":"Acme City"},{"position":"109-118","probability":"1.00","type":"Location","value":"Australia"},{"position":"134-148","probability":"0.99","type":"Person","value":"Wile E. Coyote"}]
+curl -X POST http://127.0.0.1:5500 -H "Content-Type: application/json" -d '{"text": "This is an example for NER, about the ACME Corporation which is producing Dynamite in Acme City, which is in Australia and run by Mr. Wile E. Coyote", "extended_output": true}'
+```
+```bash
+[{"position":"23-26","probability":"0.93","type":"Organization","value":"NER"},{"position":"38-54","probability":"1.00","type":"Organization","value":"ACME Corporation"},{"position":"74-82","probability":"0.90","type":"Product","value":"Dynamite"},{"position":"86-95","probability":"0.92","type":"Location","value":"Acme City"},{"position":"109-118","probability":"1.00","type":"Location","value":"Australia"},{"position":"134-148","probability":"0.99","type":"Person","value":"Wile E. Coyote"}]
 ```
 
 You can also set up authorization via the `API_KEY` env var. In this case, you need to send the API_KEY as an Authorization header:
 
 ```bash
-> curl -X POST http://127.0.0.1:5500/  -H "Authorization: Bearer api_key" -H "Content-Type: application/json"   -d '{"text": "This is an example for NER, about the ACME Corporation which is producing Dy#namite in Acme City, which is in Australia and run by Mr. Wile E. Coyote."}'
-> {"ACME Corporation":"Organization","Acme City":"Location","Australia":"Location","Dynamite":"Product","NER":"Organization","Wile E. Coyote":"Person"}
+curl -X POST http://127.0.0.1:5500/  -H "Authorization: Bearer api_key" -H "Content-Type: application/json"   -d '{"text": "This is an example for NER, about the ACME Corporation which is producing Dy#namite in Acme City, which is in Australia and run by Mr. Wile E. Coyote."}'
+```
+```bash
+{"ACME Corporation":"Organization","Acme City":"Location","Australia":"Location","Dynamite":"Product","NER":"Organization","Wile E. Coyote":"Person"}
 ```
 
 Finally, if you are using the gliner model, you can additionally extract cybersecurity-related entities:
 
 ```bash
-> curl -X POST http://127.0.0.1:5500 -H "Content-Type: application/json" -d '{"text": "Upon opening Emotet maldocs, victims are greeted with fake Microsoft 365 prompt that states THIS DOCUMENT IS PROTECTED, and instructs victims on how to enable macros.", "cybersecurity": true}'
-> {"Emotet":"Malware","Microsoft 365":"Product"}
+curl -X POST http://127.0.0.1:5500 -H "Content-Type: application/json" -d '{"text": "Upon opening Emotet maldocs, victims are greeted with fake Microsoft 365 prompt that states THIS DOCUMENT IS PROTECTED, and instructs victims on how to enable macros.", "cybersecurity": true}'
+```
+```bash
+{"Emotet":"Malware","Microsoft 365":"Product"}
 ```
 
 ## Development
