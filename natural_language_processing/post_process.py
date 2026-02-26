@@ -139,6 +139,30 @@ def dbpedia_lookup(dbpedia_url: str, entity_name: str, score_threshold: int = 10
     return None
 
 
+def attach_dbpedia_uris(entities: list[dict], text_key: str) -> list[dict]:
+    if not Config.DBPEDIA_URI_OUTPUT:
+        return entities
+
+    uri_cache: dict[str, str | None] = {}
+    enriched = []
+    for entity in entities:
+        entity_text = entity.get(text_key)
+        if not entity_text:
+            enriched.append(entity)
+            continue
+
+        normalized = normalize(str(entity_text))
+        if normalized not in uri_cache:
+            uri_cache[normalized] = dbpedia_lookup(Config.DBPEDIA_URL, normalized)
+
+        uri = uri_cache[normalized]
+        if uri:
+            enriched.append({**entity, "uri": uri})
+        else:
+            enriched.append(entity)
+    return enriched
+
+
 def remove_leading_trailing_punctuation(entities: list[dict]) -> list[dict]:
     cleaned_entities = []
     for entity in entities:
