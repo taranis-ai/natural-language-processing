@@ -1,5 +1,6 @@
 import pytest
 import natural_language_processing.post_process as pp
+from natural_language_processing.config import Config
 
 
 @pytest.mark.parametrize(
@@ -237,6 +238,48 @@ def test_deduplication():
 )
 def test_drop_demonyms(entities, expected):
     assert pp.drop_demonyms(entities) == expected
+
+
+def test_attach_dbpedia_uris_adds_uri(monkeypatch):
+    entities = [
+        {"value": "Acme City", "type": "Location"},
+        {"value": "ACME Corporation", "type": "Organization"},
+    ]
+
+    def fake_lookup(_dbpedia_url: str, entity_name: str, score_threshold: int = 1000, timeout: float = 10.0):
+        if entity_name == "acme city":
+            return "http://dbpedia.org/resource/Acme_City"
+        return None
+
+    monkeypatch.setattr(pp, "dbpedia_lookup", fake_lookup)
+
+    original = Config.DBPEDIA_URI_OUTPUT
+    Config.DBPEDIA_URI_OUTPUT = True
+    try:
+        enriched = pp.attach_dbpedia_uris(entities, text_key="value")
+    finally:
+        Config.DBPEDIA_URI_OUTPUT = original
+
+    assert enriched[0].get("uri") == "http://dbpedia.org/resource/Acme_City"
+    assert "uri" not in enriched[1]
+
+
+def test_attach_dbpedia_uris_disabled(monkeypatch):
+    entities = [{"value": "Acme City", "type": "Location"}]
+
+    def fake_lookup(_dbpedia_url: str, entity_name: str, score_threshold: int = 1000, timeout: float = 10.0):
+        return "http://dbpedia.org/resource/Acme_City"
+
+    monkeypatch.setattr(pp, "dbpedia_lookup", fake_lookup)
+
+    original = Config.DBPEDIA_URI_OUTPUT
+    Config.DBPEDIA_URI_OUTPUT = False
+    try:
+        enriched = pp.attach_dbpedia_uris(entities, text_key="value")
+    finally:
+        Config.DBPEDIA_URI_OUTPUT = original
+
+    assert "uri" not in enriched[0]
 
 
 @pytest.mark.parametrize(
