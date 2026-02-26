@@ -1,6 +1,6 @@
 from gliner import GLiNER
 from natural_language_processing.config import Config
-from natural_language_processing.post_process import clean_entities, is_entity_allowed
+from natural_language_processing.post_process import attach_dbpedia_uris, clean_entities, is_entity_allowed
 
 
 def map_cybersec_entities(cybersec_entities: list[dict[str, str]]) -> list[dict[str, str]]:
@@ -58,6 +58,7 @@ class Gliner:
         entities = clean_entities(transform_result(entities), text)
 
         if extended_output:
+            entities = attach_dbpedia_uris(entities, text_key="text")
             out_list = []
             out_list.extend(
                 {
@@ -65,6 +66,7 @@ class Gliner:
                     "type": entity.get("type", ""),
                     "probability": round(entity.get("score", 0.0), 2),
                     "position": f"{entity.get('start', '')}-{entity.get('end', '')}",
+                    **({"uri": entity["uri"]} if entity.get("uri") else {}),
                 }
                 for entity in entities
                 if isinstance(entity, dict)

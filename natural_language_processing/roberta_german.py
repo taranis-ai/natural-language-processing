@@ -1,6 +1,6 @@
 from transformers import pipeline
 from natural_language_processing.config import Config
-from natural_language_processing.post_process import map_entity_types, is_entity_allowed
+from natural_language_processing.post_process import attach_dbpedia_uris, map_entity_types, is_entity_allowed
 
 
 class RobertaGerman:
@@ -29,7 +29,7 @@ class RobertaGerman:
                 and entity.get("word") is not None
                 and is_entity_allowed(map_entity_types(entity.get("entity_group", "")), Config.ENTITIES)
             )
-            return out_list
+            return attach_dbpedia_uris(out_list, text_key="value")
 
         return {
             entity["word"]: map_entity_types(entity["entity_group"])

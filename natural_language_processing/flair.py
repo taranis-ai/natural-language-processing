@@ -2,7 +2,7 @@ from flair.models import SequenceTagger
 from flair.data import Sentence
 
 from natural_language_processing.config import Config
-from natural_language_processing.post_process import map_entity_types, is_entity_allowed
+from natural_language_processing.post_process import attach_dbpedia_uris, map_entity_types, is_entity_allowed
 
 
 class Flair:
@@ -27,7 +27,7 @@ class Flair:
                 for span in sentence.get_spans("ner")
                 if span.score >= Config.CONFIDENCE_THRESHOLD and is_entity_allowed(map_entity_types(span.tag), Config.ENTITIES)
             )
-            return out_list
+            return attach_dbpedia_uris(out_list, text_key="value")
         return {
             ner_result.data_point.text: map_entity_types(ner_result.value)
             for ner_result in sentence.get_labels()
