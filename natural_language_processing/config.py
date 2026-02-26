@@ -31,6 +31,7 @@ class Settings(CommonSettings):
     ]
     DBPEDIA_URL: str = "https://lookup.dbpedia.org/api/search"
     DBPEDIA_LOOKUP: bool = False
+    DBPEDIA_URI_OUTPUT: bool = False
 
     @field_validator("CONFIDENCE_THRESHOLD", mode="after")
     @classmethod

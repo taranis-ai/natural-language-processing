@@ -220,6 +220,9 @@ def extended_output_schema():
                 "position": {
                     "type": "string",
                 },
+                "uri": {
+                    "type": "string",
+                },
             },
             "required": ["value", "type"],
         },
