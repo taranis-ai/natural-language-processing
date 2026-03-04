@@ -244,6 +244,10 @@ components:
           description: Character position range in the original text (format "start-end")
           pattern: '^\d+-\d+$'
           example: "50-66"
+        uri:
+          type: string
+          description: DBPedia URI for the recognized entity (when enabled)
+          example: "http://dbpedia.org/resource/Acme_Corporation"
 
     ModelInfo:
       type: object

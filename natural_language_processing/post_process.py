@@ -1,9 +1,11 @@
+import asyncio
 import os
 import re
 import json
 import simplemma
 from collections import defaultdict
-import requests
+from typing import Any
+import httpx
 
 from taranis_base_bot.log import logger
 from natural_language_processing.config import Config
@@ -93,8 +95,7 @@ def map_demonym_to_country(entity: str) -> list[str] | None:
     return None
 
 
-def extract_dbpedia_entity(response: requests.Response, score_threshold: float) -> str | None:
-    data = response.json()
+def extract_dbpedia_entity(data: dict[str, Any], score_threshold: float) -> str | None:
     docs = data.get("docs", None)
     if not docs:
         return None
@@ -114,7 +115,13 @@ def extract_dbpedia_entity(response: requests.Response, score_threshold: float) 
     return uri
 
 
-def dbpedia_lookup(dbpedia_url: str, entity_name: str, score_threshold: int = 1000, timeout: float = 10.0) -> str | None:
+async def dbpedia_lookup(
+    dbpedia_url: str,
+    entity_name: str,
+    score_threshold: int = 1000,
+    timeout: float = 10.0,
+    client: httpx.AsyncClient | None = None,
+) -> str | None:
     # Query DBPedia for the entity name
     # drop results with score < score_threshold
 
@@ -123,20 +130,55 @@ def dbpedia_lookup(dbpedia_url: str, entity_name: str, score_threshold: int = 10
 
     try:
         logger.debug(f"Query DBPedia for entity {entity_name}")
-        resp = requests.get(dbpedia_url, headers=headers, params=params, timeout=timeout)
+        if client is None:
+            async with httpx.AsyncClient(timeout=timeout) as own_client:
+                resp = await own_client.get(dbpedia_url, headers=headers, params=params)
+        else:
+            resp = await client.get(dbpedia_url, headers=headers, params=params)
         resp.raise_for_status()
-    except TimeoutError:
+    except httpx.TimeoutException:
         logger.error(f"DBPedia query for {entity_name} timed out")
         return None
-    except requests.exceptions.HTTPError as e:
+    except httpx.HTTPError as e:
         logger.error(f"DBPedia query for {entity_name} failed: {e}")
         return None
 
     try:
-        return extract_dbpedia_entity(resp, score_threshold)
+        return extract_dbpedia_entity(resp.json(), score_threshold)
     except ValueError:
         logger.error(f"DBPedia query for {entity_name} failed: Could not parse results")
     return None
+
+
+async def attach_dbpedia_uris(entities: list[dict], text_key: str) -> list[dict]:
+    if not Config.DBPEDIA_URI_OUTPUT:
+        return entities
+
+    normalized_values = [normalize(str(entity[text_key])) for entity in entities if entity.get(text_key)]
+    unique_normalized_values = list(dict.fromkeys(normalized_values))
+
+    uri_cache: dict[str, str | None] = {}
+    if unique_normalized_values:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            lookup_results = await asyncio.gather(
+                *(dbpedia_lookup(Config.DBPEDIA_URL, normalized, client=client) for normalized in unique_normalized_values)
+            )
+        uri_cache = dict(zip(unique_normalized_values, lookup_results))
+
+    enriched = []
+    for entity in entities:
+        entity_text = entity.get(text_key)
+        if not entity_text:
+            enriched.append(entity)
+            continue
+
+        normalized = normalize(str(entity_text))
+        uri = uri_cache[normalized]
+        if uri:
+            enriched.append({**entity, "uri": uri})
+        else:
+            enriched.append(entity)
+    return enriched
 
 
 def remove_leading_trailing_punctuation(entities: list[dict]) -> list[dict]:
@@ -237,19 +279,29 @@ def deduplicate_by_lemma(entities: list[dict], text: str) -> list[dict]:
     return cleaned_entities
 
 
-def deduplicate_by_linking(entities: list[dict]) -> list[dict]:
+async def deduplicate_by_linking(entities: list[dict]) -> list[dict]:
     # try to match entities to external DBPedia resources
     # if multiple entities map to the same resource, keep only the longest
 
     if not Config.DBPEDIA_LOOKUP:
         return entities
 
+    normalized_entities = [normalize(entity["text"]) for entity in entities]
+    unique_normalized_values = list(dict.fromkeys(normalized_entities))
+    linked_entities_by_text: dict[str, str | None] = {}
+    if unique_normalized_values:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            lookup_results = await asyncio.gather(
+                *(dbpedia_lookup(Config.DBPEDIA_URL, normalized, client=client) for normalized in unique_normalized_values)
+            )
+        linked_entities_by_text = dict(zip(unique_normalized_values, lookup_results))
+
     entity_link_map = {}
     keep_idcs = []
 
     # for each entity, map its index to top result of the dbpedia lookup
     for i, entity in enumerate(entities):
-        if linked_entity := dbpedia_lookup(Config.DBPEDIA_URL, normalize(entity["text"])):
+        if linked_entity := linked_entities_by_text[normalized_entities[i]]:
             if linked_entity in entity_link_map:
                 entity_link_map[linked_entity].append(i)
             else:
@@ -272,7 +324,7 @@ def deduplicate_by_linking(entities: list[dict]) -> list[dict]:
     return [entities[i] for i in range(len(entities)) if i in keep_idcs]
 
 
-def clean_entities(entities: list[dict], text: str) -> list[dict[str, str]]:
+async def clean_entities(entities: list[dict], text: str) -> list[dict[str, str]]:
     cleaned_ents = [{**e, "idx": e.get("idx", id(e))} for e in entities if e.get("text", "").strip()]
 
     cleaned_ents = remove_leading_trailing_punctuation(cleaned_ents)
@@ -280,7 +332,7 @@ def clean_entities(entities: list[dict], text: str) -> list[dict[str, str]]:
     cleaned_ents = drop_demonyms(cleaned_ents)
     cleaned_ents = deduplicate_persons(cleaned_ents)
     cleaned_ents = deduplicate_by_lemma(cleaned_ents, text)
-    cleaned_ents = deduplicate_by_linking(cleaned_ents)
+    cleaned_ents = await deduplicate_by_linking(cleaned_ents)
 
     # return the cleaned entities in their original form
     keep = {e["idx"] for e in cleaned_ents}

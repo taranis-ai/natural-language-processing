@@ -109,7 +109,7 @@ def content2():
 @pytest.fixture(scope="session")
 def content3():
     text = (
-        "Sophisticated malware targeting Linux servers has been identified, with potentially devastating consequences for enterprise operations. "
+        "Sophisticated malware targeting Linux has been identified, with potentially devastating consequences for enterprise operations. "
         "Cybersecurity firms are actively developing mitigation strategies to combat this new threat, which exploits vulnerabilities in widely used "
         "Linux server applications. In a detailed press release, a leading cybersecurity firm explained how the malware spreads silently through networked systems, "
         "causing significant disruptions before detection. IT departments worldwide have been alerted, and companies are urged to perform immediate system audits "
@@ -218,6 +218,9 @@ def extended_output_schema():
                     "type": "number",
                 },
                 "position": {
+                    "type": "string",
+                },
+                "uri": {
                     "type": "string",
                 },
             },

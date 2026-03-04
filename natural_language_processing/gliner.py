@@ -1,6 +1,7 @@
+import asyncio
 from gliner import GLiNER
 from natural_language_processing.config import Config
-from natural_language_processing.post_process import clean_entities, is_entity_allowed
+from natural_language_processing.post_process import attach_dbpedia_uris, clean_entities, is_entity_allowed
 
 
 def map_cybersec_entities(cybersec_entities: list[dict[str, str]]) -> list[dict[str, str]]:
@@ -42,10 +43,14 @@ class Gliner:
         self.cybersec_model = GLiNER.from_pretrained("selfconstruct3d/AITSecNER", load_tokenizer=True)
         self.cybersec_labels = ["CLICommand/CodeSnippet", "CON", "GROUP", "MALWARE", "SECTOR", "TACTIC", "TECHNIQUE", "TOOL"]
 
-    def predict(self, text: str, extended_output: bool = False, cybersecurity: bool = False) -> dict[str, str] | list[dict]:
-        general_entities = self.general_model.predict_entities(text, self.general_labels, threshold=Config.CONFIDENCE_THRESHOLD)
+    async def predict(self, text: str, extended_output: bool = False, cybersecurity: bool = False) -> dict[str, str] | list[dict]:
+        general_entities = await asyncio.to_thread(
+            self.general_model.predict_entities, text, self.general_labels, threshold=Config.CONFIDENCE_THRESHOLD
+        )
         if cybersecurity:
-            cybersec_entities = self.cybersec_model.predict_entities(text, self.cybersec_labels, threshold=Config.CONFIDENCE_THRESHOLD)
+            cybersec_entities = await asyncio.to_thread(
+                self.cybersec_model.predict_entities, text, self.cybersec_labels, threshold=Config.CONFIDENCE_THRESHOLD
+            )
             cybersec_entities = map_cybersec_entities(cybersec_entities)
         else:
             cybersec_entities = []
@@ -55,9 +60,10 @@ class Gliner:
         if not entities:
             return [] if extended_output else {}
 
-        entities = clean_entities(transform_result(entities), text)
+        entities = await clean_entities(transform_result(entities), text)
 
         if extended_output:
+            entities = await attach_dbpedia_uris(entities, text_key="text")
             out_list = []
             out_list.extend(
                 {
@@ -65,6 +71,7 @@ class Gliner:
                     "type": entity.get("type", ""),
                     "probability": round(entity.get("score", 0.0), 2),
                     "position": f"{entity.get('start', '')}-{entity.get('end', '')}",
+                    **({"uri": entity["uri"]} if entity.get("uri") else {}),
                 }
                 for entity in entities
                 if isinstance(entity, dict)

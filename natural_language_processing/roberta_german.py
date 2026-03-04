@@ -1,6 +1,7 @@
+import asyncio
 from transformers import pipeline
 from natural_language_processing.config import Config
-from natural_language_processing.post_process import map_entity_types, is_entity_allowed
+from natural_language_processing.post_process import attach_dbpedia_uris, map_entity_types, is_entity_allowed
 
 
 class RobertaGerman:
@@ -9,8 +10,8 @@ class RobertaGerman:
     def __init__(self):
         self.model = pipeline(task="ner", model=self.model_name, aggregation_strategy="simple")
 
-    def predict(self, text: str, extended_output: bool = False) -> dict[str, str] | list[dict]:
-        entities = self.model(text)
+    async def predict(self, text: str, extended_output: bool = False) -> dict[str, str] | list[dict]:
+        entities = await asyncio.to_thread(self.model, text)
         if not entities:
             return {}
 
@@ -29,7 +30,7 @@ class RobertaGerman:
                 and entity.get("word") is not None
                 and is_entity_allowed(map_entity_types(entity.get("entity_group", "")), Config.ENTITIES)
             )
-            return out_list
+            return await attach_dbpedia_uris(out_list, text_key="value")
 
         return {
             entity["word"]: map_entity_types(entity["entity_group"])

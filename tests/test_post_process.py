@@ -1,5 +1,7 @@
 import pytest
+import httpx
 import natural_language_processing.post_process as pp
+from natural_language_processing.config import Config
 
 
 @pytest.mark.parametrize(
@@ -73,13 +75,12 @@ def test_map_demonym_to_country(inp, expected):
 
 
 @pytest.mark.parametrize(
-    "description, mock_response, status_code, monkeypatch_fn, expected, score_threshold",
+    "description, mock_response, status_code, expected, score_threshold",
     [
         (
             "valid result above threshold",
             {"docs": [{"resource": ["http://dbpedia.org/resource/Paris"], "score": [1500]}]},
             200,
-            None,
             "http://dbpedia.org/resource/Paris",
             1000,
         ),
@@ -88,14 +89,12 @@ def test_map_demonym_to_country(inp, expected):
             {"docs": [{"resource": ["http://dbpedia.org/resource/Paris"], "score": [500]}]},
             200,
             None,
-            None,
             1000,
         ),
         (
             "empty docs returns None",
             {"docs": []},
             200,
-            None,
             None,
             1000,
         ),
@@ -104,14 +103,12 @@ def test_map_demonym_to_country(inp, expected):
             {"some_other_key": []},
             200,
             None,
-            None,
             1000,
         ),
         (
             "scalar resource and score",
             {"docs": [{"resource": "http://dbpedia.org/resource/London", "score": 2000}]},
             200,
-            None,
             "http://dbpedia.org/resource/London",
             1000,
         ),
@@ -120,24 +117,21 @@ def test_map_demonym_to_country(inp, expected):
             None,
             503,
             None,
-            None,
             1000,
         ),
     ],
 )
-def test_dbpedia_lookup(
-    requests_mock, monkeypatch, dbpedia_url, description, mock_response, status_code, monkeypatch_fn, expected, score_threshold
-):
-    if monkeypatch_fn is not None:
-        monkeypatch.setattr(pp.requests, "get", monkeypatch_fn())
-    elif isinstance(mock_response, dict):
-        requests_mock.get(dbpedia_url, json=mock_response, status_code=status_code)
-    elif isinstance(mock_response, str):
-        requests_mock.get(dbpedia_url, text=mock_response, status_code=status_code)
-    else:
-        requests_mock.get(dbpedia_url, status_code=status_code)
+@pytest.mark.asyncio
+async def test_dbpedia_lookup(monkeypatch, dbpedia_url, description, mock_response, status_code, expected, score_threshold):
+    async def fake_get(self, url, headers=None, params=None):
+        request = httpx.Request("GET", url, headers=headers, params=params)
+        if mock_response is None:
+            return httpx.Response(status_code=status_code, request=request)
+        return httpx.Response(status_code=status_code, request=request, json=mock_response)
 
-    result = pp.dbpedia_lookup(dbpedia_url, "anything", score_threshold=score_threshold)
+    monkeypatch.setattr(pp.httpx.AsyncClient, "get", fake_get)
+
+    result = await pp.dbpedia_lookup(dbpedia_url, "anything", score_threshold=score_threshold)
     assert result == expected, f"Failed case: {description}"
 
 
@@ -237,6 +231,50 @@ def test_deduplication():
 )
 def test_drop_demonyms(entities, expected):
     assert pp.drop_demonyms(entities) == expected
+
+
+@pytest.mark.asyncio
+async def test_attach_dbpedia_uris_adds_uri(monkeypatch):
+    entities = [
+        {"value": "Acme City", "type": "Location"},
+        {"value": "ACME Corporation", "type": "Organization"},
+    ]
+
+    async def fake_lookup(_dbpedia_url: str, entity_name: str, score_threshold: int = 1000, timeout: float = 10.0, client=None):
+        if entity_name == "acme city":
+            return "http://dbpedia.org/resource/Acme_City"
+        return None
+
+    monkeypatch.setattr(pp, "dbpedia_lookup", fake_lookup)
+
+    original = Config.DBPEDIA_URI_OUTPUT
+    Config.DBPEDIA_URI_OUTPUT = True
+    try:
+        enriched = await pp.attach_dbpedia_uris(entities, text_key="value")
+    finally:
+        Config.DBPEDIA_URI_OUTPUT = original
+
+    assert enriched[0].get("uri") == "http://dbpedia.org/resource/Acme_City"
+    assert "uri" not in enriched[1]
+
+
+@pytest.mark.asyncio
+async def test_attach_dbpedia_uris_disabled(monkeypatch):
+    entities = [{"value": "Acme City", "type": "Location"}]
+
+    async def fake_lookup(_dbpedia_url: str, entity_name: str, score_threshold: int = 1000, timeout: float = 10.0, client=None):
+        return "http://dbpedia.org/resource/Acme_City"
+
+    monkeypatch.setattr(pp, "dbpedia_lookup", fake_lookup)
+
+    original = Config.DBPEDIA_URI_OUTPUT
+    Config.DBPEDIA_URI_OUTPUT = False
+    try:
+        enriched = await pp.attach_dbpedia_uris(entities, text_key="value")
+    finally:
+        Config.DBPEDIA_URI_OUTPUT = original
+
+    assert "uri" not in enriched[0]
 
 
 @pytest.mark.parametrize(
@@ -472,25 +510,27 @@ def test_deduplicate_by_lemma(entities, text, expected):
         ),
     ],
 )
-def test_deduplicate_by_linking(monkeypatch, entities, uri_map, expected):
-    def dbpedia_lookup_mock(url, entity):
+@pytest.mark.asyncio
+async def test_deduplicate_by_linking(monkeypatch, entities, uri_map, expected):
+    async def dbpedia_lookup_mock(url, entity, score_threshold=1000, timeout=10.0, client=None):
         return uri_map[entity]
 
     monkeypatch.setattr(pp, "dbpedia_lookup", dbpedia_lookup_mock)
 
-    res = pp.deduplicate_by_linking(entities)
+    res = await pp.deduplicate_by_linking(entities)
     assert res == expected
 
 
-def test_clean_entities_en(monkeypatch, entities_en, entity_map_en):
+@pytest.mark.asyncio
+async def test_clean_entities_en(monkeypatch, entities_en, entity_map_en):
     entities, text = entities_en
 
-    def dbpedia_lookup_mock(url, entity):
+    async def dbpedia_lookup_mock(url, entity, score_threshold=1000, timeout=10.0, client=None):
         return entity_map_en[entity]
 
     monkeypatch.setattr(pp, "dbpedia_lookup", dbpedia_lookup_mock)
 
-    cleaned = pp.clean_entities(entities, text)
+    cleaned = await pp.clean_entities(entities, text)
 
     assert any(e["text"] == "Russia" for e in cleaned)
     assert all(e["text"] != "russian" for e in cleaned)
@@ -508,15 +548,16 @@ def test_clean_entities_en(monkeypatch, entities_en, entity_map_en):
     assert all(e["text"] != "US" for e in cleaned)
 
 
-def test_clean_entities_de(monkeypatch, entities_de, entity_map_de):
+@pytest.mark.asyncio
+async def test_clean_entities_de(monkeypatch, entities_de, entity_map_de):
     entities, text = entities_de
 
-    def dbpedia_lookup_mock(url, entity):
+    async def dbpedia_lookup_mock(url, entity, score_threshold=1000, timeout=10.0, client=None):
         return entity_map_de[entity]
 
     monkeypatch.setattr(pp, "dbpedia_lookup", dbpedia_lookup_mock)
 
-    cleaned = pp.clean_entities(entities, text)
+    cleaned = await pp.clean_entities(entities, text)
 
     assert any(e["text"] == "Spanien" for e in cleaned)
     assert all(e["text"] != "Spanier" for e in cleaned)
