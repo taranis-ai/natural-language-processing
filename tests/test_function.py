@@ -32,7 +32,8 @@ def assert_entities(result: dict[str, str], expected: dict[str, set]) -> None:
         ("gliner", "example_cybersec_text", {"Emotet": "Malware", "Microsoft 365": "Product"}, True),
     ],
 )
-def test_ner_models(
+@pytest.mark.asyncio
+async def test_ner_models(
     request: pytest.FixtureRequest,
     model_fixture: str,
     text_fixture: str,
@@ -44,16 +45,16 @@ def test_ner_models(
     text = request.getfixturevalue(text_fixture)
 
     if cybersecurity:
-        result = model.predict(text, extended_output=False, cybersecurity=cybersecurity)
+        result = await model.predict(text, extended_output=False, cybersecurity=cybersecurity)
     else:
-        result = model.predict(text, extended_output=False)
+        result = await model.predict(text, extended_output=False)
     assert isinstance(result, dict)
     assert_entities(result, expected)
 
     if cybersecurity:
-        extended = model.predict(text, extended_output=True, cybersecurity=cybersecurity)
+        extended = await model.predict(text, extended_output=True, cybersecurity=cybersecurity)
     else:
-        extended = model.predict(text, extended_output=True)
+        extended = await model.predict(text, extended_output=True)
 
     validate(instance=extended, schema=extended_output_schema)
 
@@ -62,8 +63,9 @@ def test_ner_models(
     "model_fixture",
     ["roberta", "roberta_german", "gliner"],
 )
-def test_ner_on_articles(request: pytest.FixtureRequest, model_fixture: str, article: tuple[str, dict]):
+@pytest.mark.asyncio
+async def test_ner_on_articles(request: pytest.FixtureRequest, model_fixture: str, article: tuple[str, dict]):
     content, expected = article
     model = request.getfixturevalue(model_fixture)
-    result = model.predict(content)
+    result = await model.predict(content)
     assert_entities(result, expected)
