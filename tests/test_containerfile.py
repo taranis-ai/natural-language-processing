@@ -7,3 +7,4 @@ def test_container_uses_asgi_interface_for_quart():
 
     assert "ENV GRANIAN_INTERFACE=asgi" in contents
     assert "ENV GRANIAN_INTERFACE=wsgi" not in contents
+    assert "ENV GRANIAN_BLOCKING_THREADS=1" in contents
