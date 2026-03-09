@@ -30,7 +30,7 @@ uv sync --all-extras --dev
 You can run your bot locally with
 
 ```bash
-flask run --port 5500
+quart run --port 5500
 # or
 granian --interface asgi app --port 5500
 ```
