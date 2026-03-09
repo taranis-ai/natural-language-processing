@@ -32,7 +32,7 @@ You can run your bot locally with
 ```bash
 flask run --port 5500
 # or
-granian app --port 5500
+granian --interface asgi app --port 5500
 ```
 
 You can set configs either via a `.env` file or by setting environment variables directly.
