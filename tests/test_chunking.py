@@ -1,6 +1,6 @@
 import pytest
 
-from natural_language_processing.chunking import split_text_into_chunks
+from natural_language_processing.chunking import deduplicate_chunk_entities, offset_entity_positions, split_text_into_chunks
 
 
 def test_split_text_into_chunks_returns_single_chunk_for_short_text():
@@ -17,6 +17,42 @@ def test_split_text_into_chunks_prefers_whitespace_boundaries():
         (16, "pital of Germany and Vienna"),
         (35, "d Vienna is the capital of"),
         (53, "pital of Austria."),
+    ]
+
+
+def test_offset_entity_positions_offsets_character_spans():
+    entities = [
+        {"text": "Germany", "label": "Location", "start": 9, "end": 16},
+        {"text": "Vienna", "label": "Location"},
+    ]
+
+    assert offset_entity_positions(entities, chunk_start=100) == [
+        {"text": "Germany", "label": "Location", "start": 109, "end": 116},
+        {"text": "Vienna", "label": "Location"},
+    ]
+
+
+def test_deduplicate_chunk_entities_keeps_highest_score_for_exact_duplicates():
+    entities = [
+        {"text": "Germany", "label": "Location", "start": 24, "end": 31, "score": 0.82},
+        {"text": "Germany", "label": "Location", "start": 24, "end": 31, "score": 0.91},
+        {"text": "Vienna", "label": "Location", "start": 36, "end": 42, "score": 0.87},
+    ]
+
+    assert deduplicate_chunk_entities(entities, text_key="text", label_key="label") == [
+        {"text": "Germany", "label": "Location", "start": 24, "end": 31, "score": 0.91},
+        {"text": "Vienna", "label": "Location", "start": 36, "end": 42, "score": 0.87},
+    ]
+
+
+def test_deduplicate_chunk_entities_is_case_insensitive_for_text():
+    entities = [
+        {"text": "Berlin", "label": "Location", "start": 0, "end": 6, "score": 0.88},
+        {"text": "berlin", "label": "Location", "start": 0, "end": 6, "score": 0.92},
+    ]
+
+    assert deduplicate_chunk_entities(entities, text_key="text", label_key="label") == [
+        {"text": "berlin", "label": "Location", "start": 0, "end": 6, "score": 0.92},
     ]
 
 
