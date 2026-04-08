@@ -1,5 +1,6 @@
 import asyncio
 from gliner import GLiNER
+from natural_language_processing.chunking import deduplicate_chunk_entities, offset_entity_positions, split_text_into_chunks
 from natural_language_processing.config import Config
 from natural_language_processing.post_process import attach_dbpedia_uris, clean_entities, is_entity_allowed
 
@@ -43,10 +44,18 @@ class Gliner:
         self.cybersec_model = GLiNER.from_pretrained("selfconstruct3d/AITSecNER", load_tokenizer=True)
         self.cybersec_labels = ["CLICommand/CodeSnippet", "CON", "GROUP", "MALWARE", "SECTOR", "TACTIC", "TECHNIQUE", "TOOL"]
 
+    async def _predict_chunked(self, model, text: str, labels: list[str]) -> list[dict]:
+        chunks = split_text_into_chunks(text, Config.TEXT_CHUNK_LENGTH, Config.TEXT_CHUNK_OVERLAP)
+        chunk_entities = []
+
+        for chunk_start, chunk_text in chunks:
+            entities = await asyncio.to_thread(model.predict_entities, chunk_text, labels, threshold=Config.CONFIDENCE_THRESHOLD)
+            chunk_entities.extend(offset_entity_positions(entities, chunk_start))
+
+        return deduplicate_chunk_entities(chunk_entities, text_key="text", label_key="label")
+
     async def predict(self, text: str, extended_output: bool = False, cybersecurity: bool = False) -> dict[str, str] | list[dict]:
-        general_entities = await asyncio.to_thread(
-            self.general_model.predict_entities, text, self.general_labels, threshold=Config.CONFIDENCE_THRESHOLD
-        )
+        general_entities = await self._predict_chunked(self.general_model, text, self.general_labels)
         if cybersecurity:
             cybersec_entities = await asyncio.to_thread(
                 self.cybersec_model.predict_entities, text, self.cybersec_labels, threshold=Config.CONFIDENCE_THRESHOLD
