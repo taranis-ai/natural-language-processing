@@ -57,9 +57,7 @@ class Gliner:
     async def predict(self, text: str, extended_output: bool = False, cybersecurity: bool = False) -> dict[str, str] | list[dict]:
         general_entities = await self._predict_chunked(self.general_model, text, self.general_labels)
         if cybersecurity:
-            cybersec_entities = await asyncio.to_thread(
-                self.cybersec_model.predict_entities, text, self.cybersec_labels, threshold=Config.CONFIDENCE_THRESHOLD
-            )
+            cybersec_entities = await self._predict_chunked(self.cybersec_model, text, self.cybersec_labels)
             cybersec_entities = map_cybersec_entities(cybersec_entities)
         else:
             cybersec_entities = []
