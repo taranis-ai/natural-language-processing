@@ -1,4 +1,5 @@
 import re
+from typing import Any
 
 
 def split_text_into_chunks(text: str, chunk_length: int, chunk_overlap: int) -> list[tuple[int, str]]:
@@ -35,3 +36,34 @@ def split_text_into_chunks(text: str, chunk_length: int, chunk_overlap: int) -> 
         start = max(end - chunk_overlap, start + 1)
 
     return chunks
+
+
+def offset_entity_positions(entities: list[dict[str, Any]], chunk_start: int) -> list[dict[str, Any]]:
+    offset_entities = []
+    for entity in entities:
+        start = entity.get("start")
+        end = entity.get("end")
+
+        if isinstance(start, int) and isinstance(end, int):
+            offset_entities.append({**entity, "start": start + chunk_start, "end": end + chunk_start})
+        else:
+            offset_entities.append(entity)
+
+    return offset_entities
+
+
+def deduplicate_chunk_entities(entities: list[dict[str, Any]], text_key: str, label_key: str) -> list[dict[str, Any]]:
+    unique_entities: dict[tuple[Any, Any, str, str], dict[str, Any]] = {}
+
+    for entity in entities:
+        key = (
+            entity.get("start"),
+            entity.get("end"),
+            str(entity.get(text_key, "")).strip().lower(),
+            str(entity.get(label_key, "")),
+        )
+        current = unique_entities.get(key)
+        if current is None or float(entity.get("score", 0.0)) > float(current.get("score", 0.0)):
+            unique_entities[key] = entity
+
+    return sorted(unique_entities.values(), key=lambda entity: (entity.get("start", -1), entity.get("end", -1)))
