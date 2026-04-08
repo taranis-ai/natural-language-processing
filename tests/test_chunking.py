@@ -1,6 +1,8 @@
 import pytest
 
 from natural_language_processing.chunking import deduplicate_chunk_entities, offset_entity_positions, split_text_into_chunks
+from natural_language_processing.config import Config
+from natural_language_processing.gliner import Gliner
 
 
 def test_split_text_into_chunks_returns_single_chunk_for_short_text():
@@ -54,6 +56,43 @@ def test_deduplicate_chunk_entities_is_case_insensitive_for_text():
     assert deduplicate_chunk_entities(entities, text_key="text", label_key="label") == [
         {"text": "berlin", "label": "Location", "start": 0, "end": 6, "score": 0.92},
     ]
+
+
+@pytest.mark.asyncio
+async def test_gliner_general_model_processes_text_in_chunks():
+    original_chunk_length = Config.TEXT_CHUNK_LENGTH
+    original_chunk_overlap = Config.TEXT_CHUNK_OVERLAP
+    Config.TEXT_CHUNK_LENGTH = 30
+    Config.TEXT_CHUNK_OVERLAP = 8
+
+    calls = []
+
+    class FakeModel:
+        def predict_entities(self, chunk_text: str, labels: list[str], threshold: float):
+            calls.append(chunk_text)
+            if "Germany" in chunk_text:
+                start = chunk_text.index("Germany")
+                return [{"text": "Germany", "label": "Location", "start": start, "end": start + len("Germany"), "score": 0.91}]
+            return []
+
+    try:
+        model = Gliner.__new__(Gliner)
+        model.general_model = FakeModel()
+        model.general_labels = ["Location"]
+        model.cybersec_model = FakeModel()
+        model.cybersec_labels = []
+
+        result = await model._predict_chunked(
+            model.general_model,
+            "Berlin is the capital of Germany and Vienna is the capital of Austria.",
+            model.general_labels,
+        )
+    finally:
+        Config.TEXT_CHUNK_LENGTH = original_chunk_length
+        Config.TEXT_CHUNK_OVERLAP = original_chunk_overlap
+
+    assert len(calls) > 1
+    assert result == [{"text": "Germany", "label": "Location", "start": 25, "end": 32, "score": 0.91}]
 
 
 @pytest.mark.parametrize(

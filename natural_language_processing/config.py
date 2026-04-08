@@ -7,6 +7,8 @@ class Settings(CommonSettings):
     MODEL: Literal["gliner", "roberta", "roberta_german"] = "gliner"
     PACKAGE_NAME: str = "natural_language_processing"
     HF_MODEL_INFO: bool = True
+    TEXT_CHUNK_LENGTH: int = 4000
+    TEXT_CHUNK_OVERLAP: int = 200
     PAYLOAD_SCHEMA: dict[str, dict] = {
         "text": {"type": "str", "required": True},
         "extended_output": {"type": "bool", "required": False},
@@ -38,6 +40,20 @@ class Settings(CommonSettings):
     def check_between_0_and_1(cls, v: float, info: ValidationInfo) -> float:
         if not isinstance(v, float) or v <= 0. or v >= 1.:
             raise RuntimeError("CONFIDENCE_THRESHOLD must be a number > 0 and < 1")
+        return v
+
+    @field_validator("TEXT_CHUNK_LENGTH", mode="after")
+    @classmethod
+    def check_text_chunk_length(cls, v: int, info: ValidationInfo) -> int:
+        if not isinstance(v, int) or v <= 0:
+            raise RuntimeError("TEXT_CHUNK_LENGTH must be an integer > 0")
+        return v
+
+    @field_validator("TEXT_CHUNK_OVERLAP", mode="after")
+    @classmethod
+    def check_text_chunk_overlap(cls, v: int, info: ValidationInfo) -> int:
+        if not isinstance(v, int) or v < 0:
+            raise RuntimeError("TEXT_CHUNK_OVERLAP must be an integer >= 0")
         return v
 
 
