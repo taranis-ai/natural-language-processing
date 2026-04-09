@@ -60,10 +60,10 @@ def test_deduplicate_chunk_entities_is_case_insensitive_for_text():
 
 @pytest.mark.asyncio
 async def test_gliner_general_model_processes_text_in_chunks():
-    original_chunk_length = Config.TEXT_CHUNK_LENGTH
-    original_chunk_overlap = Config.TEXT_CHUNK_OVERLAP
-    Config.TEXT_CHUNK_LENGTH = 30
-    Config.TEXT_CHUNK_OVERLAP = 8
+    original_chunk_length = Config.GENERAL_TEXT_CHUNK_LENGTH
+    original_chunk_overlap = Config.GENERAL_TEXT_CHUNK_OVERLAP
+    Config.GENERAL_TEXT_CHUNK_LENGTH = 30
+    Config.GENERAL_TEXT_CHUNK_OVERLAP = 8
 
     calls = []
 
@@ -86,10 +86,12 @@ async def test_gliner_general_model_processes_text_in_chunks():
             model.general_model,
             "Berlin is the capital of Germany and Vienna is the capital of Austria.",
             model.general_labels,
+            Config.GENERAL_TEXT_CHUNK_LENGTH,
+            Config.GENERAL_TEXT_CHUNK_OVERLAP,
         )
     finally:
-        Config.TEXT_CHUNK_LENGTH = original_chunk_length
-        Config.TEXT_CHUNK_OVERLAP = original_chunk_overlap
+        Config.GENERAL_TEXT_CHUNK_LENGTH = original_chunk_length
+        Config.GENERAL_TEXT_CHUNK_OVERLAP = original_chunk_overlap
 
     assert len(calls) > 1
     assert result == [{"text": "Germany", "label": "Location", "start": 25, "end": 32, "score": 0.91}]

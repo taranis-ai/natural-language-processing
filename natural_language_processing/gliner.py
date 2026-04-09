@@ -44,8 +44,8 @@ class Gliner:
         self.cybersec_model = GLiNER.from_pretrained("selfconstruct3d/AITSecNER", load_tokenizer=True)
         self.cybersec_labels = ["CLICommand/CodeSnippet", "CON", "GROUP", "MALWARE", "SECTOR", "TACTIC", "TECHNIQUE", "TOOL"]
 
-    async def _predict_chunked(self, model, text: str, labels: list[str]) -> list[dict]:
-        chunks = split_text_into_chunks(text, Config.TEXT_CHUNK_LENGTH, Config.TEXT_CHUNK_OVERLAP)
+    async def _predict_chunked(self, model, text: str, labels: list[str], chunk_length: int, chunk_overlap: int) -> list[dict]:
+        chunks = split_text_into_chunks(text, chunk_length, chunk_overlap)
         chunk_entities = []
 
         for chunk_start, chunk_text in chunks:
@@ -55,9 +55,21 @@ class Gliner:
         return deduplicate_chunk_entities(chunk_entities, text_key="text", label_key="label")
 
     async def predict(self, text: str, extended_output: bool = False, cybersecurity: bool = False) -> dict[str, str] | list[dict]:
-        general_entities = await self._predict_chunked(self.general_model, text, self.general_labels)
+        general_entities = await self._predict_chunked(
+            self.general_model,
+            text,
+            self.general_labels,
+            Config.GENERAL_TEXT_CHUNK_LENGTH,
+            Config.GENERAL_TEXT_CHUNK_OVERLAP,
+        )
         if cybersecurity:
-            cybersec_entities = await self._predict_chunked(self.cybersec_model, text, self.cybersec_labels)
+            cybersec_entities = await self._predict_chunked(
+                self.cybersec_model,
+                text,
+                self.cybersec_labels,
+                Config.CYBERSEC_TEXT_CHUNK_LENGTH,
+                Config.CYBERSEC_TEXT_CHUNK_OVERLAP,
+            )
             cybersec_entities = map_cybersec_entities(cybersec_entities)
         else:
             cybersec_entities = []
